@@ -3,237 +3,289 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>Caja de Ahorro y Crédito Éxito Compartido</title>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<title>Éxito Compartido — Panel de Gestión</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 :root{
-  --bg:#000000;
-  --bg2:#0a0a0a;
-  --bg3:#111111;
-  --bg4:#1a1a1a;
-  --bg5:#222222;
-  --green:#22c55e;
-  --green2:#16a34a;
-  --green3:rgba(34,197,94,0.12);
-  --orange:#f97316;
-  --orange3:rgba(249,115,22,0.12);
-  --yellow:#eab308;
-  --yellow3:rgba(234,179,8,0.1);
-  --red:#ef4444;
-  --red3:rgba(239,68,68,0.12);
-  --text:#ffffff;
-  --text2:#a3a3a3;
-  --text3:#525252;
-  --border:rgba(255,255,255,0.08);
-  --border2:rgba(255,255,255,0.05);
-  --radius:10px;
-  --radius2:14px;
-  --sidebar:240px;
+  --bg:#000;--bg2:#0a0a0a;--bg3:#111;--bg4:#1a1a1a;--bg5:#222;
+  --green:#22c55e;--green2:#16a34a;--green3:rgba(34,197,94,.12);
+  --orange:#f97316;--orange3:rgba(249,115,22,.12);
+  --yellow:#eab308;--yellow3:rgba(234,179,8,.1);
+  --red:#ef4444;--red3:rgba(239,68,68,.12);
+  --blue:#3b82f6;--blue3:rgba(59,130,246,.12);
+  --purple:#a855f7;--purple3:rgba(168,85,247,.12);
+  --text:#fff;--text2:#a3a3a3;--text3:#525252;
+  --border:rgba(255,255,255,.08);--border2:rgba(255,255,255,.05);
+  --radius:10px;--radius2:14px;--sidebar:240px;
 }
-
 html,body{height:100%;font-family:'IBM Plex Sans',sans-serif;background:var(--bg);color:var(--text);font-size:14px;overflow-x:hidden}
-
-/* ── LAYOUT ── */
 .app{display:flex;min-height:100vh}
 
-/* ── SIDEBAR ── */
-.sidebar{
-  width:var(--sidebar);flex-shrink:0;
-  background:var(--bg2);
-  border-right:1px solid var(--border);
-  display:flex;flex-direction:column;
-  position:fixed;top:0;left:0;bottom:0;
-  z-index:200;
-  transition:transform .25s ease;
-}
-.logo-area{padding:20px 16px 16px;border-bottom:1px solid var(--border)}
-.logo-icon{
-  width:44px;height:44px;border-radius:12px;
-  background:var(--green);
-  display:flex;align-items:center;justify-content:center;
-  font-size:18px;font-weight:700;color:#000;margin-bottom:10px;
-}
-.logo-name{font-size:12px;font-weight:600;color:var(--text);line-height:1.3}
-.logo-sub{font-size:10px;color:var(--text3);margin-top:3px;font-style:italic}
-
-.nav{padding:12px 8px;flex:1;overflow-y:auto}
-.nav-group{font-size:10px;font-weight:500;color:var(--text3);letter-spacing:.1em;text-transform:uppercase;padding:12px 8px 5px}
-.nav-item{
-  display:flex;align-items:center;gap:10px;
-  padding:10px 10px;border-radius:var(--radius);
-  cursor:pointer;color:var(--text2);font-size:13px;
-  margin-bottom:2px;transition:all .15s;user-select:none;
-}
+/* SIDEBAR */
+.sidebar{width:var(--sidebar);flex-shrink:0;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:200;transition:transform .25s ease;overflow-y:auto}
+.logo-area{padding:18px 16px 14px;border-bottom:1px solid var(--border);flex-shrink:0}
+.logo-icon{width:40px;height:40px;border-radius:10px;background:var(--green);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:#000;margin-bottom:9px}
+.logo-name{font-size:12px;font-weight:600;line-height:1.3}
+.logo-sub{font-size:10px;color:var(--text3);margin-top:2px}
+.nav{padding:10px 8px;flex:1}
+.nav-group{font-size:10px;font-weight:500;color:var(--text3);letter-spacing:.1em;text-transform:uppercase;padding:10px 8px 4px}
+.nav-item{display:flex;align-items:center;gap:9px;padding:9px 10px;border-radius:var(--radius);cursor:pointer;color:var(--text2);font-size:13px;margin-bottom:1px;transition:all .15s;user-select:none}
 .nav-item:hover{background:var(--bg4);color:var(--text)}
 .nav-item.active{background:var(--green3);color:var(--green);font-weight:500}
-.nav-item i{font-size:18px;width:22px;flex-shrink:0}
-.nav-badge{margin-left:auto;font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;min-width:22px;text-align:center}
+.nav-item i{font-size:17px;width:20px;flex-shrink:0}
+.nav-badge{margin-left:auto;font-size:10px;font-weight:700;padding:2px 6px;border-radius:10px}
 .nb-green{background:var(--green);color:#000}
 .nb-orange{background:var(--orange);color:#000}
-
-.sidebar-footer{padding:14px;border-top:1px solid var(--border)}
-.user-row{display:flex;align-items:center;gap:10px}
-.avatar{width:36px;height:36px;border-radius:50%;background:var(--green2);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#000;flex-shrink:0}
+.nb-red{background:var(--red);color:#fff}
+.sidebar-footer{padding:12px;border-top:1px solid var(--border);flex-shrink:0}
+.user-row{display:flex;align-items:center;gap:9px}
+.avatar{width:34px;height:34px;border-radius:50%;background:var(--green2);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#000;flex-shrink:0}
 .user-name{font-size:12px;font-weight:600}
-.user-role{font-size:11px;color:var(--text3)}
-
-/* ── HAMBURGER ── */
-.hamburger{display:none;background:none;border:none;color:var(--text);cursor:pointer;padding:8px;font-size:24px;line-height:1}
+.user-role{font-size:10px;color:var(--text3)}
+.hamburger{display:none;background:none;border:none;color:var(--text);cursor:pointer;padding:8px;font-size:22px;line-height:1}
 .sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:190}
 .sidebar-overlay.open{display:block}
 
-/* ── MAIN ── */
+/* MAIN */
 .main{flex:1;margin-left:var(--sidebar);display:flex;flex-direction:column;min-height:100vh}
-
-.topbar{
-  padding:12px 20px;border-bottom:1px solid var(--border);
-  display:flex;align-items:center;gap:12px;
-  background:var(--bg);position:sticky;top:0;z-index:100;
-}
+.topbar{padding:11px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;background:var(--bg);position:sticky;top:0;z-index:100}
 .topbar-left{display:flex;align-items:center;gap:12px;flex:1;min-width:0}
-.page-title{font-size:15px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.page-title{font-size:15px;font-weight:600;white-space:nowrap}
 .page-sub{font-size:11px;color:var(--text3)}
+.topbar-actions{display:flex;gap:8px}
 
-/* ── BUTTONS ── */
-.btn{display:inline-flex;align-items:center;gap:6px;padding:9px 16px;border-radius:var(--radius);font-size:13px;font-weight:500;cursor:pointer;border:none;font-family:'IBM Plex Sans',sans-serif;transition:all .15s;white-space:nowrap}
-.btn i{font-size:16px}
-.btn-green{background:var(--green);color:#000}
-.btn-green:hover{background:var(--green2)}
-.btn-outline{background:transparent;color:var(--text2);border:1px solid var(--border)}
-.btn-outline:hover{background:var(--bg4);color:var(--text)}
-.btn-sm{padding:6px 12px;font-size:12px}
-.btn-icon{padding:8px;border-radius:var(--radius)}
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:var(--radius);font-size:13px;font-weight:500;cursor:pointer;border:none;font-family:'IBM Plex Sans',sans-serif;transition:all .15s;white-space:nowrap}
+.btn i{font-size:15px}
+.btn-green{background:var(--green);color:#000}.btn-green:hover{background:var(--green2)}
+.btn-outline{background:transparent;color:var(--text2);border:1px solid var(--border)}.btn-outline:hover{background:var(--bg4);color:var(--text)}
+.btn-red{background:var(--red);color:#fff}.btn-red:hover{filter:brightness(.9)}
+.btn-blue{background:var(--blue);color:#fff}.btn-blue:hover{filter:brightness(.9)}
+.btn-sm{padding:6px 11px;font-size:12px}
+.btn-xs{padding:4px 8px;font-size:11px}
+.btn-icon{padding:7px}
 
-/* ── CONTENT ── */
+/* CONTENT */
 .content{padding:18px 20px;flex:1}
+.screen{display:none}.screen.active{display:block;animation:fi .2s ease}
+@keyframes fi{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
 
-/* ── CARDS ── */
+/* CARDS */
 .card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius2);overflow:hidden;margin-bottom:16px}
-.card-header{padding:14px 18px;border-bottom:1px solid var(--border2);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
-.card-title{font-size:13px;font-weight:600;display:flex;align-items:center;gap:8px}
-.card-title i{font-size:16px;color:var(--green)}
+.card-header{padding:13px 16px;border-bottom:1px solid var(--border2);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+.card-title{font-size:13px;font-weight:600;display:flex;align-items:center;gap:7px}
+.card-title i{font-size:15px;color:var(--green)}
 .card-body{padding:16px}
 
-/* ── FORM ── */
-.form-grid{display:grid;gap:14px}
-.g2{grid-template-columns:1fr 1fr}
-.g3{grid-template-columns:1fr 1fr 1fr}
+/* KPI GRID */
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
+.kpi{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius2);padding:16px;position:relative;overflow:hidden}
+.kpi::before{content:'';position:absolute;top:0;left:0;right:0;height:2px}
+.kpi.k-green::before{background:var(--green)}
+.kpi.k-orange::before{background:var(--orange)}
+.kpi.k-blue::before{background:var(--blue)}
+.kpi.k-purple::before{background:var(--purple)}
+.kpi.k-yellow::before{background:var(--yellow)}
+.kpi.k-red::before{background:var(--red)}
+.kpi-icon{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:18px;margin-bottom:12px}
+.ki-green{background:var(--green3);color:var(--green)}
+.ki-orange{background:var(--orange3);color:var(--orange)}
+.ki-blue{background:var(--blue3);color:var(--blue)}
+.ki-purple{background:var(--purple3);color:var(--purple)}
+.ki-yellow{background:var(--yellow3);color:var(--yellow)}
+.ki-red{background:var(--red3);color:var(--red)}
+.kpi-label{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px}
+.kpi-value{font-size:22px;font-weight:700;font-family:'IBM Plex Mono',monospace;line-height:1}
+.kpi-sub{font-size:11px;color:var(--text3);margin-top:5px}
+
+/* GRID LAYOUTS */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+.g4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:12px}
+.col-span-2{grid-column:span 2}
+.col-span-3{grid-column:span 3}
+
+/* FORM */
+.form-grid{display:grid;gap:12px}
 .field label{display:block;font-size:11px;color:var(--text3);margin-bottom:5px;font-weight:500;letter-spacing:.04em;text-transform:uppercase}
-.field input,.field select,.field textarea{
-  width:100%;background:var(--bg3);border:1px solid var(--border);
-  color:var(--text);padding:10px 12px;border-radius:var(--radius);
-  font-size:14px;font-family:'IBM Plex Sans',sans-serif;outline:none;
-  transition:border-color .15s;-webkit-appearance:none;
-}
-.field input:focus,.field select:focus{border-color:var(--green);background:var(--bg4)}
-.field select option{background:var(--bg3);color:var(--text)}
-.field input[readonly]{color:var(--text2)}
+.field input,.field select,.field textarea{width:100%;background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:9px 11px;border-radius:var(--radius);font-size:13px;font-family:'IBM Plex Sans',sans-serif;outline:none;transition:border-color .15s;-webkit-appearance:none}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--green);background:var(--bg4)}
+.field select option{background:var(--bg3)}
+.field input[readonly]{color:var(--text2);cursor:default}
 
-/* ── SUMMARY BOXES ── */
-.summary-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:16px}
-.sum-box{background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius);padding:14px}
-.sum-box.hl{border-color:rgba(34,197,94,.35);background:rgba(34,197,94,.05)}
-.sum-label{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:6px}
-.sum-value{font-size:20px;font-weight:600;font-family:'IBM Plex Mono',monospace}
-.cv-green{color:var(--green)}
-.cv-orange{color:var(--orange)}
-.cv-yellow{color:var(--yellow)}
-.cv-red{color:var(--red)}
-
-/* ── TABS ── */
-.tabs{display:flex;overflow-x:auto;padding:0 16px;background:var(--bg2);border-bottom:1px solid var(--border2);scrollbar-width:none}
-.tabs::-webkit-scrollbar{display:none}
-.tab{padding:12px 16px;font-size:13px;cursor:pointer;color:var(--text3);border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .15s;user-select:none;white-space:nowrap}
-.tab:hover{color:var(--text2)}
-.tab.active{color:var(--green);border-bottom-color:var(--green)}
-
-/* ── TABLE ── */
+/* TABLE */
 .tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
-table{width:100%;border-collapse:collapse;min-width:540px}
-thead th{font-size:10px;color:var(--text3);font-weight:500;text-transform:uppercase;letter-spacing:.07em;padding:10px 14px;text-align:left;border-bottom:1px solid var(--border2);white-space:nowrap}
-tbody td{padding:11px 14px;font-size:13px;border-bottom:1px solid rgba(255,255,255,.03)}
+table{width:100%;border-collapse:collapse;min-width:500px}
+thead th{font-size:10px;color:var(--text3);font-weight:500;text-transform:uppercase;letter-spacing:.06em;padding:9px 13px;text-align:left;border-bottom:1px solid var(--border2);white-space:nowrap}
+tbody td{padding:10px 13px;font-size:13px;border-bottom:1px solid rgba(255,255,255,.025)}
 tbody tr:last-child td{border-bottom:none}
 tbody tr:hover td{background:rgba(255,255,255,.02)}
-tbody tr.row-hl td{background:rgba(234,179,8,.04)}
 .mono{font-family:'IBM Plex Mono',monospace;font-size:12px}
+.td-actions{display:flex;gap:5px;align-items:center}
 
-/* ── BADGES ── */
-.badge{display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:500}
+/* BADGES */
+.badge{display:inline-flex;align-items:center;padding:2px 9px;border-radius:20px;font-size:11px;font-weight:500}
 .bg-green{background:rgba(34,197,94,.13);color:var(--green)}
 .bg-orange{background:rgba(249,115,22,.13);color:var(--orange)}
 .bg-yellow{background:rgba(234,179,8,.13);color:var(--yellow)}
 .bg-red{background:rgba(239,68,68,.13);color:var(--red)}
+.bg-blue{background:rgba(59,130,246,.13);color:var(--blue)}
+.bg-purple{background:rgba(168,85,247,.13);color:var(--purple)}
 .bg-gray{background:rgba(255,255,255,.06);color:var(--text3)}
 
-/* ── MODAL ── */
+/* MODAL */
 .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:300;align-items:flex-end;justify-content:center}
 .modal-overlay.open{display:flex}
 @media(min-width:600px){.modal-overlay{align-items:center}}
-.modal{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius2) var(--radius2) 0 0;width:100%;max-width:580px;max-height:92vh;overflow-y:auto}
+.modal{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius2) var(--radius2) 0 0;width:100%;max-width:600px;max-height:92vh;overflow-y:auto}
+.modal.modal-lg{max-width:780px}
 @media(min-width:600px){.modal{border-radius:var(--radius2)}}
-.modal-header{padding:16px 18px;border-bottom:1px solid var(--border2);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:var(--bg2);z-index:10}
-.modal-title{font-size:14px;font-weight:600}
-.modal-close{background:none;border:none;color:var(--text3);cursor:pointer;font-size:22px;padding:2px;line-height:1}
-.modal-body{padding:18px}
-.modal-footer{padding:14px 18px;border-top:1px solid var(--border2);display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap}
+.modal-header{padding:15px 16px;border-bottom:1px solid var(--border2);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:var(--bg2);z-index:10}
+.modal-title{font-size:14px;font-weight:600;display:flex;align-items:center;gap:7px}
+.modal-title i{color:var(--green)}
+.modal-close{background:none;border:none;color:var(--text3);cursor:pointer;font-size:20px;padding:2px;line-height:1}
+.modal-body{padding:16px}
+.modal-footer{padding:13px 16px;border-top:1px solid var(--border2);display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap}
 
-/* ── ALERT ── */
-.alert{padding:10px 14px;border-radius:var(--radius);font-size:13px;margin-bottom:14px;display:flex;align-items:flex-start;gap:8px;line-height:1.5}
-.alert i{font-size:16px;flex-shrink:0;margin-top:1px}
-.alert-green{background:rgba(34,197,94,.1);color:var(--green);border:1px solid rgba(34,197,94,.2)}
-.alert-orange{background:rgba(249,115,22,.1);color:var(--orange);border:1px solid rgba(249,115,22,.2)}
+/* ALERTS */
+.alert{padding:10px 13px;border-radius:var(--radius);font-size:12px;margin-bottom:13px;display:flex;align-items:flex-start;gap:8px;line-height:1.5}
+.alert i{font-size:15px;flex-shrink:0;margin-top:1px}
+.alert-green{background:rgba(34,197,94,.08);color:var(--green);border:1px solid rgba(34,197,94,.18)}
+.alert-orange{background:rgba(249,115,22,.08);color:var(--orange);border:1px solid rgba(249,115,22,.18)}
+.alert-blue{background:rgba(59,130,246,.08);color:var(--blue);border:1px solid rgba(59,130,246,.18)}
 
-/* ── SCREEN ── */
-.screen{display:none}.screen.active{display:block}
-@keyframes fi{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
-.screen.active{animation:fi .2s ease}
+/* DIVIDER */
+.divider{height:1px;background:var(--border2);margin:13px 0}
+.divider-label{display:flex;align-items:center;gap:10px;margin:14px 0;font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.07em}
+.divider-label::before,.divider-label::after{content:'';flex:1;height:1px;background:var(--border2)}
 
-/* ── DIVIDER ── */
-.divider{height:1px;background:var(--border2);margin:14px 0}
+/* SEARCH BAR */
+.search-bar{position:relative}
+.search-bar i{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--text3);font-size:15px;pointer-events:none}
+.search-bar input{background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:8px 10px 8px 32px;border-radius:var(--radius);font-size:13px;font-family:'IBM Plex Sans',sans-serif;outline:none;width:180px}
+.search-bar input:focus{border-color:var(--green);width:220px;transition:width .2s}
 
-/* ── RESPONSIVE ── */
+/* TABS */
+.tabs{display:flex;overflow-x:auto;padding:0 16px;background:var(--bg2);border-bottom:1px solid var(--border2);scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{padding:11px 14px;font-size:13px;cursor:pointer;color:var(--text3);border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .15s;user-select:none;white-space:nowrap;display:flex;align-items:center;gap:5px}
+.tab:hover{color:var(--text2)}
+.tab.active{color:var(--green);border-bottom-color:var(--green)}
+.tab i{font-size:14px}
+.sub-screen{display:none}.sub-screen.active{display:block}
+
+/* SUMMARY BOXES */
+.sum-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px}
+.sum-box{background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius);padding:13px}
+.sum-box.hl{border-color:rgba(34,197,94,.3);background:rgba(34,197,94,.04)}
+.sum-label{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px}
+.sum-value{font-size:18px;font-weight:600;font-family:'IBM Plex Mono',monospace}
+
+/* SOCIO CARD */
+.socio-card{background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius2);padding:14px;display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:8px;transition:border-color .15s;cursor:pointer}
+.socio-card:hover{border-color:rgba(34,197,94,.3)}
+.socio-avatar{width:42px;height:42px;border-radius:50%;background:var(--green2);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#000;flex-shrink:0}
+.socio-info{flex:1;min-width:0}
+.socio-name{font-size:13px;font-weight:600;margin-bottom:2px}
+.socio-meta{font-size:11px;color:var(--text3)}
+.socio-aporte{text-align:right;flex-shrink:0}
+.socio-aporte-val{font-size:15px;font-weight:700;font-family:'IBM Plex Mono',monospace;color:var(--green)}
+.socio-aporte-lbl{font-size:10px;color:var(--text3)}
+
+/* ASIENTO CONTABLE */
+.asiento{background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius2);margin-bottom:10px;overflow:hidden}
+.asiento-head{padding:11px 14px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;user-select:none}
+.asiento-head:hover{background:rgba(255,255,255,.02)}
+.asiento-code{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--text3)}
+.asiento-desc{font-size:13px;font-weight:500;margin:2px 0}
+.asiento-fecha{font-size:11px;color:var(--text3)}
+.asiento-body{padding:0 14px 14px;display:none}
+.asiento-body.open{display:block}
+.asiento-table{width:100%;border-collapse:collapse;margin-top:10px}
+.asiento-table th{font-size:10px;color:var(--text3);font-weight:500;text-transform:uppercase;padding:6px 8px;border-bottom:1px solid var(--border2);text-align:left}
+.asiento-table td{padding:7px 8px;font-size:12px;border-bottom:1px solid rgba(255,255,255,.02);font-family:'IBM Plex Mono',monospace}
+.asiento-table tr:last-child td{border-bottom:none}
+.td-debe{color:var(--text)}
+.td-haber{color:var(--orange)}
+.td-totals{background:rgba(255,255,255,.03)}
+
+/* PLAN CUENTAS */
+.cuenta-row{display:flex;align-items:center;padding:8px 12px;border-bottom:1px solid rgba(255,255,255,.025);gap:10px;font-size:13px}
+.cuenta-row:hover{background:rgba(255,255,255,.02)}
+.cuenta-codigo{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--text3);width:80px;flex-shrink:0}
+.cuenta-nombre{flex:1}
+.cuenta-tipo{font-size:11px;padding:2px 8px;border-radius:10px}
+.ct-activo{background:rgba(34,197,94,.1);color:var(--green)}
+.ct-pasivo{background:rgba(239,68,68,.1);color:var(--red)}
+.ct-patrimonio{background:rgba(168,85,247,.1);color:var(--purple)}
+.ct-ingreso{background:rgba(59,130,246,.1);color:var(--blue)}
+.ct-gasto{background:rgba(249,115,22,.1);color:var(--orange)}
+.cuenta-nivel{width:20px;flex-shrink:0;text-align:center}
+
+/* REPORTE */
+.reporte-section{margin-bottom:20px}
+.reporte-title{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--border2)}
+.reporte-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;font-size:13px;border-bottom:1px solid rgba(255,255,255,.02)}
+.reporte-row.total{font-weight:700;color:var(--green);font-size:14px;padding-top:10px;border-top:1px solid rgba(34,197,94,.2);border-bottom:none}
+.reporte-row .val{font-family:'IBM Plex Mono',monospace}
+
+/* USUARIO CARD */
+.user-card{background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius2);padding:14px;display:flex;align-items:center;gap:13px;margin-bottom:8px}
+.user-card-avatar{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;color:#000;flex-shrink:0}
+.ua-admin{background:var(--green)}
+.ua-contador{background:var(--blue)}
+.ua-socio{background:var(--purple)}
+.user-card-info{flex:1}
+.user-card-name{font-size:13px;font-weight:600;margin-bottom:2px}
+.user-card-email{font-size:11px;color:var(--text3)}
+.user-card-actions{display:flex;gap:6px}
+
+/* PROGRESS BAR */
+.progress-wrap{margin-top:6px}
+.progress-bar{height:4px;background:var(--bg5);border-radius:2px;overflow:hidden}
+.progress-fill{height:100%;border-radius:2px;transition:width .5s ease}
+.pf-green{background:var(--green)}
+.pf-orange{background:var(--orange)}
+.pf-red{background:var(--red)}
+
+/* RESPONSIVE */
+@media(max-width:900px){
+  .kpi-grid{grid-template-columns:repeat(2,1fr)}
+  .sum-row{grid-template-columns:repeat(2,1fr)}
+}
 @media(max-width:768px){
   .sidebar{transform:translateX(-100%)}
   .sidebar.open{transform:translateX(0)}
   .hamburger{display:block}
   .main{margin-left:0}
-  .g3{grid-template-columns:1fr 1fr}
-  .g2{grid-template-columns:1fr}
+  .g3,.g2{grid-template-columns:1fr}
+  .col-span-2,.col-span-3{grid-column:span 1}
   .topbar-actions .btn span{display:none}
-  .topbar-actions .btn i{margin:0}
-  table{min-width:480px}
-  .content{padding:14px}
+  .kpi-grid{grid-template-columns:repeat(2,1fr)}
+  .content{padding:13px}
 }
-@media(max-width:420px){
-  .g3{grid-template-columns:1fr}
-  .summary-grid{grid-template-columns:1fr 1fr}
-  .sum-value{font-size:17px}
+@media(max-width:480px){
+  .kpi-grid{grid-template-columns:1fr 1fr}
+  .sum-row{grid-template-columns:1fr 1fr}
+  .kpi-value{font-size:18px}
 }
 
-/* ── PRINT ── */
-@media print{
-  .sidebar,.topbar,.tabs,.no-print{display:none!important}
-  .main{margin-left:0}
-  .content{padding:0}
-  body{background:#fff;color:#000}
-  .card{border:1px solid #ddd;page-break-inside:avoid}
-  .sum-box{background:#f5f5f5}
-  tbody td,thead th{color:#000!important}
-  .badge{border:1px solid #ccc}
-  .print-header{display:block!important}
-}
-.print-header{display:none;text-align:center;margin-bottom:20px}
-.print-header h2{font-size:16px;font-weight:700}
-.print-header p{font-size:12px;color:#555;margin-top:4px}
+/* TOAST */
+#toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--green);color:#000;padding:11px 18px;border-radius:var(--radius);font-size:13px;font-weight:500;z-index:500;transition:transform .3s ease;display:flex;align-items:center;gap:7px;box-shadow:0 4px 24px rgba(0,0,0,.5);white-space:nowrap}
+#toast.error{background:var(--red);color:#fff}
+
+/* EMPTY STATE */
+.empty{text-align:center;padding:40px 20px;color:var(--text3)}
+.empty i{font-size:36px;display:block;margin:0 auto 10px;color:var(--bg5)}
+.empty p{font-size:13px}
 </style>
 </head>
 <body>
-
 <div class="app">
 
-<!-- SIDEBAR OVERLAY (mobile) -->
+<!-- OVERLAY MOBILE -->
 <div class="sidebar-overlay" id="overlay" onclick="closeSidebar()"></div>
 
 <!-- SIDEBAR -->
@@ -243,27 +295,26 @@ tbody tr.row-hl td{background:rgba(234,179,8,.04)}
     <div class="logo-name">Caja de Ahorro y Crédito</div>
     <div class="logo-sub">Éxito Compartido</div>
   </div>
-
   <nav class="nav">
     <div class="nav-group">Principal</div>
-    <div class="nav-item" onclick="navClick(this,'Dashboard')"><i class="ti ti-layout-dashboard"></i>Dashboard</div>
-    <div class="nav-item" onclick="navClick(this,'Clientes')"><i class="ti ti-users"></i>Clientes<span class="nav-badge nb-green">18</span></div>
-    <div class="nav-item active" onclick="navClick(this,'Créditos')"><i class="ti ti-credit-card"></i>Créditos</div>
-    <div class="nav-item" onclick="navClick(this,'Pagos')"><i class="ti ti-cash"></i>Pagos<span class="nav-badge nb-orange">3</span></div>
+    <div class="nav-item active" id="nav-dashboard" onclick="goTo('dashboard',this)"><i class="ti ti-layout-dashboard"></i>Dashboard</div>
+    <div class="nav-item" id="nav-clientes" onclick="goTo('clientes',this)"><i class="ti ti-users"></i>Clientes</div>
+    <div class="nav-item" id="nav-creditos" onclick="goTo('creditos',this)"><i class="ti ti-credit-card"></i>Créditos<span class="nav-badge nb-orange" id="badge-mora">0</span></div>
+    <div class="nav-item" id="nav-pagos" onclick="goTo('pagos',this)"><i class="ti ti-cash"></i>Cobros / Pagos</div>
     <div class="nav-group">Administración</div>
-    <div class="nav-item" onclick="navClick(this,'Socios')"><i class="ti ti-briefcase"></i>Socios</div>
-    <div class="nav-item" onclick="navClick(this,'Reportes')"><i class="ti ti-chart-bar"></i>Reportes</div>
-    <div class="nav-item" onclick="navClick(this,'Estados Financieros')"><i class="ti ti-file-text"></i>Est. Financieros</div>
+    <div class="nav-item" id="nav-socios" onclick="goTo('socios',this)"><i class="ti ti-briefcase"></i>Socios &amp; Capital</div>
+    <div class="nav-item" id="nav-contabilidad" onclick="goTo('contabilidad',this)"><i class="ti ti-book"></i>Contabilidad</div>
+    <div class="nav-item" id="nav-reportes" onclick="goTo('reportes',this)"><i class="ti ti-chart-bar"></i>Reportes</div>
     <div class="nav-group">Sistema</div>
-    <div class="nav-item" onclick="navClick(this,'Configuración')"><i class="ti ti-settings"></i>Configuración</div>
+    <div class="nav-item" id="nav-usuarios" onclick="goTo('usuarios',this)"><i class="ti ti-shield-check"></i>Usuarios &amp; Accesos</div>
+    <div class="nav-item" id="nav-config" onclick="goTo('config',this)"><i class="ti ti-settings"></i>Configuración</div>
   </nav>
-
   <div class="sidebar-footer">
     <div class="user-row">
-      <div class="avatar">AD</div>
+      <div class="avatar" id="sb-avatar">AD</div>
       <div>
-        <div class="user-name">Administrador</div>
-        <div class="user-role">Acceso total</div>
+        <div class="user-name" id="sb-name">Administrador</div>
+        <div class="user-role" id="sb-role">Acceso total</div>
       </div>
     </div>
   </div>
@@ -271,212 +322,402 @@ tbody tr.row-hl td{background:rgba(234,179,8,.04)}
 
 <!-- MAIN -->
 <main class="main">
-
-  <!-- TOPBAR -->
   <div class="topbar">
-    <button class="hamburger no-print" onclick="openSidebar()"><i class="ti ti-menu-2"></i></button>
+    <button class="hamburger" onclick="openSidebar()"><i class="ti ti-menu-2"></i></button>
     <div class="topbar-left">
       <div>
-        <div class="page-title">Módulo de Créditos</div>
-        <div class="page-sub">Éxito Compartido</div>
+        <div class="page-title" id="page-title">Dashboard</div>
+        <div class="page-sub">Éxito Compartido · <span id="fecha-hoy"></span></div>
       </div>
     </div>
-    <div class="topbar-actions" style="display:flex;gap:8px">
-      <button class="btn btn-outline btn-sm no-print" onclick="window.print()"><i class="ti ti-printer"></i><span>Imprimir</span></button>
-      <button class="btn btn-green btn-sm no-print" onclick="openModal('modal-nuevo')"><i class="ti ti-plus"></i><span>Nuevo crédito</span></button>
-    </div>
-  </div>
-
-  <!-- TABS -->
-  <div class="tabs no-print">
-    <div class="tab active" onclick="showTab('calc',this)"><i class="ti ti-calculator" style="font-size:14px;vertical-align:-2px;margin-right:5px"></i>Calculadora</div>
-    <div class="tab" onclick="showTab('lista',this)"><i class="ti ti-list" style="font-size:14px;vertical-align:-2px;margin-right:5px"></i>Créditos activos</div>
-    <div class="tab" onclick="showTab('historial',this)"><i class="ti ti-history" style="font-size:14px;vertical-align:-2px;margin-right:5px"></i>Historial de pagos</div>
+    <div class="topbar-actions" id="topbar-actions"></div>
   </div>
 
   <div class="content">
 
-    <!-- PRINT HEADER -->
-    <div class="print-header">
-      <h2>Caja de Ahorro y Crédito Éxito Compartido</h2>
-      <p>Tabla de amortización generada el <span id="print-date"></span></p>
-    </div>
-
-    <!-- ── TAB CALCULADORA ── -->
-    <div class="screen active" id="screen-calc">
-
-      <div class="card">
-        <div class="card-header">
-          <div class="card-title"><i class="ti ti-sliders"></i>Parámetros del crédito</div>
+    <!-- ══════════════════════════════════════════════════
+         DASHBOARD
+    ══════════════════════════════════════════════════ -->
+    <div class="screen active" id="screen-dashboard">
+      <div class="kpi-grid">
+        <div class="kpi k-green">
+          <div class="kpi-icon ki-green"><i class="ti ti-cash"></i></div>
+          <div class="kpi-label">Cobros hoy</div>
+          <div class="kpi-value cv-green" id="kpi-cobros-hoy">$0.00</div>
+          <div class="kpi-sub" id="kpi-cobros-hoy-n">0 pagos registrados</div>
         </div>
-        <div class="card-body">
-          <div class="form-grid g3">
-            <div class="field" style="grid-column:1/-1">
-              <label>Cliente</label>
-              <select id="f-cliente">
-                <option value="">— Seleccionar cliente —</option>
-                <option>María Torres — Cédula 1712345678</option>
-                <option>Jorge Ríos — Cédula 1798765432</option>
-                <option>Ana Mora — Cédula 1734567890</option>
-                <option>Carlos Vega — Cédula 1756781234</option>
-                <option>Luis Pinto — Cédula 1723456789</option>
-              </select>
-            </div>
-            <div class="field">
-              <label>Monto del crédito ($)</label>
-              <input type="number" id="f-monto" value="5000" min="1" step="100" inputmode="numeric" oninput="calcular()">
-            </div>
-            <div class="field">
-              <label>Tasa de interés mensual (%)</label>
-              <input type="number" id="f-tasa" value="1.5" min="0.01" step="0.01" inputmode="decimal" oninput="calcular()">
-            </div>
-            <div class="field">
-              <label>Número de cuotas</label>
-              <input type="number" id="f-plazo" value="12" min="1" max="360" inputmode="numeric" oninput="calcular()">
-            </div>
-            <div class="field">
-              <label>Frecuencia de pago</label>
-              <select id="f-tipo-plazo" onchange="calcular()">
-                <option value="mensual">Mensual</option>
-                <option value="quincenal">Quincenal</option>
-                <option value="semanal">Semanal</option>
-                <option value="diario">Diario</option>
-              </select>
-            </div>
-            <div class="field">
-              <label>Tabla de amortización</label>
-              <select id="f-tabla" onchange="calcular()">
-                <option value="francesa">Francesa — cuota fija</option>
-                <option value="alemana">Alemana — capital fijo</option>
-                <option value="americana">Americana — interés periódico</option>
-              </select>
-            </div>
-            <div class="field">
-              <label>Fecha de inicio</label>
-              <input type="date" id="f-fecha" oninput="calcular()">
-            </div>
-          </div>
-
-          <div class="summary-grid">
-            <div class="sum-box hl">
-              <div class="sum-label">Cuota a pagar</div>
-              <div class="sum-value cv-green" id="s-cuota">$0.00</div>
-            </div>
-            <div class="sum-box">
-              <div class="sum-label">Monto del crédito</div>
-              <div class="sum-value" id="s-monto">$0.00</div>
-            </div>
-            <div class="sum-box">
-              <div class="sum-label">Total intereses</div>
-              <div class="sum-value cv-orange" id="s-interes">$0.00</div>
-            </div>
-            <div class="sum-box">
-              <div class="sum-label">Total a pagar</div>
-              <div class="sum-value cv-yellow" id="s-total">$0.00</div>
-            </div>
-          </div>
+        <div class="kpi k-blue">
+          <div class="kpi-icon ki-blue"><i class="ti ti-device-mobile"></i></div>
+          <div class="kpi-label">Transferencias hoy</div>
+          <div class="kpi-value" style="color:var(--blue)" id="kpi-trans-hoy">$0.00</div>
+          <div class="kpi-sub" id="kpi-trans-hoy-n">0 operaciones</div>
+        </div>
+        <div class="kpi k-orange">
+          <div class="kpi-icon ki-orange"><i class="ti ti-credit-card"></i></div>
+          <div class="kpi-label">Créditos activos</div>
+          <div class="kpi-value" style="color:var(--orange)" id="kpi-creditos">0</div>
+          <div class="kpi-sub" id="kpi-cartera">Cartera: $0.00</div>
+        </div>
+        <div class="kpi k-red">
+          <div class="kpi-icon ki-red"><i class="ti ti-alert-triangle"></i></div>
+          <div class="kpi-label">En mora</div>
+          <div class="kpi-value" style="color:var(--red)" id="kpi-mora">0</div>
+          <div class="kpi-sub" id="kpi-mora-val">$0.00 en riesgo</div>
         </div>
       </div>
-
-      <div class="card" id="card-tabla">
-        <div class="card-header">
-          <div class="card-title"><i class="ti ti-table"></i>Tabla de amortización</div>
-          <div style="display:flex;gap:8px;flex-wrap:wrap" class="no-print">
-            <button class="btn btn-outline btn-sm" onclick="window.print()"><i class="ti ti-file-pdf"></i>PDF</button>
-            <button class="btn btn-green btn-sm" onclick="registrarCredito()"><i class="ti ti-device-floppy"></i>Registrar</button>
+      <div class="g2" style="margin-bottom:16px">
+        <div class="kpi k-purple" style="margin-bottom:0">
+          <div class="kpi-icon ki-purple"><i class="ti ti-users"></i></div>
+          <div class="kpi-label">Total aportes socios</div>
+          <div class="kpi-value" style="color:var(--purple)" id="kpi-aportes">$0.00</div>
+          <div class="kpi-sub" id="kpi-socios-n">0 socios activos</div>
+        </div>
+        <div class="kpi k-yellow" style="margin-bottom:0">
+          <div class="kpi-icon ki-yellow"><i class="ti ti-trending-up"></i></div>
+          <div class="kpi-label">Cobros mes actual</div>
+          <div class="kpi-value" style="color:var(--yellow)" id="kpi-mes">$0.00</div>
+          <div class="kpi-sub" id="kpi-mes-sub">Efectivo + Transferencia</div>
+        </div>
+      </div>
+      <!-- ACTIVIDAD RECIENTE -->
+      <div class="g2">
+        <div class="card" style="margin-bottom:0">
+          <div class="card-header">
+            <div class="card-title"><i class="ti ti-clock"></i>Últimos cobros</div>
+            <button class="btn btn-outline btn-xs" onclick="goTo('pagos',document.getElementById('nav-pagos'))">Ver todos</button>
+          </div>
+          <div class="tbl-wrap">
+            <table>
+              <thead><tr><th>Cliente</th><th>Monto</th><th>Método</th><th>Hora</th></tr></thead>
+              <tbody id="tbody-recientes">
+                <tr><td colspan="4" class="empty" style="text-align:center;padding:24px;color:var(--text3)">Sin cobros registrados hoy</td></tr>
+              </tbody>
+            </table>
           </div>
         </div>
-        <div class="tbl-wrap">
-          <table id="tabla-amort">
-            <thead>
-              <tr>
-                <th>#</th>
-                <th>Fecha</th>
-                <th>Cuota</th>
-                <th>Capital</th>
-                <th>Interés</th>
-                <th>Saldo</th>
-                <th>Estado</th>
-              </tr>
-            </thead>
-            <tbody id="tbody-amort">
-              <tr><td colspan="7" style="text-align:center;padding:32px;color:var(--text3)"><i class="ti ti-arrow-up" style="font-size:18px;display:block;margin:0 auto 8px"></i>Ingresa los parámetros para generar la tabla</td></tr>
-            </tbody>
-          </table>
+        <div class="card" style="margin-bottom:0">
+          <div class="card-header">
+            <div class="card-title"><i class="ti ti-alert-circle" style="color:var(--red)"></i>Créditos en mora</div>
+            <button class="btn btn-outline btn-xs" onclick="goTo('creditos',document.getElementById('nav-creditos'))">Ver todos</button>
+          </div>
+          <div class="tbl-wrap">
+            <table>
+              <thead><tr><th>Cliente</th><th>Saldo</th><th>Días</th></tr></thead>
+              <tbody id="tbody-mora-dash">
+                <tr><td colspan="3" style="text-align:center;padding:24px;color:var(--text3)">Sin créditos en mora</td></tr>
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
     </div>
 
-    <!-- ── TAB LISTA ── -->
-    <div class="screen" id="screen-lista">
-      <div class="alert alert-green no-print">
-        <i class="ti ti-info-circle"></i>
-        <span>Al conectar la base de datos, aquí aparecerán todos los créditos registrados en tiempo real.</span>
-      </div>
+    <!-- ══════════════════════════════════════════════════
+         CLIENTES
+    ══════════════════════════════════════════════════ -->
+    <div class="screen" id="screen-clientes">
       <div class="card">
         <div class="card-header">
-          <div class="card-title"><i class="ti ti-credit-card"></i>Créditos activos</div>
-          <input type="search" placeholder="Buscar..." style="background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:8px 12px;border-radius:var(--radius);font-size:13px;width:160px;outline:none">
+          <div class="card-title"><i class="ti ti-users"></i>Clientes registrados <span class="badge bg-gray" id="badge-total-clientes">0</span></div>
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+            <div class="search-bar"><i class="ti ti-search"></i><input type="text" placeholder="Buscar..." oninput="filtrarClientes(this.value)" id="search-clientes"></div>
+            <button class="btn btn-green btn-sm" onclick="openModal('modal-nuevo-cliente')"><i class="ti ti-user-plus"></i><span>Nuevo cliente</span></button>
+          </div>
         </div>
         <div class="tbl-wrap">
           <table>
-            <thead><tr><th>#</th><th>Cliente</th><th>Monto orig.</th><th>Saldo</th><th>Cuota</th><th>Próx. pago</th><th>Estado</th><th class="no-print">Acción</th></tr></thead>
-            <tbody>
-              <tr>
-                <td class="mono">C-001</td><td>María Torres</td>
-                <td class="mono">$5,000.00</td><td class="mono">$3,240.00</td>
-                <td class="mono">$462.00</td><td class="mono">01/06/26</td>
-                <td><span class="badge bg-green">Al día</span></td>
-                <td class="no-print"><button class="btn btn-outline btn-sm">Ver</button></td>
-              </tr>
-              <tr>
-                <td class="mono">C-002</td><td>Jorge Ríos</td>
-                <td class="mono">$3,500.00</td><td class="mono">$2,100.00</td>
-                <td class="mono">$320.00</td><td class="mono">02/06/26</td>
-                <td><span class="badge bg-green">Al día</span></td>
-                <td class="no-print"><button class="btn btn-outline btn-sm">Ver</button></td>
-              </tr>
-              <tr>
-                <td class="mono">C-003</td><td>Luis Pinto</td>
-                <td class="mono">$2,000.00</td><td class="mono">$1,450.00</td>
-                <td class="mono">$185.00</td><td class="mono">28/05/26</td>
-                <td><span class="badge bg-red">En mora</span></td>
-                <td class="no-print"><button class="btn btn-outline btn-sm">Ver</button></td>
-              </tr>
-              <tr>
-                <td class="mono">C-004</td><td>Ana Mora</td>
-                <td class="mono">$8,000.00</td><td class="mono">$5,600.00</td>
-                <td class="mono">$742.00</td><td class="mono">05/06/26</td>
-                <td><span class="badge bg-green">Al día</span></td>
-                <td class="no-print"><button class="btn btn-outline btn-sm">Ver</button></td>
-              </tr>
-            </tbody>
+            <thead><tr><th>#</th><th>Nombre completo</th><th>Cédula</th><th>Teléfono</th><th>Créditos</th><th>Estado</th><th>Acciones</th></tr></thead>
+            <tbody id="tbody-clientes"></tbody>
           </table>
         </div>
       </div>
     </div>
 
-    <!-- ── TAB HISTORIAL ── -->
-    <div class="screen" id="screen-historial">
+    <!-- ══════════════════════════════════════════════════
+         CRÉDITOS
+    ══════════════════════════════════════════════════ -->
+    <div class="screen" id="screen-creditos">
+      <div class="tabs">
+        <div class="tab active" onclick="showSubTab('creditos','calc',this)"><i class="ti ti-calculator"></i>Calculadora</div>
+        <div class="tab" onclick="showSubTab('creditos','lista',this)"><i class="ti ti-list"></i>Créditos activos</div>
+        <div class="tab" onclick="showSubTab('creditos','historial-cred',this)"><i class="ti ti-history"></i>Historial</div>
+      </div>
+      <!-- TAB CALCULADORA -->
+      <div class="sub-screen active" id="sub-creditos-calc" style="padding-top:16px">
+        <div class="card">
+          <div class="card-header"><div class="card-title"><i class="ti ti-sliders"></i>Parámetros del crédito</div></div>
+          <div class="card-body">
+            <div class="g3">
+              <div class="field" style="grid-column:1/-1">
+                <label>Cliente</label>
+                <select id="f-cliente"><option value="">— Seleccionar cliente —</option></select>
+              </div>
+              <div class="field"><label>Monto ($)</label><input type="number" id="f-monto" value="5000" min="1" step="100" oninput="calcular()"></div>
+              <div class="field"><label>Tasa mensual (%)</label><input type="number" id="f-tasa" value="1.5" min="0.01" step="0.01" oninput="calcular()"></div>
+              <div class="field"><label>Número de cuotas</label><input type="number" id="f-plazo" value="12" min="1" max="360" oninput="calcular()"></div>
+              <div class="field"><label>Frecuencia de pago</label>
+                <select id="f-tipo-plazo" onchange="calcular()">
+                  <option value="mensual">Mensual</option>
+                  <option value="quincenal">Quincenal</option>
+                  <option value="semanal">Semanal</option>
+                  <option value="diario">Diario</option>
+                </select>
+              </div>
+              <div class="field"><label>Tabla de amortización</label>
+                <select id="f-tabla" onchange="calcular()">
+                  <option value="francesa">Francesa (cuota fija)</option>
+                  <option value="alemana">Alemana (capital fijo)</option>
+                  <option value="americana">Americana (interés periódico)</option>
+                </select>
+              </div>
+              <div class="field"><label>Fecha de inicio</label><input type="date" id="f-fecha" oninput="calcular()"></div>
+            </div>
+            <div class="sum-row" style="margin-top:14px">
+              <div class="sum-box hl"><div class="sum-label">Cuota a pagar</div><div class="sum-value" style="color:var(--green)" id="s-cuota">$0.00</div></div>
+              <div class="sum-box"><div class="sum-label">Monto crédito</div><div class="sum-value" id="s-monto">$0.00</div></div>
+              <div class="sum-box"><div class="sum-label">Total intereses</div><div class="sum-value" style="color:var(--orange)" id="s-interes">$0.00</div></div>
+              <div class="sum-box"><div class="sum-label">Total a pagar</div><div class="sum-value" style="color:var(--yellow)" id="s-total">$0.00</div></div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title"><i class="ti ti-table"></i>Tabla de amortización</div>
+            <div style="display:flex;gap:8px">
+              <button class="btn btn-outline btn-sm" onclick="window.print()"><i class="ti ti-printer"></i><span>Imprimir</span></button>
+              <button class="btn btn-green btn-sm" onclick="registrarCreditoCalc()"><i class="ti ti-device-floppy"></i><span>Registrar crédito</span></button>
+            </div>
+          </div>
+          <div class="tbl-wrap">
+            <table><thead><tr><th>#</th><th>Fecha</th><th>Cuota</th><th>Capital</th><th>Interés</th><th>Saldo</th><th>Estado</th></tr></thead>
+            <tbody id="tbody-amort"></tbody></table>
+          </div>
+        </div>
+      </div>
+      <!-- TAB LISTA -->
+      <div class="sub-screen" id="sub-creditos-lista" style="padding-top:16px">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title"><i class="ti ti-credit-card"></i>Créditos activos</div>
+            <div style="display:flex;gap:8px;align-items:center">
+              <div class="search-bar"><i class="ti ti-search"></i><input type="text" placeholder="Buscar..." oninput="filtrarCreditos(this.value)"></div>
+            </div>
+          </div>
+          <div class="tbl-wrap">
+            <table>
+              <thead><tr><th>Código</th><th>Cliente</th><th>Monto orig.</th><th>Saldo</th><th>Cuota</th><th>Próx. pago</th><th>Estado</th><th>Acciones</th></tr></thead>
+              <tbody id="tbody-creditos-lista"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <!-- TAB HISTORIAL -->
+      <div class="sub-screen" id="sub-creditos-historial-cred" style="padding-top:16px">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title"><i class="ti ti-history"></i>Historial de pagos</div>
+          </div>
+          <div class="tbl-wrap">
+            <table>
+              <thead><tr><th>Fecha</th><th>Cliente</th><th>Crédito</th><th>#</th><th>Capital</th><th>Interés</th><th>Total</th><th>Saldo rest.</th><th>Método</th></tr></thead>
+              <tbody id="tbody-hist-cred"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════
+         COBROS / PAGOS
+    ══════════════════════════════════════════════════ -->
+    <div class="screen" id="screen-pagos">
+      <div class="sum-row">
+        <div class="sum-box hl"><div class="sum-label">Total cobrado hoy</div><div class="sum-value" style="color:var(--green)" id="p-hoy-total">$0.00</div></div>
+        <div class="sum-box"><div class="sum-label">Efectivo hoy</div><div class="sum-value" id="p-hoy-ef">$0.00</div></div>
+        <div class="sum-box"><div class="sum-label">Transferencia hoy</div><div class="sum-value" id="p-hoy-tr">$0.00</div></div>
+        <div class="sum-box"><div class="sum-label">Pagos registrados hoy</div><div class="sum-value" id="p-hoy-n">0</div></div>
+      </div>
       <div class="card">
         <div class="card-header">
-          <div class="card-title"><i class="ti ti-history"></i>Historial de pagos</div>
-          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap" class="no-print">
-            <input type="date" style="background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:8px 10px;border-radius:var(--radius);font-size:12px;outline:none">
+          <div class="card-title"><i class="ti ti-cash"></i>Registro de cobros</div>
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+            <input type="date" id="filtro-pagos-desde" style="background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:7px 10px;border-radius:var(--radius);font-size:12px;outline:none">
             <span style="color:var(--text3);font-size:12px">al</span>
-            <input type="date" style="background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:8px 10px;border-radius:var(--radius);font-size:12px;outline:none">
-            <button class="btn btn-green btn-sm"><i class="ti ti-filter"></i>Filtrar</button>
+            <input type="date" id="filtro-pagos-hasta" style="background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:7px 10px;border-radius:var(--radius);font-size:12px;outline:none">
+            <button class="btn btn-green btn-sm" onclick="openModal('modal-nuevo-pago')"><i class="ti ti-plus"></i><span>Registrar cobro</span></button>
           </div>
         </div>
         <div class="tbl-wrap">
           <table>
-            <thead><tr><th>Fecha</th><th>Cliente</th><th>Crédito</th><th>#</th><th>Capital</th><th>Interés</th><th>Total</th><th>Saldo rest.</th></tr></thead>
-            <tbody>
-              <tr><td class="mono">22/05/26</td><td>María Torres</td><td class="mono">C-001</td><td class="mono">4</td><td class="mono">$405.00</td><td class="mono cv-orange">$57.00</td><td class="mono">$462.00</td><td class="mono">$3,240.00</td></tr>
-              <tr><td class="mono">20/05/26</td><td>Jorge Ríos</td><td class="mono">C-002</td><td class="mono">3</td><td class="mono">$285.00</td><td class="mono cv-orange">$35.00</td><td class="mono">$320.00</td><td class="mono">$2,100.00</td></tr>
-              <tr><td class="mono">18/05/26</td><td>Ana Mora</td><td class="mono">C-004</td><td class="mono">3</td><td class="mono">$680.00</td><td class="mono cv-orange">$62.00</td><td class="mono">$742.00</td><td class="mono">$5,600.00</td></tr>
-            </tbody>
+            <thead><tr><th>Fecha</th><th>Cliente</th><th>Crédito</th><th>Cuota #</th><th>Capital</th><th>Interés</th><th>Total</th><th>Método</th><th>Comprobante</th></tr></thead>
+            <tbody id="tbody-pagos"></tbody>
           </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════
+         SOCIOS & CAPITAL
+    ══════════════════════════════════════════════════ -->
+    <div class="screen" id="screen-socios">
+      <div class="sum-row">
+        <div class="sum-box hl"><div class="sum-label">Total capital social</div><div class="sum-value" style="color:var(--green)" id="cap-total">$0.00</div></div>
+        <div class="sum-box"><div class="sum-label">Total socios</div><div class="sum-value" id="cap-socios">0</div></div>
+        <div class="sum-box"><div class="sum-label">Aporte promedio</div><div class="sum-value" id="cap-promedio">$0.00</div></div>
+        <div class="sum-box"><div class="sum-label">Retiros totales</div><div class="sum-value" style="color:var(--red)" id="cap-retiros">$0.00</div></div>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title"><i class="ti ti-briefcase"></i>Socios</div>
+          <div style="display:flex;gap:8px">
+            <div class="search-bar"><i class="ti ti-search"></i><input type="text" placeholder="Buscar socio..." oninput="filtrarSocios(this.value)"></div>
+            <button class="btn btn-green btn-sm" onclick="openModal('modal-nuevo-socio')"><i class="ti ti-user-plus"></i><span>Nuevo socio</span></button>
+          </div>
+        </div>
+        <div class="card-body" id="lista-socios"></div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════
+         CONTABILIDAD
+    ══════════════════════════════════════════════════ -->
+    <div class="screen" id="screen-contabilidad">
+      <div class="tabs">
+        <div class="tab active" onclick="showSubTab('contabilidad','asientos',this)"><i class="ti ti-book-2"></i>Asientos contables</div>
+        <div class="tab" onclick="showSubTab('contabilidad','plan',this)"><i class="ti ti-list-tree"></i>Plan de cuentas</div>
+      </div>
+      <!-- ASIENTOS -->
+      <div class="sub-screen active" id="sub-contabilidad-asientos" style="padding-top:16px">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title"><i class="ti ti-book-2"></i>Libro diario</div>
+            <button class="btn btn-green btn-sm" onclick="openModal('modal-nuevo-asiento')"><i class="ti ti-plus"></i><span>Nuevo asiento</span></button>
+          </div>
+          <div class="card-body" id="lista-asientos"></div>
+        </div>
+      </div>
+      <!-- PLAN DE CUENTAS -->
+      <div class="sub-screen" id="sub-contabilidad-plan" style="padding-top:16px">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title"><i class="ti ti-list-tree"></i>Plan de cuentas</div>
+            <button class="btn btn-green btn-sm" onclick="openModal('modal-nueva-cuenta')"><i class="ti ti-plus"></i><span>Nueva cuenta</span></button>
+          </div>
+          <div id="lista-cuentas"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════
+         REPORTES
+    ══════════════════════════════════════════════════ -->
+    <div class="screen" id="screen-reportes">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title"><i class="ti ti-filter"></i>Período del reporte</div>
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+            <input type="date" id="rep-desde" style="background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:7px 10px;border-radius:var(--radius);font-size:12px;outline:none">
+            <span style="color:var(--text3);font-size:12px">al</span>
+            <input type="date" id="rep-hasta" style="background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:7px 10px;border-radius:var(--radius);font-size:12px;outline:none">
+            <button class="btn btn-green btn-sm" onclick="generarReporte()"><i class="ti ti-refresh"></i><span>Generar</span></button>
+            <button class="btn btn-outline btn-sm" onclick="window.print()"><i class="ti ti-printer"></i><span>Imprimir</span></button>
+          </div>
+        </div>
+      </div>
+      <div class="g2">
+        <div class="card" style="margin-bottom:0">
+          <div class="card-header"><div class="card-title"><i class="ti ti-cash"></i>Cobros en el período</div></div>
+          <div class="card-body">
+            <div class="reporte-section">
+              <div class="reporte-row"><span>Cobros en efectivo</span><span class="val" id="rep-ef">$0.00</span></div>
+              <div class="reporte-row"><span>Cobros por transferencia</span><span class="val" id="rep-tr">$0.00</span></div>
+              <div class="reporte-row"><span>Otros métodos</span><span class="val" id="rep-otro">$0.00</span></div>
+              <div class="reporte-row total"><span>TOTAL COBRADO</span><span class="val" id="rep-total-cobros">$0.00</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="card" style="margin-bottom:0">
+          <div class="card-header"><div class="card-title"><i class="ti ti-briefcase"></i>Capital social</div></div>
+          <div class="card-body">
+            <div class="reporte-section">
+              <div class="reporte-row"><span>Aportes recibidos</span><span class="val" id="rep-aportes">$0.00</span></div>
+              <div class="reporte-row"><span>Retiros</span><span class="val" style="color:var(--red)" id="rep-retiros-rep">$0.00</span></div>
+              <div class="reporte-row"><span>Dividendos pagados</span><span class="val" id="rep-dividendos">$0.00</span></div>
+              <div class="reporte-row total"><span>CAPITAL NETO</span><span class="val" id="rep-cap-neto">$0.00</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card" style="margin-top:16px">
+        <div class="card-header"><div class="card-title"><i class="ti ti-chart-bar"></i>Cartera de créditos</div></div>
+        <div class="card-body">
+          <div class="g3">
+            <div><div class="reporte-row"><span>Créditos otorgados</span><span class="val" id="rep-cred-n">0</span></div>
+            <div class="reporte-row"><span>Monto total otorgado</span><span class="val" id="rep-cred-monto">$0.00</span></div>
+            <div class="reporte-row"><span>Saldo pendiente total</span><span class="val" id="rep-cred-saldo">$0.00</span></div></div>
+            <div><div class="reporte-row"><span>Créditos al día</span><span class="val" style="color:var(--green)" id="rep-al-dia">0</span></div>
+            <div class="reporte-row"><span>Créditos en mora</span><span class="val" style="color:var(--red)" id="rep-en-mora">0</span></div>
+            <div class="reporte-row"><span>Cancelados período</span><span class="val" id="rep-cancelados">0</span></div></div>
+            <div><div class="reporte-row"><span>Intereses cobrados</span><span class="val" style="color:var(--orange)" id="rep-int-cobrados">$0.00</span></div>
+            <div class="reporte-row"><span>Capital recuperado</span><span class="val" id="rep-cap-rec">$0.00</span></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════
+         USUARIOS & ACCESOS
+    ══════════════════════════════════════════════════ -->
+    <div class="screen" id="screen-usuarios">
+      <div class="alert alert-blue"><i class="ti ti-info-circle"></i>Los usuarios aquí registrados pueden acceder al sistema con su correo y contraseña. Administra los permisos con cuidado.</div>
+      <div class="g2">
+        <div>
+          <div class="card-title" style="margin-bottom:12px;padding:0"><i class="ti ti-shield-check" style="color:var(--green);font-size:16px;margin-right:7px"></i>Administradores</div>
+          <div id="lista-admins"></div>
+        </div>
+        <div>
+          <div class="card-title" style="margin-bottom:12px;padding:0"><i class="ti ti-calculator" style="color:var(--blue);font-size:16px;margin-right:7px"></i>Contadores / Tesoreros</div>
+          <div id="lista-contadores"></div>
+        </div>
+      </div>
+      <div style="margin-top:16px">
+        <div class="card-title" style="margin-bottom:12px;padding:0"><i class="ti ti-briefcase" style="color:var(--purple);font-size:16px;margin-right:7px"></i>Socios con acceso al portal</div>
+        <div id="lista-usuarios-socios"></div>
+      </div>
+      <div style="margin-top:16px">
+        <button class="btn btn-green" onclick="openModal('modal-nuevo-usuario')"><i class="ti ti-user-plus"></i>Crear nuevo usuario</button>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════
+         CONFIGURACIÓN
+    ══════════════════════════════════════════════════ -->
+    <div class="screen" id="screen-config">
+      <div class="card">
+        <div class="card-header"><div class="card-title"><i class="ti ti-building"></i>Datos de la institución</div></div>
+        <div class="card-body">
+          <div class="g2">
+            <div class="field"><label>Nombre de la caja</label><input type="text" id="cfg-nombre" value="Caja de Ahorro y Crédito Éxito Compartido"></div>
+            <div class="field"><label>RUC / Identificación</label><input type="text" id="cfg-ruc" placeholder="0000000000001"></div>
+            <div class="field"><label>Dirección</label><input type="text" id="cfg-direccion" placeholder="Ciudad, Provincia"></div>
+            <div class="field"><label>Teléfono</label><input type="text" id="cfg-telefono" placeholder="0999000000"></div>
+            <div class="field"><label>Email institucional</label><input type="email" id="cfg-email" placeholder="info@exitocompartido.com"></div>
+            <div class="field"><label>Tasa de interés por defecto (%)</label><input type="number" id="cfg-tasa" value="1.5" step="0.01"></div>
+          </div>
+          <div style="margin-top:14px"><button class="btn btn-green" onclick="guardarConfig()"><i class="ti ti-device-floppy"></i>Guardar configuración</button></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><div class="card-title"><i class="ti ti-database"></i>Base de datos Supabase</div></div>
+        <div class="card-body">
+          <div class="g2">
+            <div class="field"><label>URL del proyecto</label><input type="text" id="cfg-sb-url" placeholder="https://xxx.supabase.co"></div>
+            <div class="field"><label>Anon Key</label><input type="password" id="cfg-sb-key" placeholder="sb_publishable_..."></div>
+          </div>
+          <div style="margin-top:14px;display:flex;gap:8px">
+            <button class="btn btn-green" onclick="guardarSupabase()"><i class="ti ti-plug"></i>Conectar</button>
+            <button class="btn btn-outline" onclick="testSupabase()"><i class="ti ti-wifi"></i>Probar conexión</button>
+          </div>
         </div>
       </div>
     </div>
@@ -485,212 +726,1246 @@ tbody tr.row-hl td{background:rgba(234,179,8,.04)}
 </main>
 </div>
 
-<!-- MODAL NUEVO CRÉDITO -->
-<div class="modal-overlay" id="modal-nuevo">
+<!-- ══════════════════════════════════════════════════════
+     MODALES
+══════════════════════════════════════════════════════ -->
+
+<!-- MODAL: NUEVO CLIENTE -->
+<div class="modal-overlay" id="modal-nuevo-cliente">
   <div class="modal">
-    <div class="modal-header">
-      <div class="modal-title"><i class="ti ti-plus" style="color:var(--green);margin-right:6px"></i>Registrar nuevo crédito</div>
-      <button class="modal-close" onclick="closeModal('modal-nuevo')"><i class="ti ti-x"></i></button>
-    </div>
+    <div class="modal-header"><div class="modal-title"><i class="ti ti-user-plus"></i>Nuevo cliente</div><button class="modal-close" onclick="closeModal('modal-nuevo-cliente')"><i class="ti ti-x"></i></button></div>
     <div class="modal-body">
-      <div class="alert alert-orange">
-        <i class="ti ti-alert-triangle"></i>
-        <span>Usa primero la calculadora para ver la tabla de amortización antes de registrar.</span>
-      </div>
-      <div class="form-grid g2">
-        <div class="field" style="grid-column:1/-1">
-          <label>Cliente</label>
-          <select><option>María Torres</option><option>Jorge Ríos</option><option>Ana Mora</option><option>Carlos Vega</option></select>
-        </div>
-        <div class="field">
-          <label>Monto ($)</label>
-          <input type="number" value="5000" inputmode="numeric">
-        </div>
-        <div class="field">
-          <label>Tasa mensual (%)</label>
-          <input type="number" value="1.5" step="0.01" inputmode="decimal">
-        </div>
-        <div class="field">
-          <label>Número de cuotas</label>
-          <input type="number" value="12" inputmode="numeric">
-        </div>
-        <div class="field">
-          <label>Frecuencia</label>
-          <select><option>Mensual</option><option>Quincenal</option><option>Semanal</option></select>
-        </div>
-        <div class="field">
-          <label>Tabla de amortización</label>
-          <select><option>Francesa</option><option>Alemana</option><option>Americana</option></select>
-        </div>
-        <div class="field">
-          <label>Fecha de inicio</label>
-          <input type="date">
-        </div>
-      </div>
-      <div class="divider"></div>
-      <div class="field">
-        <label>Observaciones</label>
-        <textarea rows="2" style="width:100%;background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:10px 12px;border-radius:var(--radius);font-size:13px;resize:vertical;font-family:'IBM Plex Sans',sans-serif;outline:none"></textarea>
+      <div class="g2">
+        <div class="field"><label>Nombres</label><input type="text" id="nc-nombres" placeholder="Nombres"></div>
+        <div class="field"><label>Apellidos</label><input type="text" id="nc-apellidos" placeholder="Apellidos"></div>
+        <div class="field"><label>Cédula</label><input type="text" id="nc-cedula" placeholder="1700000000" maxlength="10"></div>
+        <div class="field"><label>Teléfono</label><input type="text" id="nc-telefono" placeholder="0999000000"></div>
+        <div class="field"><label>Email</label><input type="email" id="nc-email" placeholder="cliente@email.com"></div>
+        <div class="field"><label>Fecha de nacimiento</label><input type="date" id="nc-nacimiento"></div>
+        <div class="field"><label>Ocupación</label><input type="text" id="nc-ocupacion" placeholder="Comerciante, empleado..."></div>
+        <div class="field"><label>Ingresos mensuales ($)</label><input type="number" id="nc-ingresos" placeholder="0.00" step="0.01"></div>
+        <div class="field col-span-2"><label>Dirección</label><input type="text" id="nc-direccion" placeholder="Dirección completa"></div>
+        <div class="field col-span-2"><label>Observaciones</label><textarea id="nc-obs" rows="2" placeholder="Notas adicionales..."></textarea></div>
       </div>
     </div>
     <div class="modal-footer">
-      <button class="btn btn-outline" onclick="closeModal('modal-nuevo')">Cancelar</button>
-      <button class="btn btn-green" onclick="closeModal('modal-nuevo');showToast('Crédito registrado exitosamente')">
-        <i class="ti ti-check"></i>Registrar crédito
-      </button>
+      <button class="btn btn-outline" onclick="closeModal('modal-nuevo-cliente')">Cancelar</button>
+      <button class="btn btn-green" onclick="guardarCliente()"><i class="ti ti-check"></i>Registrar cliente</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: NUEVO PAGO -->
+<div class="modal-overlay" id="modal-nuevo-pago">
+  <div class="modal">
+    <div class="modal-header"><div class="modal-title"><i class="ti ti-cash"></i>Registrar cobro</div><button class="modal-close" onclick="closeModal('modal-nuevo-pago')"><i class="ti ti-x"></i></button></div>
+    <div class="modal-body">
+      <div class="g2">
+        <div class="field col-span-2"><label>Cliente</label>
+          <select id="np-cliente" onchange="cargarCreditosCliente(this.value)"><option value="">— Seleccionar cliente —</option></select>
+        </div>
+        <div class="field col-span-2"><label>Crédito</label>
+          <select id="np-credito" onchange="cargarCuotasCredito(this.value)"><option value="">— Seleccionar crédito —</option></select>
+        </div>
+        <div class="field col-span-2"><label>Cuota a pagar</label>
+          <select id="np-cuota" onchange="llenarMontoCuota(this.value)"><option value="">— Seleccionar cuota —</option></select>
+        </div>
+        <div class="field"><label>Capital ($)</label><input type="number" id="np-capital" placeholder="0.00" step="0.01" oninput="actualizarTotalPago()"></div>
+        <div class="field"><label>Interés ($)</label><input type="number" id="np-interes" placeholder="0.00" step="0.01" oninput="actualizarTotalPago()"></div>
+        <div class="field"><label>Total a cobrar ($)</label><input type="number" id="np-total" placeholder="0.00" readonly style="color:var(--green);font-weight:600"></div>
+        <div class="field"><label>Fecha de pago</label><input type="date" id="np-fecha"></div>
+        <div class="field"><label>Método de pago</label>
+          <select id="np-metodo">
+            <option value="efectivo">Efectivo</option>
+            <option value="transferencia">Transferencia</option>
+            <option value="cheque">Cheque</option>
+            <option value="otro">Otro</option>
+          </select>
+        </div>
+        <div class="field col-span-2"><label>Comprobante / Referencia</label><input type="text" id="np-comprobante" placeholder="Número de comprobante (opcional)"></div>
+        <div class="field col-span-2"><label>Observaciones</label><textarea id="np-obs" rows="2" placeholder="Notas..."></textarea></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('modal-nuevo-pago')">Cancelar</button>
+      <button class="btn btn-green" onclick="guardarPago()"><i class="ti ti-check"></i>Registrar cobro</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: NUEVO SOCIO -->
+<div class="modal-overlay" id="modal-nuevo-socio">
+  <div class="modal">
+    <div class="modal-header"><div class="modal-title"><i class="ti ti-user-plus"></i>Nuevo socio</div><button class="modal-close" onclick="closeModal('modal-nuevo-socio')"><i class="ti ti-x"></i></button></div>
+    <div class="modal-body">
+      <div class="g2">
+        <div class="field"><label>Nombres</label><input type="text" id="ns-nombres" placeholder="Nombres"></div>
+        <div class="field"><label>Apellidos</label><input type="text" id="ns-apellidos" placeholder="Apellidos"></div>
+        <div class="field"><label>Cédula</label><input type="text" id="ns-cedula" placeholder="1700000000" maxlength="10"></div>
+        <div class="field"><label>Teléfono</label><input type="text" id="ns-telefono" placeholder="0999000000"></div>
+        <div class="field"><label>Email</label><input type="email" id="ns-email" placeholder="socio@email.com"></div>
+        <div class="field"><label>Fecha de ingreso</label><input type="date" id="ns-fecha"></div>
+        <div class="field"><label>Aporte inicial ($)</label><input type="number" id="ns-aporte" placeholder="0.00" step="0.01"></div>
+        <div class="field"><label>Dirección</label><input type="text" id="ns-direccion" placeholder="Dirección"></div>
+        <div class="field col-span-2"><label>Observaciones</label><textarea id="ns-obs" rows="2" placeholder="Notas..."></textarea></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('modal-nuevo-socio')">Cancelar</button>
+      <button class="btn btn-green" onclick="guardarSocio()"><i class="ti ti-check"></i>Registrar socio</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: APORTE SOCIO -->
+<div class="modal-overlay" id="modal-aporte">
+  <div class="modal">
+    <div class="modal-header"><div class="modal-title"><i class="ti ti-plus"></i>Registrar movimiento de capital</div><button class="modal-close" onclick="closeModal('modal-aporte')"><i class="ti ti-x"></i></button></div>
+    <div class="modal-body">
+      <input type="hidden" id="aporte-socio-id">
+      <div class="g2">
+        <div class="field"><label>Socio</label><input type="text" id="aporte-socio-nombre" readonly></div>
+        <div class="field"><label>Tipo de movimiento</label>
+          <select id="aporte-tipo">
+            <option value="aporte">Aporte de capital</option>
+            <option value="retiro">Retiro de capital</option>
+            <option value="dividendo">Pago de dividendo</option>
+          </select>
+        </div>
+        <div class="field"><label>Monto ($)</label><input type="number" id="aporte-monto" placeholder="0.00" step="0.01"></div>
+        <div class="field"><label>Fecha</label><input type="date" id="aporte-fecha"></div>
+        <div class="field col-span-2"><label>Descripción</label><input type="text" id="aporte-desc" placeholder="Descripción del movimiento"></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('modal-aporte')">Cancelar</button>
+      <button class="btn btn-green" onclick="guardarAporte()"><i class="ti ti-check"></i>Registrar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: DETALLE SOCIO -->
+<div class="modal-overlay" id="modal-detalle-socio">
+  <div class="modal modal-lg">
+    <div class="modal-header"><div class="modal-title"><i class="ti ti-briefcase"></i>Detalle del socio</div><button class="modal-close" onclick="closeModal('modal-detalle-socio')"><i class="ti ti-x"></i></button></div>
+    <div class="modal-body">
+      <div class="g2" style="margin-bottom:16px">
+        <div><div class="field"><label>Nombre</label><input type="text" id="ds-nombre" readonly></div></div>
+        <div><div class="field"><label>Cédula</label><input type="text" id="ds-cedula" readonly></div></div>
+        <div><div class="field"><label>Total aportado</label><input type="text" id="ds-total" readonly style="color:var(--green);font-weight:700"></div></div>
+        <div><div class="field"><label>Fecha de ingreso</label><input type="text" id="ds-fecha" readonly></div></div>
+      </div>
+      <div class="divider-label">Movimientos de capital</div>
+      <div class="tbl-wrap">
+        <table><thead><tr><th>Fecha</th><th>Tipo</th><th>Monto</th><th>Descripción</th></tr></thead>
+        <tbody id="tbody-movimientos"></tbody></table>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-green" onclick="openAporte(currentSocioId)"><i class="ti ti-plus"></i>Añadir movimiento</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: NUEVO ASIENTO -->
+<div class="modal-overlay" id="modal-nuevo-asiento">
+  <div class="modal modal-lg">
+    <div class="modal-header"><div class="modal-title"><i class="ti ti-book-2"></i>Nuevo asiento contable</div><button class="modal-close" onclick="closeModal('modal-nuevo-asiento')"><i class="ti ti-x"></i></button></div>
+    <div class="modal-body">
+      <div class="g2" style="margin-bottom:14px">
+        <div class="field"><label>Fecha del asiento</label><input type="date" id="asi-fecha"></div>
+        <div class="field"><label>Tipo de asiento</label>
+          <select id="asi-tipo" onchange="precargarAsiento(this.value)">
+            <option value="">— Seleccionar tipo —</option>
+            <option value="aporte">Aporte de socio</option>
+            <option value="credito">Otorgamiento de crédito</option>
+            <option value="cobro_interes">Cobro de intereses</option>
+            <option value="cobro_capital">Cobro de capital</option>
+            <option value="retiro">Retiro de socio</option>
+            <option value="dividendo">Pago de dividendo</option>
+            <option value="manual">Asiento manual</option>
+          </select>
+        </div>
+        <div class="field col-span-2"><label>Descripción / Glosa</label><input type="text" id="asi-desc" placeholder="Descripción del asiento contable"></div>
+      </div>
+      <div class="divider-label">Partidas</div>
+      <div id="asiento-partidas">
+        <table style="width:100%;border-collapse:collapse;min-width:400px">
+          <thead><tr>
+            <th style="text-align:left;font-size:10px;color:var(--text3);padding:6px 8px;border-bottom:1px solid var(--border2);text-transform:uppercase">Cuenta</th>
+            <th style="text-align:right;font-size:10px;color:var(--text3);padding:6px 8px;border-bottom:1px solid var(--border2);text-transform:uppercase">Debe</th>
+            <th style="text-align:right;font-size:10px;color:var(--text3);padding:6px 8px;border-bottom:1px solid var(--border2);text-transform:uppercase">Haber</th>
+            <th style="width:32px"></th>
+          </tr></thead>
+          <tbody id="tbody-partidas"></tbody>
+        </table>
+        <button class="btn btn-outline btn-sm" style="margin-top:10px" onclick="addPartida()"><i class="ti ti-plus"></i>Agregar partida</button>
+      </div>
+      <div style="display:flex;justify-content:flex-end;gap:20px;margin-top:12px;padding-top:12px;border-top:1px solid var(--border2)">
+        <div style="font-size:13px;color:var(--text2)">Debe: <span style="font-family:monospace;color:var(--text)" id="asi-total-debe">$0.00</span></div>
+        <div style="font-size:13px;color:var(--text2)">Haber: <span style="font-family:monospace;color:var(--text)" id="asi-total-haber">$0.00</span></div>
+        <div style="font-size:13px;font-weight:600" id="asi-balance-msg"></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('modal-nuevo-asiento')">Cancelar</button>
+      <button class="btn btn-green" onclick="guardarAsiento()"><i class="ti ti-check"></i>Guardar asiento</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: NUEVA CUENTA CONTABLE -->
+<div class="modal-overlay" id="modal-nueva-cuenta">
+  <div class="modal">
+    <div class="modal-header"><div class="modal-title"><i class="ti ti-plus"></i>Nueva cuenta contable</div><button class="modal-close" onclick="closeModal('modal-nueva-cuenta')"><i class="ti ti-x"></i></button></div>
+    <div class="modal-body">
+      <div class="g2">
+        <div class="field"><label>Código</label><input type="text" id="cc-codigo" placeholder="Ej: 1.1.01"></div>
+        <div class="field"><label>Tipo</label>
+          <select id="cc-tipo">
+            <option value="activo">Activo</option>
+            <option value="pasivo">Pasivo</option>
+            <option value="patrimonio">Patrimonio</option>
+            <option value="ingreso">Ingreso</option>
+            <option value="gasto">Gasto</option>
+          </select>
+        </div>
+        <div class="field col-span-2"><label>Nombre de la cuenta</label><input type="text" id="cc-nombre" placeholder="Nombre descriptivo"></div>
+        <div class="field"><label>Nivel</label>
+          <select id="cc-nivel">
+            <option value="1">1 — Grupo principal</option>
+            <option value="2" selected>2 — Subgrupo</option>
+            <option value="3">3 — Cuenta auxiliar</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('modal-nueva-cuenta')">Cancelar</button>
+      <button class="btn btn-green" onclick="guardarCuenta()"><i class="ti ti-check"></i>Guardar cuenta</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: NUEVO USUARIO -->
+<div class="modal-overlay" id="modal-nuevo-usuario">
+  <div class="modal">
+    <div class="modal-header"><div class="modal-title"><i class="ti ti-user-plus"></i>Crear usuario de acceso</div><button class="modal-close" onclick="closeModal('modal-nuevo-usuario')"><i class="ti ti-x"></i></button></div>
+    <div class="modal-body">
+      <div class="alert alert-blue"><i class="ti ti-lock"></i>Este usuario podrá ingresar al sistema con su correo y contraseña.</div>
+      <div class="g2">
+        <div class="field"><label>Nombre completo</label><input type="text" id="nu-nombre" placeholder="Nombre"></div>
+        <div class="field"><label>Rol / Perfil</label>
+          <select id="nu-rol">
+            <option value="admin">Administrador</option>
+            <option value="contador">Contador / Tesorero</option>
+            <option value="socio">Socio (solo consulta)</option>
+          </select>
+        </div>
+        <div class="field col-span-2"><label>Correo electrónico</label><input type="email" id="nu-email" placeholder="usuario@exitocompartido.com"></div>
+        <div class="field"><label>Contraseña</label><input type="password" id="nu-pass" placeholder="Mínimo 6 caracteres"></div>
+        <div class="field"><label>Confirmar contraseña</label><input type="password" id="nu-pass2" placeholder="Repetir contraseña"></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('modal-nuevo-usuario')">Cancelar</button>
+      <button class="btn btn-green" onclick="guardarUsuario()"><i class="ti ti-check"></i>Crear usuario</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: DETALLE CRÉDITO -->
+<div class="modal-overlay" id="modal-detalle-credito">
+  <div class="modal modal-lg">
+    <div class="modal-header"><div class="modal-title"><i class="ti ti-credit-card"></i>Detalle del crédito</div><button class="modal-close" onclick="closeModal('modal-detalle-credito')"><i class="ti ti-x"></i></button></div>
+    <div class="modal-body">
+      <div class="g2" style="margin-bottom:14px">
+        <div class="field"><label>Código</label><input type="text" id="dc-codigo" readonly></div>
+        <div class="field"><label>Cliente</label><input type="text" id="dc-cliente" readonly></div>
+        <div class="field"><label>Monto original</label><input type="text" id="dc-monto" readonly></div>
+        <div class="field"><label>Saldo pendiente</label><input type="text" id="dc-saldo" readonly style="color:var(--orange)"></div>
+        <div class="field"><label>Tasa mensual</label><input type="text" id="dc-tasa" readonly></div>
+        <div class="field"><label>Estado</label><input type="text" id="dc-estado" readonly></div>
+      </div>
+      <div class="divider-label">Cuotas pendientes</div>
+      <div class="tbl-wrap">
+        <table><thead><tr><th>#</th><th>Fecha vence</th><th>Cuota</th><th>Capital</th><th>Interés</th><th>Saldo</th><th>Estado</th></tr></thead>
+        <tbody id="tbody-cuotas-detalle"></tbody></table>
+      </div>
     </div>
   </div>
 </div>
 
 <!-- TOAST -->
-<div id="toast" style="position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--green);color:#000;padding:12px 20px;border-radius:var(--radius);font-size:13px;font-weight:500;z-index:400;transition:transform .3s ease;display:flex;align-items:center;gap:8px;box-shadow:0 4px 24px rgba(0,0,0,.5)">
-  <i class="ti ti-check"></i><span id="toast-msg"></span>
-</div>
+<div id="toast"><i class="ti ti-check"></i><span id="toast-msg"></span></div>
 
 <script>
-// ── FORMATO ──────────────────────────────────────────────────
-const fmt = v => '$' + Number(v).toLocaleString('es-EC',{minimumFractionDigits:2,maximumFractionDigits:2});
-const fmtDate = d => {
-  const dd=String(d.getDate()).padStart(2,'0');
-  const mm=String(d.getMonth()+1).padStart(2,'0');
-  const yy=d.getFullYear();
-  return `${dd}/${mm}/${yy}`;
+// ═══════════════════════════════════════════════════════════════
+// ESTADO GLOBAL
+// ═══════════════════════════════════════════════════════════════
+const DB = {
+  clientes: [
+    {id:'c1',nombres:'María',apellidos:'Torres',cedula:'1712345678',telefono:'0991000001',email:'',ocupacion:'Comerciante',ingresos:800,activo:true},
+    {id:'c2',nombres:'Jorge',apellidos:'Ríos',cedula:'1798765432',telefono:'0991000002',email:'',ocupacion:'Empleado',ingresos:600,activo:true},
+    {id:'c3',nombres:'Ana',apellidos:'Mora',cedula:'1734567890',telefono:'0991000003',email:'',ocupacion:'Docente',ingresos:1200,activo:true},
+    {id:'c4',nombres:'Carlos',apellidos:'Vega',cedula:'1756781234',telefono:'0991000004',email:'',ocupacion:'Agricultor',ingresos:500,activo:true},
+    {id:'c5',nombres:'Luis',apellidos:'Pinto',cedula:'1723456789',telefono:'0991000005',email:'',ocupacion:'Mecánico',ingresos:700,activo:true},
+  ],
+  creditos: [
+    {id:'cr1',codigo:'C-001',clienteId:'c1',montoOriginal:5000,saldo:3240,tasa:1.5,cuotas:12,frecuencia:'mensual',tabla:'francesa',fechaInicio:'2026-01-15',estado:'activo'},
+    {id:'cr2',codigo:'C-002',clienteId:'c2',montoOriginal:3500,saldo:2100,tasa:1.5,cuotas:12,frecuencia:'mensual',tabla:'francesa',fechaInicio:'2026-01-20',estado:'activo'},
+    {id:'cr3',codigo:'C-003',clienteId:'c5',montoOriginal:2000,saldo:1450,tasa:2.0,cuotas:10,frecuencia:'mensual',tabla:'francesa',fechaInicio:'2026-02-01',estado:'mora'},
+    {id:'cr4',codigo:'C-004',clienteId:'c3',montoOriginal:8000,saldo:5600,tasa:1.5,cuotas:18,frecuencia:'mensual',tabla:'francesa',fechaInicio:'2026-02-10',estado:'activo'},
+  ],
+  cuotas: [],
+  pagos: [
+    {id:'p1',creditoId:'cr1',clienteId:'c1',cuotaNum:4,fechaPago:'2026-05-22',capital:405,interes:57,metodo:'efectivo',comprobante:''},
+    {id:'p2',creditoId:'cr2',clienteId:'c2',cuotaNum:3,fechaPago:'2026-05-20',capital:285,interes:35,metodo:'transferencia',comprobante:'TRF-001'},
+    {id:'p3',creditoId:'cr4',clienteId:'c3',cuotaNum:3,fechaPago:'2026-05-18',capital:680,interes:62,metodo:'efectivo',comprobante:''},
+    {id:'p4',creditoId:'cr1',clienteId:'c1',cuotaNum:5,fechaPago:hoyStr(),capital:405,interes:57,metodo:'efectivo',comprobante:''},
+    {id:'p5',creditoId:'cr2',clienteId:'c2',cuotaNum:4,fechaPago:hoyStr(),capital:285,interes:35,metodo:'transferencia',comprobante:'TRF-002'},
+  ],
+  socios: [
+    {id:'s1',nombres:'Pedro',apellidos:'Alvarado',cedula:'1711000001',telefono:'0991100001',email:'',fechaIngreso:'2024-01-10',activo:true},
+    {id:'s2',nombres:'Carmen',apellidos:'Salazar',cedula:'1722000002',telefono:'0991100002',email:'',fechaIngreso:'2024-01-10',activo:true},
+    {id:'s3',nombres:'Roberto',apellidos:'Flores',cedula:'1733000003',telefono:'0991100003',email:'',fechaIngreso:'2024-03-15',activo:true},
+    {id:'s4',nombres:'Elena',apellidos:'Castro',cedula:'1744000004',telefono:'0991100004',email:'',fechaIngreso:'2024-06-01',activo:true},
+  ],
+  capitalMovimientos: [
+    {id:'m1',socioId:'s1',tipo:'aporte',monto:1000,fecha:'2024-01-10',desc:'Aporte inicial'},
+    {id:'m2',socioId:'s1',tipo:'aporte',monto:500,fecha:'2024-06-01',desc:'Aporte junio'},
+    {id:'m3',socioId:'s2',tipo:'aporte',monto:1000,fecha:'2024-01-10',desc:'Aporte inicial'},
+    {id:'m4',socioId:'s2',tipo:'aporte',monto:300,fecha:'2024-09-01',desc:'Aporte septiembre'},
+    {id:'m5',socioId:'s3',tipo:'aporte',monto:800,fecha:'2024-03-15',desc:'Aporte inicial'},
+    {id:'m6',socioId:'s4',tipo:'aporte',monto:600,fecha:'2024-06-01',desc:'Aporte inicial'},
+    {id:'m7',socioId:'s4',tipo:'retiro',monto:100,fecha:'2025-01-15',desc:'Retiro parcial'},
+  ],
+  usuarios: [
+    {id:'u1',nombre:'Administrador',email:'admin@exitocompartido.com',rol:'admin',activo:true},
+    {id:'u2',nombre:'Contador Tesorero',email:'contador@exitocompartido.com',rol:'contador',activo:true},
+  ],
+  asientos: [
+    {id:'a1',codigo:'ASI-001',fecha:'2024-01-10',tipo:'aporte',desc:'Aporte inicial socios fundadores',
+     partidas:[
+       {cuenta:'1.1.01 — Caja',debe:3400,haber:0},
+       {cuenta:'3.1.01 — Capital social',debe:0,haber:3400},
+     ]},
+    {id:'a2',codigo:'ASI-002',fecha:'2026-01-15',tipo:'credito',desc:'Otorgamiento crédito C-001 María Torres',
+     partidas:[
+       {cuenta:'1.3.01 — Cartera de créditos',debe:5000,haber:0},
+       {cuenta:'1.1.01 — Caja',debe:0,haber:5000},
+     ]},
+    {id:'a3',codigo:'ASI-003',fecha:'2026-05-22',tipo:'cobro_interes',desc:'Cobro cuota 4 crédito C-001',
+     partidas:[
+       {cuenta:'1.1.01 — Caja',debe:462,haber:0},
+       {cuenta:'1.3.01 — Cartera de créditos',debe:0,haber:405},
+       {cuenta:'4.1.01 — Intereses ganados',debe:0,haber:57},
+     ]},
+  ],
+  cuentas: [
+    {codigo:'1',nombre:'ACTIVO',tipo:'activo',nivel:1},
+    {codigo:'1.1',nombre:'Activo corriente',tipo:'activo',nivel:2},
+    {codigo:'1.1.01',nombre:'Caja',tipo:'activo',nivel:3},
+    {codigo:'1.1.02',nombre:'Bancos',tipo:'activo',nivel:3},
+    {codigo:'1.3',nombre:'Cartera de créditos',tipo:'activo',nivel:2},
+    {codigo:'1.3.01',nombre:'Cartera de créditos vigente',tipo:'activo',nivel:3},
+    {codigo:'1.3.02',nombre:'Cartera vencida',tipo:'activo',nivel:3},
+    {codigo:'2',nombre:'PASIVO',tipo:'pasivo',nivel:1},
+    {codigo:'2.1',nombre:'Obligaciones con socios',tipo:'pasivo',nivel:2},
+    {codigo:'2.1.01',nombre:'Depósitos de ahorro',tipo:'pasivo',nivel:3},
+    {codigo:'3',nombre:'PATRIMONIO',tipo:'patrimonio',nivel:1},
+    {codigo:'3.1',nombre:'Capital social',tipo:'patrimonio',nivel:2},
+    {codigo:'3.1.01',nombre:'Aportes de socios',tipo:'patrimonio',nivel:3},
+    {codigo:'3.2',nombre:'Resultados',tipo:'patrimonio',nivel:2},
+    {codigo:'3.2.01',nombre:'Utilidades del ejercicio',tipo:'patrimonio',nivel:3},
+    {codigo:'4',nombre:'INGRESOS',tipo:'ingreso',nivel:1},
+    {codigo:'4.1',nombre:'Intereses ganados',tipo:'ingreso',nivel:2},
+    {codigo:'4.1.01',nombre:'Intereses en créditos',tipo:'ingreso',nivel:3},
+    {codigo:'5',nombre:'GASTOS',tipo:'gasto',nivel:1},
+    {codigo:'5.1',nombre:'Gastos operativos',tipo:'gasto',nivel:2},
+    {codigo:'5.1.01',nombre:'Gastos administrativos',tipo:'gasto',nivel:3},
+  ],
 };
 
-function addPeriod(date,tipo,n){
-  const d=new Date(date);
-  if(tipo==='mensual') d.setMonth(d.getMonth()+n);
-  else if(tipo==='quincenal') d.setDate(d.getDate()+n*15);
-  else if(tipo==='semanal') d.setDate(d.getDate()+n*7);
+let currentSocioId = null;
+let asientoCount = DB.asientos.length;
+let cuentaCount = DB.cuentas.filter(c=>c.nivel===3).length;
+
+// ═══════════════════════════════════════════════════════════════
+// UTILIDADES
+// ═══════════════════════════════════════════════════════════════
+function hoyStr(){const d=new Date();return d.toISOString().split('T')[0]}
+const fmt = v => '$' + Number(v).toLocaleString('es-EC',{minimumFractionDigits:2,maximumFractionDigits:2});
+const fmtDate = s => {if(!s)return'';const p=s.split('-');return`${p[2]}/${p[1]}/${p[0]}`};
+function getCliente(id){return DB.clientes.find(c=>c.id===id)||{}}
+function getCredito(id){return DB.creditos.find(c=>c.id===id)||{}}
+function getSocio(id){return DB.socios.find(s=>s.id===id)||{}}
+function uid(){return 'id'+Math.random().toString(36).substr(2,9)}
+function nombreCompleto(c){return c.nombres+' '+c.apellidos}
+
+function addPeriod(dateStr,tipo,n){
+  const d=new Date(dateStr+'T12:00:00');
+  if(tipo==='mensual')d.setMonth(d.getMonth()+n);
+  else if(tipo==='quincenal')d.setDate(d.getDate()+n*15);
+  else if(tipo==='semanal')d.setDate(d.getDate()+n*7);
   else d.setDate(d.getDate()+n);
-  return d;
+  return d.toISOString().split('T')[0];
 }
 
-// ── CALCULADORA ──────────────────────────────────────────────
-function calcular(){
-  const monto = parseFloat(document.getElementById('f-monto').value)||0;
-  const tasaMes = parseFloat(document.getElementById('f-tasa').value)||0;
-  const plazo = parseInt(document.getElementById('f-plazo').value)||0;
-  const tipoTabla = document.getElementById('f-tabla').value;
-  const tipoPlazo = document.getElementById('f-tipo-plazo').value;
-  const fechaStr = document.getElementById('f-fecha').value;
-  if(!monto||!tasaMes||!plazo) return;
+// ═══════════════════════════════════════════════════════════════
+// NAVEGACIÓN
+// ═══════════════════════════════════════════════════════════════
+const titulos={
+  dashboard:'Dashboard',clientes:'Clientes',creditos:'Módulo de Créditos',
+  pagos:'Cobros y Pagos',socios:'Socios & Capital Social',
+  contabilidad:'Contabilidad',reportes:'Reportes Financieros',
+  usuarios:'Usuarios & Accesos',config:'Configuración'
+};
+const acciones={
+  clientes:`<button class="btn btn-green btn-sm" onclick="openModal('modal-nuevo-cliente')"><i class="ti ti-user-plus"></i><span>Nuevo cliente</span></button>`,
+  pagos:`<button class="btn btn-green btn-sm" onclick="openModal('modal-nuevo-pago')"><i class="ti ti-plus"></i><span>Registrar cobro</span></button>`,
+  socios:`<button class="btn btn-green btn-sm" onclick="openModal('modal-nuevo-socio')"><i class="ti ti-user-plus"></i><span>Nuevo socio</span></button>`,
+  usuarios:`<button class="btn btn-green btn-sm" onclick="openModal('modal-nuevo-usuario')"><i class="ti ti-user-plus"></i><span>Crear usuario</span></button>`,
+  creditos:`<button class="btn btn-green btn-sm" onclick="openModal('modal-nuevo-credito-form')"><i class="ti ti-plus"></i><span>Nuevo crédito</span></button>`,
+};
 
-  let tasa;
-  const m={'mensual':1,'quincenal':2,'semanal':4,'diario':30};
-  tasa = tasaMes / (m[tipoPlazo]||1) / 100;
-
-  const fechaBase = fechaStr ? new Date(fechaStr+'T12:00:00') : new Date();
-  let filas=[];
-
-  if(tipoTabla==='francesa'){
-    const cuota = tasa===0 ? monto/plazo : monto*(tasa*Math.pow(1+tasa,plazo))/(Math.pow(1+tasa,plazo)-1);
-    let saldo=monto;
-    for(let i=1;i<=plazo;i++){
-      const interes=saldo*tasa;
-      const capital=cuota-interes;
-      saldo=Math.max(0,saldo-capital);
-      filas.push({n:i,fecha:addPeriod(fechaBase,tipoPlazo,i),cuota,capital,interes,saldo});
-    }
-  } else if(tipoTabla==='alemana'){
-    const capCuota=monto/plazo;
-    let saldo=monto;
-    for(let i=1;i<=plazo;i++){
-      const interes=saldo*tasa;
-      const cuota=capCuota+interes;
-      saldo=Math.max(0,saldo-capCuota);
-      filas.push({n:i,fecha:addPeriod(fechaBase,tipoPlazo,i),cuota,capital:capCuota,interes,saldo});
-    }
-  } else {
-    for(let i=1;i<=plazo;i++){
-      const interes=monto*tasa;
-      const capital=i===plazo?monto:0;
-      filas.push({n:i,fecha:addPeriod(fechaBase,tipoPlazo,i),cuota:interes+capital,capital,interes,saldo:i===plazo?0:monto});
-    }
-  }
-
-  const totalPagar=filas.reduce((a,f)=>a+f.cuota,0);
-  const totalIntereses=filas.reduce((a,f)=>a+f.interes,0);
-
-  document.getElementById('s-cuota').textContent = fmt(filas[0]?.cuota||0)+(tipoTabla==='alemana'?' var.':'');
-  document.getElementById('s-monto').textContent = fmt(monto);
-  document.getElementById('s-interes').textContent = fmt(totalIntereses);
-  document.getElementById('s-total').textContent = fmt(totalPagar);
-
-  const hoy=new Date();
-  let proximoEncontrado=false;
-  document.getElementById('tbody-amort').innerHTML = filas.map(f=>{
-    const pasado=f.fecha<hoy;
-    let esProx=false;
-    if(!pasado&&!proximoEncontrado){esProx=true;proximoEncontrado=true;}
-    const badge=pasado
-      ?'<span class="badge bg-green">Pagado</span>'
-      :esProx
-        ?'<span class="badge bg-yellow">Próximo</span>'
-        :'<span class="badge bg-gray">Pendiente</span>';
-    return `<tr class="${esProx?'row-hl':''}">
-      <td class="mono">${f.n}</td>
-      <td class="mono">${fmtDate(f.fecha)}</td>
-      <td class="mono">${fmt(f.cuota)}</td>
-      <td class="mono">${fmt(f.capital)}</td>
-      <td class="mono cv-orange">${fmt(f.interes)}</td>
-      <td class="mono">${fmt(f.saldo)}</td>
-      <td>${badge}</td>
-    </tr>`;
-  }).join('');
-}
-
-function registrarCredito(){
-  const cliente=document.getElementById('f-cliente').value;
-  if(!cliente){showToast('Selecciona un cliente primero');return;}
-  showToast('Crédito registrado para '+cliente.split(' — ')[0]);
-}
-
-// ── TABS ─────────────────────────────────────────────────────
-function showTab(id,el){
+function goTo(name, el){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
-  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
-  document.getElementById('screen-'+id).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('screen-'+name).classList.add('active');
+  if(el) el.classList.add('active');
+  document.getElementById('page-title').textContent = titulos[name]||name;
+  document.getElementById('topbar-actions').innerHTML = acciones[name]||'';
+  closeSidebar();
+  renderScreen(name);
+}
+
+function renderScreen(name){
+  if(name==='dashboard') renderDashboard();
+  else if(name==='clientes') renderClientes();
+  else if(name==='creditos') renderCreditos();
+  else if(name==='pagos') renderPagos();
+  else if(name==='socios') renderSocios();
+  else if(name==='contabilidad') renderContabilidad();
+  else if(name==='reportes') initReportes();
+  else if(name==='usuarios') renderUsuarios();
+}
+
+function showSubTab(screen, sub, el){
+  document.querySelectorAll(`#screen-${screen} .sub-screen`).forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll(`#screen-${screen} .tab`).forEach(t=>t.classList.remove('active'));
+  document.getElementById(`sub-${screen}-${sub}`).classList.add('active');
   if(el) el.classList.add('active');
 }
 
-// ── SIDEBAR MOBILE ───────────────────────────────────────────
-function openSidebar(){
-  document.getElementById('sidebar').classList.add('open');
-  document.getElementById('overlay').classList.add('open');
-}
-function closeSidebar(){
-  document.getElementById('sidebar').classList.remove('open');
-  document.getElementById('overlay').classList.remove('open');
-}
-function navClick(el,name){
-  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
-  el.classList.add('active');
-  if(name!=='Créditos') showToast('Módulo "'+name+'" próximamente');
-  closeSidebar();
-}
+// ═══════════════════════════════════════════════════════════════
+// SIDEBAR MOBILE
+// ═══════════════════════════════════════════════════════════════
+function openSidebar(){document.getElementById('sidebar').classList.add('open');document.getElementById('overlay').classList.add('open')}
+function closeSidebar(){document.getElementById('sidebar').classList.remove('open');document.getElementById('overlay').classList.remove('open')}
 
-// ── MODAL ────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════
+// MODAL
+// ═══════════════════════════════════════════════════════════════
 function openModal(id){document.getElementById(id).classList.add('open')}
 function closeModal(id){document.getElementById(id).classList.remove('open')}
 document.querySelectorAll('.modal-overlay').forEach(m=>{
   m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open')});
 });
 
-// ── TOAST ────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════
+// TOAST
+// ═══════════════════════════════════════════════════════════════
 let toastTimer;
-function showToast(msg){
+function showToast(msg,tipo=''){
   const t=document.getElementById('toast');
+  const ico=t.querySelector('i');
+  t.className = tipo==='error' ? 'error' : '';
+  ico.className = tipo==='error' ? 'ti ti-alert-circle' : 'ti ti-check';
   document.getElementById('toast-msg').textContent=msg;
   t.style.transform='translateX(-50%) translateY(0)';
   clearTimeout(toastTimer);
-  toastTimer=setTimeout(()=>{t.style.transform='translateX(-50%) translateY(80px)'},3000);
+  toastTimer=setTimeout(()=>{t.style.transform='translateX(-50%) translateY(80px)'},3200);
 }
 
-// ── INIT ─────────────────────────────────────────────────────
-document.getElementById('f-fecha').valueAsDate=new Date();
-document.getElementById('print-date').textContent=new Date().toLocaleDateString('es-EC');
-calcular();
+// ═══════════════════════════════════════════════════════════════
+// DASHBOARD
+// ═══════════════════════════════════════════════════════════════
+function renderDashboard(){
+  const hoy = hoyStr();
+  const pagosHoy = DB.pagos.filter(p=>p.fechaPago===hoy);
+  const totalHoy = pagosHoy.reduce((a,p)=>a+(p.capital+p.interes),0);
+  const efHoy = pagosHoy.filter(p=>p.metodo==='efectivo').reduce((a,p)=>a+(p.capital+p.interes),0);
+  const trHoy = pagosHoy.filter(p=>p.metodo==='transferencia').reduce((a,p)=>a+(p.capital+p.interes),0);
+  const creditosActivos = DB.creditos.filter(c=>c.estado!=='cancelado');
+  const enMora = DB.creditos.filter(c=>c.estado==='mora');
+  const cartera = creditosActivos.reduce((a,c)=>a+c.saldo,0);
+  const moraMonto = enMora.reduce((a,c)=>a+c.saldo,0);
+  const totalAportes = calcTotalAportes();
+  const mesActual = new Date().toISOString().substr(0,7);
+  const pagosMes = DB.pagos.filter(p=>p.fechaPago.substr(0,7)===mesActual);
+  const totalMes = pagosMes.reduce((a,p)=>a+(p.capital+p.interes),0);
+
+  document.getElementById('kpi-cobros-hoy').textContent = fmt(totalHoy);
+  document.getElementById('kpi-cobros-hoy-n').textContent = pagosHoy.length+' pago'+( pagosHoy.length!==1?'s':'')+' registrado'+(pagosHoy.length!==1?'s':'');
+  document.getElementById('kpi-trans-hoy').textContent = fmt(trHoy);
+  document.getElementById('kpi-trans-hoy-n').textContent = pagosHoy.filter(p=>p.metodo==='transferencia').length+' operaciones';
+  document.getElementById('kpi-creditos').textContent = creditosActivos.length;
+  document.getElementById('kpi-cartera').textContent = 'Cartera: '+fmt(cartera);
+  document.getElementById('kpi-mora').textContent = enMora.length;
+  document.getElementById('kpi-mora-val').textContent = fmt(moraMonto)+' en riesgo';
+  document.getElementById('kpi-aportes').textContent = fmt(totalAportes);
+  document.getElementById('kpi-socios-n').textContent = DB.socios.filter(s=>s.activo).length+' socios activos';
+  document.getElementById('kpi-mes').textContent = fmt(totalMes);
+  document.getElementById('badge-mora').textContent = enMora.length;
+
+  // Últimos cobros
+  const recientes = [...DB.pagos].sort((a,b)=>b.fechaPago.localeCompare(a.fechaPago)).slice(0,5);
+  document.getElementById('tbody-recientes').innerHTML = recientes.length ? recientes.map(p=>{
+    const cl=getCliente(p.clienteId);
+    const hora = p.fechaPago===hoy ? 'Hoy' : fmtDate(p.fechaPago);
+    return `<tr><td>${nombreCompleto(cl)}</td><td class="mono">${fmt(p.capital+p.interes)}</td>
+    <td><span class="badge ${p.metodo==='efectivo'?'bg-green':'bg-blue'}">${p.metodo==='efectivo'?'Efectivo':'Transferencia'}</span></td>
+    <td class="mono">${hora}</td></tr>`;
+  }).join('') : '<tr><td colspan="4" style="text-align:center;padding:24px;color:var(--text3)">Sin cobros</td></tr>';
+
+  // Mora
+  document.getElementById('tbody-mora-dash').innerHTML = enMora.length ? enMora.map(cr=>{
+    const cl=getCliente(cr.clienteId);
+    const dias = Math.floor((new Date()-new Date(cr.fechaInicio+'T12:00:00'))/(86400000));
+    return `<tr><td>${nombreCompleto(cl)}</td><td class="mono" style="color:var(--red)">${fmt(cr.saldo)}</td><td class="mono">${dias}d</td></tr>`;
+  }).join('') : '<tr><td colspan="3" style="text-align:center;padding:24px;color:var(--text3)">Sin mora ✓</td></tr>';
+}
+
+function calcTotalAportes(){
+  return DB.capitalMovimientos.reduce((a,m)=>{
+    if(m.tipo==='aporte')return a+m.monto;
+    if(m.tipo==='retiro')return a-m.monto;
+    return a;
+  },0);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// CLIENTES
+// ═══════════════════════════════════════════════════════════════
+function renderClientes(filtro=''){
+  const lista = filtro ? DB.clientes.filter(c=>(nombreCompleto(c)+c.cedula).toLowerCase().includes(filtro.toLowerCase())) : DB.clientes;
+  document.getElementById('badge-total-clientes').textContent = DB.clientes.length;
+  document.getElementById('tbody-clientes').innerHTML = lista.length ? lista.map((c,i)=>{
+    const creditos = DB.creditos.filter(cr=>cr.clienteId===c.id);
+    return `<tr>
+      <td class="mono">${i+1}</td>
+      <td><strong>${nombreCompleto(c)}</strong></td>
+      <td class="mono">${c.cedula}</td>
+      <td>${c.telefono||'—'}</td>
+      <td><span class="badge ${creditos.length?'bg-orange':'bg-gray'}">${creditos.length} crédito${creditos.length!==1?'s':''}</span></td>
+      <td><span class="badge bg-green">Activo</span></td>
+      <td><div class="td-actions">
+        <button class="btn btn-outline btn-xs" onclick="verDetalleCreditos('${c.id}')"><i class="ti ti-eye"></i>Ver</button>
+        <button class="btn btn-green btn-xs" onclick="prepararCreditoParaCliente('${c.id}')"><i class="ti ti-plus"></i>Crédito</button>
+      </div></td>
+    </tr>`;
+  }).join('') : '<tr><td colspan="7" style="text-align:center;padding:30px;color:var(--text3)">No se encontraron clientes</td></tr>';
+}
+
+function filtrarClientes(v){renderClientes(v)}
+
+function guardarCliente(){
+  const nombres=document.getElementById('nc-nombres').value.trim();
+  const apellidos=document.getElementById('nc-apellidos').value.trim();
+  const cedula=document.getElementById('nc-cedula').value.trim();
+  if(!nombres||!apellidos||!cedula){showToast('Nombre, apellido y cédula son obligatorios','error');return}
+  if(DB.clientes.find(c=>c.cedula===cedula)){showToast('Ya existe un cliente con esa cédula','error');return}
+  DB.clientes.push({
+    id:uid(),nombres,apellidos,cedula,
+    telefono:document.getElementById('nc-telefono').value,
+    email:document.getElementById('nc-email').value,
+    ocupacion:document.getElementById('nc-ocupacion').value,
+    ingresos:parseFloat(document.getElementById('nc-ingresos').value)||0,
+    direccion:document.getElementById('nc-direccion').value,
+    activo:true
+  });
+  closeModal('modal-nuevo-cliente');
+  renderClientes();
+  actualizarSelectClientes();
+  showToast('Cliente registrado exitosamente');
+  document.getElementById('nc-nombres').value='';document.getElementById('nc-apellidos').value='';
+  document.getElementById('nc-cedula').value='';document.getElementById('nc-telefono').value='';
+}
+
+function prepararCreditoParaCliente(clienteId){
+  document.getElementById('f-cliente').value = clienteId;
+  goTo('creditos', document.getElementById('nav-creditos'));
+}
+
+// ═══════════════════════════════════════════════════════════════
+// CRÉDITOS + CALCULADORA
+// ═══════════════════════════════════════════════════════════════
+function renderCreditos(){
+  actualizarSelectClientes();
+  renderListaCreditos();
+  renderHistorialCred();
+  calcular();
+}
+
+function actualizarSelectClientes(){
+  const selects=['f-cliente','np-cliente'];
+  selects.forEach(id=>{
+    const sel=document.getElementById(id);
+    if(!sel)return;
+    const val=sel.value;
+    sel.innerHTML='<option value="">— Seleccionar cliente —</option>'+
+      DB.clientes.map(c=>`<option value="${c.id}">${nombreCompleto(c)} — Cédula ${c.cedula}</option>`).join('');
+    if(val)sel.value=val;
+  });
+}
+
+function calcular(){
+  const monto=parseFloat(document.getElementById('f-monto').value)||0;
+  const tasaMes=parseFloat(document.getElementById('f-tasa').value)||0;
+  const plazo=parseInt(document.getElementById('f-plazo').value)||0;
+  const tipoTabla=document.getElementById('f-tabla').value;
+  const tipoPlazo=document.getElementById('f-tipo-plazo').value;
+  const fechaStr=document.getElementById('f-fecha').value||hoyStr();
+  if(!monto||!tasaMes||!plazo)return;
+
+  const m={mensual:1,quincenal:2,semanal:4,diario:30};
+  const tasa=tasaMes/(m[tipoPlazo]||1)/100;
+  let filas=[];
+
+  if(tipoTabla==='francesa'){
+    const cuota=tasa===0?monto/plazo:monto*(tasa*Math.pow(1+tasa,plazo))/(Math.pow(1+tasa,plazo)-1);
+    let saldo=monto;
+    for(let i=1;i<=plazo;i++){
+      const interes=saldo*tasa;const capital=cuota-interes;saldo=Math.max(0,saldo-capital);
+      filas.push({n:i,fecha:addPeriod(fechaStr,tipoPlazo,i),cuota,capital,interes,saldo});
+    }
+  } else if(tipoTabla==='alemana'){
+    const capCuota=monto/plazo;let saldo=monto;
+    for(let i=1;i<=plazo;i++){
+      const interes=saldo*tasa;const cuota=capCuota+interes;saldo=Math.max(0,saldo-capCuota);
+      filas.push({n:i,fecha:addPeriod(fechaStr,tipoPlazo,i),cuota,capital:capCuota,interes,saldo});
+    }
+  } else {
+    for(let i=1;i<=plazo;i++){
+      const interes=monto*tasa;const capital=i===plazo?monto:0;
+      filas.push({n:i,fecha:addPeriod(fechaStr,tipoPlazo,i),cuota:interes+capital,capital,interes,saldo:i===plazo?0:monto});
+    }
+  }
+
+  const totalPagar=filas.reduce((a,f)=>a+f.cuota,0);
+  const totalIntereses=filas.reduce((a,f)=>a+f.interes,0);
+  document.getElementById('s-cuota').textContent=fmt(filas[0]?.cuota||0)+(tipoTabla==='alemana'?' var.':'');
+  document.getElementById('s-monto').textContent=fmt(monto);
+  document.getElementById('s-interes').textContent=fmt(totalIntereses);
+  document.getElementById('s-total').textContent=fmt(totalPagar);
+
+  const hoy2=hoyStr();let proxEncontrado=false;
+  document.getElementById('tbody-amort').innerHTML=filas.map(f=>{
+    const pasado=f.fecha<hoy2;let esProx=false;
+    if(!pasado&&!proxEncontrado){esProx=true;proxEncontrado=true;}
+    const badge=pasado?'<span class="badge bg-green">Pagado</span>':esProx?'<span class="badge bg-yellow">Próximo</span>':'<span class="badge bg-gray">Pendiente</span>';
+    return `<tr class="${esProx?'row-hl':''}"><td class="mono">${f.n}</td><td class="mono">${fmtDate(f.fecha)}</td>
+    <td class="mono">${fmt(f.cuota)}</td><td class="mono">${fmt(f.capital)}</td>
+    <td class="mono" style="color:var(--orange)">${fmt(f.interes)}</td>
+    <td class="mono">${fmt(f.saldo)}</td><td>${badge}</td></tr>`;
+  }).join('');
+}
+
+function registrarCreditoCalc(){
+  const clienteId=document.getElementById('f-cliente').value;
+  if(!clienteId){showToast('Selecciona un cliente primero','error');return}
+  const monto=parseFloat(document.getElementById('f-monto').value)||0;
+  const tasa=parseFloat(document.getElementById('f-tasa').value)||0;
+  const plazo=parseInt(document.getElementById('f-plazo').value)||0;
+  const frecuencia=document.getElementById('f-tipo-plazo').value;
+  const tabla=document.getElementById('f-tabla').value;
+  const fechaInicio=document.getElementById('f-fecha').value||hoyStr();
+  if(!monto||!tasa||!plazo){showToast('Completa todos los parámetros','error');return}
+  const num=DB.creditos.length+1;
+  const id=uid();
+  DB.creditos.push({id,codigo:'C-'+String(num).padStart(3,'0'),clienteId,montoOriginal:monto,saldo:monto,tasa,cuotas:plazo,frecuencia,tabla,fechaInicio,estado:'activo'});
+  renderListaCreditos();
+  showToast('Crédito '+('C-'+String(num).padStart(3,'0'))+' registrado exitosamente');
+}
+
+function renderListaCreditos(filtro=''){
+  const lista = filtro ? DB.creditos.filter(cr=>{
+    const cl=getCliente(cr.clienteId);
+    return (nombreCompleto(cl)+cr.codigo).toLowerCase().includes(filtro.toLowerCase());
+  }) : DB.creditos;
+  document.getElementById('tbody-creditos-lista').innerHTML=lista.length?lista.map(cr=>{
+    const cl=getCliente(cr.clienteId);
+    const badge=cr.estado==='mora'?'bg-red':cr.estado==='cancelado'?'bg-gray':'bg-green';
+    const estadoLabel={activo:'Al día',mora:'En mora',cancelado:'Cancelado'}[cr.estado]||cr.estado;
+    const cuotaAprox = cr.saldo / (cr.cuotas - DB.pagos.filter(p=>p.creditoId===cr.id).length || 1);
+    return `<tr>
+      <td class="mono">${cr.codigo}</td>
+      <td><strong>${nombreCompleto(cl)}</strong></td>
+      <td class="mono">${fmt(cr.montoOriginal)}</td>
+      <td class="mono" style="color:var(--orange)">${fmt(cr.saldo)}</td>
+      <td class="mono">${fmt(cuotaAprox)}</td>
+      <td class="mono">—</td>
+      <td><span class="badge ${badge}">${estadoLabel}</span></td>
+      <td><div class="td-actions">
+        <button class="btn btn-outline btn-xs" onclick="verDetalleCredito('${cr.id}')"><i class="ti ti-eye"></i></button>
+        <button class="btn btn-green btn-xs" onclick="prepararPagoCredito('${cr.id}')"><i class="ti ti-cash"></i>Cobrar</button>
+      </div></td>
+    </tr>`;
+  }).join(''):'<tr><td colspan="8" style="text-align:center;padding:30px;color:var(--text3)">No hay créditos registrados</td></tr>';
+}
+
+function filtrarCreditos(v){renderListaCreditos(v)}
+
+function renderHistorialCred(){
+  const pagos=[...DB.pagos].sort((a,b)=>b.fechaPago.localeCompare(a.fechaPago));
+  document.getElementById('tbody-hist-cred').innerHTML=pagos.map(p=>{
+    const cl=getCliente(p.clienteId);const cr=getCredito(p.creditoId);
+    return `<tr><td class="mono">${fmtDate(p.fechaPago)}</td><td>${nombreCompleto(cl)}</td>
+    <td class="mono">${cr.codigo||'—'}</td><td class="mono">${p.cuotaNum||'—'}</td>
+    <td class="mono">${fmt(p.capital)}</td>
+    <td class="mono" style="color:var(--orange)">${fmt(p.interes)}</td>
+    <td class="mono" style="color:var(--green)">${fmt(p.capital+p.interes)}</td>
+    <td class="mono">${fmt(cr.saldo)}</td>
+    <td><span class="badge ${p.metodo==='efectivo'?'bg-green':'bg-blue'}">${p.metodo}</span></td></tr>`;
+  }).join('');
+}
+
+function verDetalleCredito(id){
+  const cr=getCredito(id);const cl=getCliente(cr.clienteId);
+  document.getElementById('dc-codigo').value=cr.codigo;
+  document.getElementById('dc-cliente').value=nombreCompleto(cl);
+  document.getElementById('dc-monto').value=fmt(cr.montoOriginal);
+  document.getElementById('dc-saldo').value=fmt(cr.saldo);
+  document.getElementById('dc-tasa').value=cr.tasa+'% mensual';
+  document.getElementById('dc-estado').value=cr.estado;
+  // Generar tabla de cuotas
+  const m={mensual:1,quincenal:2,semanal:4,diario:30};
+  const tasa=cr.tasa/(m[cr.frecuencia]||1)/100;
+  const plazo=cr.cuotas;
+  const monto=cr.montoOriginal;
+  const pagosRealizados=DB.pagos.filter(p=>p.creditoId===id).length;
+  let filas=[];
+  if(cr.tabla==='francesa'){
+    const cuota=tasa===0?monto/plazo:monto*(tasa*Math.pow(1+tasa,plazo))/(Math.pow(1+tasa,plazo)-1);
+    let saldo=monto;
+    for(let i=1;i<=plazo;i++){const int=saldo*tasa;const cap=cuota-int;saldo=Math.max(0,saldo-cap);filas.push({n:i,cuota,cap,int,saldo});}
+  }
+  document.getElementById('tbody-cuotas-detalle').innerHTML=filas.map(f=>{
+    const pagado=f.n<=pagosRealizados;
+    return `<tr><td class="mono">${f.n}</td><td class="mono">—</td>
+    <td class="mono">${fmt(f.cuota)}</td><td class="mono">${fmt(f.cap)}</td>
+    <td class="mono" style="color:var(--orange)">${fmt(f.int)}</td>
+    <td class="mono">${fmt(f.saldo)}</td>
+    <td><span class="badge ${pagado?'bg-green':f.n===pagosRealizados+1?'bg-yellow':'bg-gray'}">${pagado?'Pagado':f.n===pagosRealizados+1?'Próximo':'Pendiente'}</span></td></tr>`;
+  }).join('');
+  openModal('modal-detalle-credito');
+}
+
+function verDetalleCreditos(clienteId){
+  const creditos=DB.creditos.filter(cr=>cr.clienteId===clienteId);
+  if(creditos.length===0){showToast('Este cliente no tiene créditos');return}
+  verDetalleCredito(creditos[0].id);
+}
+
+function prepararPagoCredito(creditoId){
+  const cr=getCredito(creditoId);
+  document.getElementById('np-cliente').value=cr.clienteId;
+  cargarCreditosCliente(cr.clienteId);
+  setTimeout(()=>{
+    document.getElementById('np-credito').value=creditoId;
+    cargarCuotasCredito(creditoId);
+  },50);
+  goTo('pagos',document.getElementById('nav-pagos'));
+  setTimeout(()=>openModal('modal-nuevo-pago'),100);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// PAGOS
+// ═══════════════════════════════════════════════════════════════
+function renderPagos(){
+  actualizarSelectClientes();
+  const hoy=hoyStr();
+  const pagosHoy=DB.pagos.filter(p=>p.fechaPago===hoy);
+  const totHoy=pagosHoy.reduce((a,p)=>a+(p.capital+p.interes),0);
+  const ef=pagosHoy.filter(p=>p.metodo==='efectivo').reduce((a,p)=>a+(p.capital+p.interes),0);
+  const tr=pagosHoy.filter(p=>p.metodo==='transferencia').reduce((a,p)=>a+(p.capital+p.interes),0);
+  document.getElementById('p-hoy-total').textContent=fmt(totHoy);
+  document.getElementById('p-hoy-ef').textContent=fmt(ef);
+  document.getElementById('p-hoy-tr').textContent=fmt(tr);
+  document.getElementById('p-hoy-n').textContent=pagosHoy.length;
+  document.getElementById('np-fecha').value=hoy;
+
+  const todos=[...DB.pagos].sort((a,b)=>b.fechaPago.localeCompare(a.fechaPago));
+  document.getElementById('tbody-pagos').innerHTML=todos.length?todos.map(p=>{
+    const cl=getCliente(p.clienteId);const cr=getCredito(p.creditoId);
+    return `<tr><td class="mono">${fmtDate(p.fechaPago)}</td><td>${nombreCompleto(cl)}</td>
+    <td class="mono">${cr.codigo||'—'}</td><td class="mono">${p.cuotaNum||'—'}</td>
+    <td class="mono">${fmt(p.capital)}</td>
+    <td class="mono" style="color:var(--orange)">${fmt(p.interes)}</td>
+    <td class="mono" style="color:var(--green);font-weight:600">${fmt(p.capital+p.interes)}</td>
+    <td><span class="badge ${p.metodo==='efectivo'?'bg-green':p.metodo==='transferencia'?'bg-blue':'bg-gray'}">${p.metodo}</span></td>
+    <td class="mono">${p.comprobante||'—'}</td></tr>`;
+  }).join(''):'<tr><td colspan="9" style="text-align:center;padding:30px;color:var(--text3)">No hay pagos registrados</td></tr>';
+}
+
+function cargarCreditosCliente(clienteId){
+  const sel=document.getElementById('np-credito');
+  sel.innerHTML='<option value="">— Seleccionar crédito —</option>';
+  if(!clienteId)return;
+  DB.creditos.filter(c=>c.clienteId===clienteId&&c.estado!=='cancelado').forEach(c=>{
+    sel.innerHTML+=`<option value="${c.id}">${c.codigo} — Saldo: ${fmt(c.saldo)}</option>`;
+  });
+}
+
+function cargarCuotasCredito(creditoId){
+  const sel=document.getElementById('np-cuota');
+  sel.innerHTML='<option value="">— Seleccionar cuota —</option>';
+  if(!creditoId)return;
+  const cr=getCredito(creditoId);
+  const pagosHechos=DB.pagos.filter(p=>p.creditoId===creditoId).length;
+  const m={mensual:1,quincenal:2,semanal:4,diario:30};
+  const tasa=cr.tasa/(m[cr.frecuencia]||1)/100;
+  const cuota=tasa===0?cr.montoOriginal/cr.cuotas:cr.montoOriginal*(tasa*Math.pow(1+tasa,cr.cuotas))/(Math.pow(1+tasa,cr.cuotas)-1);
+  let saldo=cr.montoOriginal;
+  for(let i=1;i<=cr.cuotas;i++){
+    const int=saldo*tasa;const cap=cuota-int;saldo=Math.max(0,saldo-cap);
+    if(i>pagosHechos&&i<=pagosHechos+3){
+      sel.innerHTML+=`<option value="${i}|${cap.toFixed(2)}|${int.toFixed(2)}">Cuota #${i} — ${fmt(cuota)} (Cap:${fmt(cap)} Int:${fmt(int)})</option>`;
+    }
+  }
+}
+
+function llenarMontoCuota(val){
+  if(!val)return;
+  const parts=val.split('|');
+  document.getElementById('np-capital').value=parts[1]||'';
+  document.getElementById('np-interes').value=parts[2]||'';
+  actualizarTotalPago();
+}
+
+function actualizarTotalPago(){
+  const cap=parseFloat(document.getElementById('np-capital').value)||0;
+  const int=parseFloat(document.getElementById('np-interes').value)||0;
+  document.getElementById('np-total').value=(cap+int).toFixed(2);
+}
+
+function guardarPago(){
+  const clienteId=document.getElementById('np-cliente').value;
+  const creditoId=document.getElementById('np-credito').value;
+  const cuotaVal=document.getElementById('np-cuota').value;
+  const capital=parseFloat(document.getElementById('np-capital').value)||0;
+  const interes=parseFloat(document.getElementById('np-interes').value)||0;
+  const fecha=document.getElementById('np-fecha').value||hoyStr();
+  const metodo=document.getElementById('np-metodo').value;
+  if(!clienteId||!creditoId){showToast('Selecciona cliente y crédito','error');return}
+  if(!capital&&!interes){showToast('Ingresa el monto a cobrar','error');return}
+  const cuotaNum=cuotaVal?parseInt(cuotaVal.split('|')[0]):null;
+  DB.pagos.push({id:uid(),creditoId,clienteId,cuotaNum,fechaPago:fecha,capital,interes,metodo,
+    comprobante:document.getElementById('np-comprobante').value});
+  // Actualizar saldo crédito
+  const cr=DB.creditos.find(c=>c.id===creditoId);
+  if(cr)cr.saldo=Math.max(0,cr.saldo-capital);
+  closeModal('modal-nuevo-pago');
+  renderPagos();
+  renderDashboard();
+  showToast('Cobro registrado: '+fmt(capital+interes));
+}
+
+// ═══════════════════════════════════════════════════════════════
+// SOCIOS & CAPITAL
+// ═══════════════════════════════════════════════════════════════
+function renderSocios(filtro=''){
+  const totalAportes=calcTotalAportes();
+  const socios=DB.socios.filter(s=>s.activo);
+  let totalRetiros=DB.capitalMovimientos.filter(m=>m.tipo==='retiro').reduce((a,m)=>a+m.monto,0);
+  document.getElementById('cap-total').textContent=fmt(totalAportes);
+  document.getElementById('cap-socios').textContent=socios.length;
+  document.getElementById('cap-promedio').textContent=socios.length?fmt(totalAportes/socios.length):fmt(0);
+  document.getElementById('cap-retiros').textContent=fmt(totalRetiros);
+
+  const lista=filtro?DB.socios.filter(s=>nombreCompleto(s).toLowerCase().includes(filtro.toLowerCase())):DB.socios;
+  document.getElementById('lista-socios').innerHTML=lista.map(s=>{
+    const movs=DB.capitalMovimientos.filter(m=>m.socioId===s.id);
+    const aporte=movs.reduce((a,m)=>m.tipo==='aporte'?a+m.monto:m.tipo==='retiro'?a-m.monto:a,0);
+    const iniciales=(s.nombres[0]||'')+(s.apellidos[0]||'');
+    const pct=totalAportes>0?Math.round(aporte/totalAportes*100):0;
+    return `<div class="socio-card" onclick="abrirDetalleSocio('${s.id}')">
+      <div class="socio-avatar">${iniciales.toUpperCase()}</div>
+      <div class="socio-info">
+        <div class="socio-name">${nombreCompleto(s)}</div>
+        <div class="socio-meta">Cédula ${s.cedula} · Desde ${fmtDate(s.fechaIngreso)}</div>
+        <div class="progress-wrap"><div class="progress-bar"><div class="progress-fill pf-green" style="width:${pct}%"></div></div></div>
+      </div>
+      <div class="socio-aporte">
+        <div class="socio-aporte-val">${fmt(aporte)}</div>
+        <div class="socio-aporte-lbl">${pct}% del capital</div>
+        <div style="margin-top:6px;display:flex;gap:5px;justify-content:flex-end">
+          <button class="btn btn-green btn-xs" onclick="event.stopPropagation();openAporte('${s.id}')"><i class="ti ti-plus"></i>Aporte</button>
+          <button class="btn btn-outline btn-xs" onclick="event.stopPropagation();abrirDetalleSocio('${s.id}')"><i class="ti ti-eye"></i></button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function filtrarSocios(v){renderSocios(v)}
+
+function guardarSocio(){
+  const nombres=document.getElementById('ns-nombres').value.trim();
+  const apellidos=document.getElementById('ns-apellidos').value.trim();
+  const cedula=document.getElementById('ns-cedula').value.trim();
+  if(!nombres||!apellidos||!cedula){showToast('Nombre, apellido y cédula son obligatorios','error');return}
+  const id=uid();
+  DB.socios.push({id,nombres,apellidos,cedula,telefono:document.getElementById('ns-telefono').value,
+    email:document.getElementById('ns-email').value,fechaIngreso:document.getElementById('ns-fecha').value||hoyStr(),activo:true});
+  const aporte=parseFloat(document.getElementById('ns-aporte').value)||0;
+  if(aporte>0){
+    DB.capitalMovimientos.push({id:uid(),socioId:id,tipo:'aporte',monto:aporte,fecha:hoyStr(),desc:'Aporte inicial'});
+    // Asiento automático
+    const num=asientoCount+1;asientoCount++;
+    DB.asientos.push({id:uid(),codigo:'ASI-'+String(num).padStart(3,'0'),fecha:hoyStr(),tipo:'aporte',
+      desc:`Aporte inicial socio ${nombres} ${apellidos}`,
+      partidas:[{cuenta:'1.1.01 — Caja',debe:aporte,haber:0},{cuenta:'3.1.01 — Aportes de socios',debe:0,haber:aporte}]});
+  }
+  closeModal('modal-nuevo-socio');
+  renderSocios();
+  showToast('Socio registrado exitosamente');
+}
+
+function abrirDetalleSocio(socioId){
+  currentSocioId=socioId;
+  const s=getSocio(socioId);
+  const movs=DB.capitalMovimientos.filter(m=>m.socioId===socioId);
+  const total=movs.reduce((a,m)=>m.tipo==='aporte'?a+m.monto:m.tipo==='retiro'?a-m.monto:a,0);
+  document.getElementById('ds-nombre').value=nombreCompleto(s);
+  document.getElementById('ds-cedula').value=s.cedula;
+  document.getElementById('ds-total').value=fmt(total);
+  document.getElementById('ds-fecha').value=fmtDate(s.fechaIngreso);
+  document.getElementById('tbody-movimientos').innerHTML=movs.length?movs.map(m=>`
+    <tr><td class="mono">${fmtDate(m.fecha)}</td>
+    <td><span class="badge ${m.tipo==='aporte'?'bg-green':m.tipo==='retiro'?'bg-red':'bg-blue'}">${m.tipo}</span></td>
+    <td class="mono ${m.tipo==='retiro'?'cv-red':''}">${m.tipo==='retiro'?'-':''}${fmt(m.monto)}</td>
+    <td>${m.desc||'—'}</td></tr>`).join('')
+    :'<tr><td colspan="4" style="text-align:center;padding:20px;color:var(--text3)">Sin movimientos</td></tr>';
+  openModal('modal-detalle-socio');
+}
+
+function openAporte(socioId){
+  currentSocioId=socioId;
+  const s=getSocio(socioId);
+  document.getElementById('aporte-socio-id').value=socioId;
+  document.getElementById('aporte-socio-nombre').value=nombreCompleto(s);
+  document.getElementById('aporte-fecha').value=hoyStr();
+  document.getElementById('aporte-monto').value='';
+  document.getElementById('aporte-desc').value='';
+  openModal('modal-aporte');
+}
+
+function guardarAporte(){
+  const socioId=document.getElementById('aporte-socio-id').value;
+  const tipo=document.getElementById('aporte-tipo').value;
+  const monto=parseFloat(document.getElementById('aporte-monto').value)||0;
+  const fecha=document.getElementById('aporte-fecha').value||hoyStr();
+  const desc=document.getElementById('aporte-desc').value;
+  if(!monto){showToast('Ingresa el monto','error');return}
+  DB.capitalMovimientos.push({id:uid(),socioId,tipo,monto,fecha,desc});
+  // Asiento automático
+  const num=asientoCount+1;asientoCount++;
+  const s=getSocio(socioId);
+  let partidas;
+  if(tipo==='aporte')partidas=[{cuenta:'1.1.01 — Caja',debe:monto,haber:0},{cuenta:'3.1.01 — Aportes de socios',debe:0,haber:monto}];
+  else if(tipo==='retiro')partidas=[{cuenta:'3.1.01 — Aportes de socios',debe:monto,haber:0},{cuenta:'1.1.01 — Caja',debe:0,haber:monto}];
+  else partidas=[{cuenta:'3.2.01 — Utilidades del ejercicio',debe:monto,haber:0},{cuenta:'1.1.01 — Caja',debe:0,haber:monto}];
+  DB.asientos.push({id:uid(),codigo:'ASI-'+String(num).padStart(3,'0'),fecha,tipo,
+    desc:`${tipo.charAt(0).toUpperCase()+tipo.slice(1)} - ${nombreCompleto(s)}`,partidas});
+  closeModal('modal-aporte');
+  renderSocios();
+  if(currentSocioId)abrirDetalleSocio(currentSocioId);
+  showToast('Movimiento registrado y asiento generado');
+}
+
+// ═══════════════════════════════════════════════════════════════
+// CONTABILIDAD
+// ═══════════════════════════════════════════════════════════════
+function renderContabilidad(){
+  renderAsientos();
+  renderPlanCuentas();
+}
+
+function renderAsientos(){
+  const lista=[...DB.asientos].sort((a,b)=>b.fecha.localeCompare(a.fecha));
+  document.getElementById('lista-asientos').innerHTML=lista.length?lista.map(a=>{
+    const totalDebe=a.partidas.reduce((s,p)=>s+p.debe,0);
+    const totalHaber=a.partidas.reduce((s,p)=>s+p.haber,0);
+    return `<div class="asiento">
+      <div class="asiento-head" onclick="toggleAsiento('${a.id}')">
+        <div>
+          <div class="asiento-code">${a.codigo} · <span style="color:var(--text2)">${a.tipo}</span></div>
+          <div class="asiento-desc">${a.desc}</div>
+          <div class="asiento-fecha">${fmtDate(a.fecha)}</div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-family:monospace;font-size:13px;color:var(--green)">${fmt(totalDebe)}</div>
+          <div style="font-size:10px;color:var(--text3)">Debe = Haber</div>
+        </div>
+      </div>
+      <div class="asiento-body" id="ab-${a.id}">
+        <table class="asiento-table">
+          <thead><tr><th>Cuenta</th><th style="text-align:right">Debe</th><th style="text-align:right">Haber</th></tr></thead>
+          <tbody>
+            ${a.partidas.map(p=>`<tr>
+              <td>${p.cuenta}</td>
+              <td style="text-align:right" class="td-debe">${p.debe?fmt(p.debe):'—'}</td>
+              <td style="text-align:right" class="td-haber">${p.haber?fmt(p.haber):'—'}</td>
+            </tr>`).join('')}
+            <tr class="td-totals">
+              <td style="font-weight:600">TOTALES</td>
+              <td style="text-align:right;font-weight:700">${fmt(totalDebe)}</td>
+              <td style="text-align:right;font-weight:700">${fmt(totalHaber)}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>`;
+  }).join(''):'<div class="empty"><i class="ti ti-book-2"></i><p>No hay asientos contables registrados</p></div>';
+}
+
+function toggleAsiento(id){
+  const el=document.getElementById('ab-'+id);
+  el.classList.toggle('open');
+}
+
+function renderPlanCuentas(){
+  const tipos={activo:'ct-activo',pasivo:'ct-pasivo',patrimonio:'ct-patrimonio',ingreso:'ct-ingreso',gasto:'ct-gasto'};
+  document.getElementById('lista-cuentas').innerHTML=DB.cuentas.map(c=>`
+    <div class="cuenta-row" style="${c.nivel===1?'background:rgba(255,255,255,.02);font-weight:600':''}${c.nivel===2?'padding-left:24px':''}${c.nivel===3?'padding-left:40px':''}">
+      <div class="cuenta-nivel">${c.nivel===1?'▶':c.nivel===2?'├':'└'}</div>
+      <div class="cuenta-codigo">${c.codigo}</div>
+      <div class="cuenta-nombre">${c.nombre}</div>
+      ${c.nivel===3?`<span class="cuenta-tipo ${tipos[c.tipo]||''}">${c.tipo}</span>`:''}
+    </div>`).join('');
+}
+
+// PARTIDAS DEL ASIENTO
+const plantillasAsiento={
+  aporte:[{cuenta:'1.1.01 — Caja',debe:0,haber:0},{cuenta:'3.1.01 — Aportes de socios',debe:0,haber:0}],
+  credito:[{cuenta:'1.3.01 — Cartera de créditos vigente',debe:0,haber:0},{cuenta:'1.1.01 — Caja',debe:0,haber:0}],
+  cobro_interes:[{cuenta:'1.1.01 — Caja',debe:0,haber:0},{cuenta:'1.3.01 — Cartera de créditos vigente',debe:0,haber:0},{cuenta:'4.1.01 — Intereses en créditos',debe:0,haber:0}],
+  cobro_capital:[{cuenta:'1.1.01 — Caja',debe:0,haber:0},{cuenta:'1.3.01 — Cartera de créditos vigente',debe:0,haber:0}],
+  retiro:[{cuenta:'3.1.01 — Aportes de socios',debe:0,haber:0},{cuenta:'1.1.01 — Caja',debe:0,haber:0}],
+  dividendo:[{cuenta:'3.2.01 — Utilidades del ejercicio',debe:0,haber:0},{cuenta:'1.1.01 — Caja',debe:0,haber:0}],
+  manual:[{cuenta:'',debe:0,haber:0},{cuenta:'',debe:0,haber:0}],
+};
+
+function precargarAsiento(tipo){
+  if(!tipo)return;
+  document.getElementById('tbody-partidas').innerHTML='';
+  const plantilla=plantillasAsiento[tipo]||plantillasAsiento.manual;
+  plantilla.forEach(p=>addPartida(p));
+}
+
+function addPartida(data={}){
+  const id='p'+Date.now()+Math.random().toString(36).substr(2,4);
+  const cuentasOpts=DB.cuentas.filter(c=>c.nivel===3).map(c=>`<option value="${c.codigo} — ${c.nombre}" ${data.cuenta&&data.cuenta.includes(c.codigo)?'selected':''}>${c.codigo} — ${c.nombre}</option>`).join('');
+  const tr=document.createElement('tr');
+  tr.id='partida-'+id;
+  tr.innerHTML=`
+    <td><select style="width:100%;background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:6px 8px;border-radius:var(--radius);font-size:12px;outline:none" onchange="recalcTotales()">
+      <option value="">— Cuenta —</option>${cuentasOpts}</select></td>
+    <td><input type="number" placeholder="0.00" step="0.01" value="${data.debe||''}" style="width:100%;background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:6px 8px;border-radius:var(--radius);font-size:12px;text-align:right;outline:none" class="debe-inp" oninput="recalcTotales()"></td>
+    <td><input type="number" placeholder="0.00" step="0.01" value="${data.haber||''}" style="width:100%;background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:6px 8px;border-radius:var(--radius);font-size:12px;text-align:right;outline:none" class="haber-inp" oninput="recalcTotales()"></td>
+    <td><button onclick="document.getElementById('partida-${id}').remove();recalcTotales()" style="background:none;border:none;color:var(--red);cursor:pointer;font-size:16px;padding:4px"><i class="ti ti-trash"></i></button></td>`;
+  document.getElementById('tbody-partidas').appendChild(tr);
+  recalcTotales();
+}
+
+function recalcTotales(){
+  const debe=[...document.querySelectorAll('.debe-inp')].reduce((a,i)=>a+(parseFloat(i.value)||0),0);
+  const haber=[...document.querySelectorAll('.haber-inp')].reduce((a,i)=>a+(parseFloat(i.value)||0),0);
+  document.getElementById('asi-total-debe').textContent=fmt(debe);
+  document.getElementById('asi-total-haber').textContent=fmt(haber);
+  const msg=document.getElementById('asi-balance-msg');
+  if(Math.abs(debe-haber)<0.01){msg.textContent='✓ Balanceado';msg.style.color='var(--green)';}
+  else{msg.textContent='⚠ Diferencia: '+fmt(Math.abs(debe-haber));msg.style.color='var(--red)';}
+}
+
+function guardarAsiento(){
+  const fecha=document.getElementById('asi-fecha').value||hoyStr();
+  const tipo=document.getElementById('asi-tipo').value||'manual';
+  const desc=document.getElementById('asi-desc').value.trim();
+  if(!desc){showToast('Agrega una descripción al asiento','error');return}
+  const filas=[...document.getElementById('tbody-partidas').querySelectorAll('tr')];
+  const partidas=filas.map(tr=>({
+    cuenta:tr.querySelector('select').value,
+    debe:parseFloat(tr.querySelector('.debe-inp').value)||0,
+    haber:parseFloat(tr.querySelector('.haber-inp').value)||0,
+  })).filter(p=>p.cuenta);
+  if(partidas.length<2){showToast('Un asiento necesita al menos 2 partidas','error');return}
+  const debe=partidas.reduce((a,p)=>a+p.debe,0);
+  const haber=partidas.reduce((a,p)=>a+p.haber,0);
+  if(Math.abs(debe-haber)>0.01){showToast('El asiento no está balanceado (Debe ≠ Haber)','error');return}
+  asientoCount++;
+  DB.asientos.push({id:uid(),codigo:'ASI-'+String(asientoCount).padStart(3,'0'),fecha,tipo,desc,partidas});
+  closeModal('modal-nuevo-asiento');
+  renderAsientos();
+  showToast('Asiento '+('ASI-'+String(asientoCount).padStart(3,'0'))+' registrado');
+  document.getElementById('tbody-partidas').innerHTML='';
+  document.getElementById('asi-desc').value='';
+}
+
+function guardarCuenta(){
+  const codigo=document.getElementById('cc-codigo').value.trim();
+  const nombre=document.getElementById('cc-nombre').value.trim();
+  const tipo=document.getElementById('cc-tipo').value;
+  const nivel=parseInt(document.getElementById('cc-nivel').value);
+  if(!codigo||!nombre){showToast('Código y nombre son obligatorios','error');return}
+  DB.cuentas.push({codigo,nombre,tipo,nivel});
+  DB.cuentas.sort((a,b)=>a.codigo.localeCompare(b.codigo));
+  closeModal('modal-nueva-cuenta');
+  renderPlanCuentas();
+  showToast('Cuenta contable creada');
+}
+
+// ═══════════════════════════════════════════════════════════════
+// REPORTES
+// ═══════════════════════════════════════════════════════════════
+function initReportes(){
+  const hoy=hoyStr();
+  const primerDiaMes=hoy.substr(0,8)+'01';
+  document.getElementById('rep-desde').value=primerDiaMes;
+  document.getElementById('rep-hasta').value=hoy;
+  generarReporte();
+}
+
+function generarReporte(){
+  const desde=document.getElementById('rep-desde').value;
+  const hasta=document.getElementById('rep-hasta').value;
+  const pagosPer=DB.pagos.filter(p=>p.fechaPago>=desde&&p.fechaPago<=hasta);
+  const ef=pagosPer.filter(p=>p.metodo==='efectivo').reduce((a,p)=>a+(p.capital+p.interes),0);
+  const tr=pagosPer.filter(p=>p.metodo==='transferencia').reduce((a,p)=>a+(p.capital+p.interes),0);
+  const otro=pagosPer.filter(p=>p.metodo!=='efectivo'&&p.metodo!=='transferencia').reduce((a,p)=>a+(p.capital+p.interes),0);
+  const intCobrados=pagosPer.reduce((a,p)=>a+p.interes,0);
+  const capRec=pagosPer.reduce((a,p)=>a+p.capital,0);
+
+  const movsPer=DB.capitalMovimientos.filter(m=>m.fecha>=desde&&m.fecha<=hasta);
+  const aportes=movsPer.filter(m=>m.tipo==='aporte').reduce((a,m)=>a+m.monto,0);
+  const retiros=movsPer.filter(m=>m.tipo==='retiro').reduce((a,m)=>a+m.monto,0);
+  const dividendos=movsPer.filter(m=>m.tipo==='dividendo').reduce((a,m)=>a+m.monto,0);
+
+  const creditosPer=DB.creditos.filter(c=>c.fechaInicio>=desde&&c.fechaInicio<=hasta);
+  const creditosActivos=DB.creditos.filter(c=>c.estado!=='cancelado');
+  const enMora=DB.creditos.filter(c=>c.estado==='mora');
+  const saldoTotal=creditosActivos.reduce((a,c)=>a+c.saldo,0);
+  const montoTotal=creditosPer.reduce((a,c)=>a+c.montoOriginal,0);
+
+  document.getElementById('rep-ef').textContent=fmt(ef);
+  document.getElementById('rep-tr').textContent=fmt(tr);
+  document.getElementById('rep-otro').textContent=fmt(otro);
+  document.getElementById('rep-total-cobros').textContent=fmt(ef+tr+otro);
+  document.getElementById('rep-aportes').textContent=fmt(aportes);
+  document.getElementById('rep-retiros-rep').textContent=fmt(retiros);
+  document.getElementById('rep-dividendos').textContent=fmt(dividendos);
+  document.getElementById('rep-cap-neto').textContent=fmt(aportes-retiros-dividendos);
+  document.getElementById('rep-cred-n').textContent=creditosPer.length;
+  document.getElementById('rep-cred-monto').textContent=fmt(montoTotal);
+  document.getElementById('rep-cred-saldo').textContent=fmt(saldoTotal);
+  document.getElementById('rep-al-dia').textContent=creditosActivos.length-enMora.length;
+  document.getElementById('rep-en-mora').textContent=enMora.length;
+  document.getElementById('rep-cancelados').textContent=DB.creditos.filter(c=>c.estado==='cancelado'&&c.fechaInicio>=desde).length;
+  document.getElementById('rep-int-cobrados').textContent=fmt(intCobrados);
+  document.getElementById('rep-cap-rec').textContent=fmt(capRec);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// USUARIOS
+// ═══════════════════════════════════════════════════════════════
+function renderUsuarios(){
+  const admins=DB.usuarios.filter(u=>u.rol==='admin');
+  const contadores=DB.usuarios.filter(u=>u.rol==='contador');
+  const socios=DB.usuarios.filter(u=>u.rol==='socio');
+  document.getElementById('lista-admins').innerHTML=admins.length?admins.map(u=>userCard(u)).join(''):'<div style="color:var(--text3);font-size:13px;padding:8px">Sin administradores</div>';
+  document.getElementById('lista-contadores').innerHTML=contadores.length?contadores.map(u=>userCard(u)).join(''):'<div style="color:var(--text3);font-size:13px;padding:8px">Sin contadores</div>';
+  document.getElementById('lista-usuarios-socios').innerHTML=socios.length?socios.map(u=>userCard(u)).join(''):'<div style="color:var(--text3);font-size:13px;padding:8px">No hay socios con acceso al portal</div>';
+}
+
+function userCard(u){
+  const clsAvatar={admin:'ua-admin',contador:'ua-contador',socio:'ua-socio'}[u.rol]||'ua-admin';
+  const iniciales=u.nombre.split(' ').map(n=>n[0]).slice(0,2).join('').toUpperCase();
+  const rolLabel={admin:'Administrador',contador:'Contador / Tesorero',socio:'Socio (consulta)'}[u.rol];
+  return `<div class="user-card">
+    <div class="user-card-avatar ${clsAvatar}">${iniciales}</div>
+    <div class="user-card-info">
+      <div class="user-card-name">${u.nombre}</div>
+      <div class="user-card-email">${u.email}</div>
+      <span class="badge ${u.rol==='admin'?'bg-green':u.rol==='contador'?'bg-blue':'bg-purple'}" style="margin-top:4px">${rolLabel}</span>
+    </div>
+    <div class="user-card-actions">
+      <button class="btn btn-outline btn-xs" onclick="eliminarUsuario('${u.id}')"><i class="ti ti-trash" style="color:var(--red)"></i></button>
+    </div>
+  </div>`;
+}
+
+function guardarUsuario(){
+  const nombre=document.getElementById('nu-nombre').value.trim();
+  const email=document.getElementById('nu-email').value.trim().toLowerCase();
+  const rol=document.getElementById('nu-rol').value;
+  const pass=document.getElementById('nu-pass').value;
+  const pass2=document.getElementById('nu-pass2').value;
+  if(!nombre||!email){showToast('Nombre y correo son obligatorios','error');return}
+  if(pass!==pass2){showToast('Las contraseñas no coinciden','error');return}
+  if(pass.length<6){showToast('La contraseña debe tener al menos 6 caracteres','error');return}
+  if(DB.usuarios.find(u=>u.email===email)){showToast('Ya existe un usuario con ese correo','error');return}
+  DB.usuarios.push({id:uid(),nombre,email,rol,activo:true,pass});
+  closeModal('modal-nuevo-usuario');
+  renderUsuarios();
+  showToast('Usuario '+nombre+' creado exitosamente');
+  document.getElementById('nu-nombre').value='';document.getElementById('nu-email').value='';
+  document.getElementById('nu-pass').value='';document.getElementById('nu-pass2').value='';
+}
+
+function eliminarUsuario(id){
+  if(!confirm('¿Eliminar este usuario?'))return;
+  const idx=DB.usuarios.findIndex(u=>u.id===id);
+  if(idx>-1)DB.usuarios.splice(idx,1);
+  renderUsuarios();
+  showToast('Usuario eliminado');
+}
+
+// ═══════════════════════════════════════════════════════════════
+// CONFIGURACIÓN
+// ═══════════════════════════════════════════════════════════════
+function guardarConfig(){showToast('Configuración guardada')}
+function guardarSupabase(){
+  const url=document.getElementById('cfg-sb-url').value.trim();
+  const key=document.getElementById('cfg-sb-key').value.trim();
+  if(!url||!key){showToast('Ingresa URL y API key','error');return}
+  localStorage.setItem('sb_url',url);localStorage.setItem('sb_key',key);
+  showToast('Conexión Supabase guardada');
+}
+function testSupabase(){showToast('Para probar la conexión necesitas abrir este archivo en un servidor web')}
+
+// ═══════════════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════════════
+(function init(){
+  const hoy=new Date();
+  document.getElementById('fecha-hoy').textContent=hoy.toLocaleDateString('es-EC',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  document.getElementById('f-fecha').value=hoyStr();
+  document.getElementById('ns-fecha').value=hoyStr();
+  document.getElementById('np-fecha').value=hoyStr();
+  document.getElementById('asi-fecha').value=hoyStr();
+  renderDashboard();
+  actualizarSelectClientes();
+  // Cargar credenciales Supabase guardadas
+  const url=localStorage.getItem('sb_url');const key=localStorage.getItem('sb_key');
+  if(url)document.getElementById('cfg-sb-url').value=url;
+  if(key)document.getElementById('cfg-sb-key').value=key;
+})();
+
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape')document.querySelectorAll('.modal-overlay.open').forEach(m=>m.classList.remove('open'));
+});
 </script>
 </body>
 </html>
