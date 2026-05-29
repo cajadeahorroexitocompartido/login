@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Caja de Ahorro y Crédito Éxito Compartido</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{
+  --bg:#000000;
+  --bg2:#0a0a0a;
+  --bg3:#111111;
+  --bg4:#1a1a1a;
+  --bg5:#222222;
+  --green:#22c55e;
+  --green2:#16a34a;
+  --green3:rgba(34,197,94,0.12);
+  --orange:#f97316;
+  --orange3:rgba(249,115,22,0.12);
+  --yellow:#eab308;
+  --yellow3:rgba(234,179,8,0.1);
+  --red:#ef4444;
+  --red3:rgba(239,68,68,0.12);
+  --text:#ffffff;
+  --text2:#a3a3a3;
+  --text3:#525252;
+  --border:rgba(255,255,255,0.08);
+  --border2:rgba(255,255,255,0.05);
+  --radius:10px;
+  --radius2:14px;
+  --sidebar:240px;
+}
+
+html,body{height:100%;font-family:'IBM Plex Sans',sans-serif;background:var(--bg);color:var(--text);font-size:14px;overflow-x:hidden}
+
+/* ── LAYOUT ── */
+.app{display:flex;min-height:100vh}
+
+/* ── SIDEBAR ── */
+.sidebar{
+  width:var(--sidebar);flex-shrink:0;
+  background:var(--bg2);
+  border-right:1px solid var(--border);
+  display:flex;flex-direction:column;
+  position:fixed;top:0;left:0;bottom:0;
+  z-index:200;
+  transition:transform .25s ease;
+}
+.logo-area{padding:20px 16px 16px;border-bottom:1px solid var(--border)}
+.logo-icon{
+  width:44px;height:44px;border-radius:12px;
+  background:var(--green);
+  display:flex;align-items:center;justify-content:center;
+  font-size:18px;font-weight:700;color:#000;margin-bottom:10px;
+}
+.logo-name{font-size:12px;font-weight:600;color:var(--text);line-height:1.3}
+.logo-sub{font-size:10px;color:var(--text3);margin-top:3px;font-style:italic}
+
+.nav{padding:12px 8px;flex:1;overflow-y:auto}
+.nav-group{font-size:10px;font-weight:500;color:var(--text3);letter-spacing:.1em;text-transform:uppercase;padding:12px 8px 5px}
+.nav-item{
+  display:flex;align-items:center;gap:10px;
+  padding:10px 10px;border-radius:var(--radius);
+  cursor:pointer;color:var(--text2);font-size:13px;
+  margin-bottom:2px;transition:all .15s;user-select:none;
+}
+.nav-item:hover{background:var(--bg4);color:var(--text)}
+.nav-item.active{background:var(--green3);color:var(--green);font-weight:500}
+.nav-item i{font-size:18px;width:22px;flex-shrink:0}
+.nav-badge{margin-left:auto;font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;min-width:22px;text-align:center}
+.nb-green{background:var(--green);color:#000}
+.nb-orange{background:var(--orange);color:#000}
+
+.sidebar-footer{padding:14px;border-top:1px solid var(--border)}
+.user-row{display:flex;align-items:center;gap:10px}
+.avatar{width:36px;height:36px;border-radius:50%;background:var(--green2);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#000;flex-shrink:0}
+.user-name{font-size:12px;font-weight:600}
+.user-role{font-size:11px;color:var(--text3)}
+
+/* ── HAMBURGER ── */
+.hamburger{display:none;background:none;border:none;color:var(--text);cursor:pointer;padding:8px;font-size:24px;line-height:1}
+.sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:190}
+.sidebar-overlay.open{display:block}
+
+/* ── MAIN ── */
+.main{flex:1;margin-left:var(--sidebar);display:flex;flex-direction:column;min-height:100vh}
+
+.topbar{
+  padding:12px 20px;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:12px;
+  background:var(--bg);position:sticky;top:0;z-index:100;
+}
+.topbar-left{display:flex;align-items:center;gap:12px;flex:1;min-width:0}
+.page-title{font-size:15px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.page-sub{font-size:11px;color:var(--text3)}
+
+/* ── BUTTONS ── */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:9px 16px;border-radius:var(--radius);font-size:13px;font-weight:500;cursor:pointer;border:none;font-family:'IBM Plex Sans',sans-serif;transition:all .15s;white-space:nowrap}
+.btn i{font-size:16px}
+.btn-green{background:var(--green);color:#000}
+.btn-green:hover{background:var(--green2)}
+.btn-outline{background:transparent;color:var(--text2);border:1px solid var(--border)}
+.btn-outline:hover{background:var(--bg4);color:var(--text)}
+.btn-sm{padding:6px 12px;font-size:12px}
+.btn-icon{padding:8px;border-radius:var(--radius)}
+
+/* ── CONTENT ── */
+.content{padding:18px 20px;flex:1}
+
+/* ── CARDS ── */
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius2);overflow:hidden;margin-bottom:16px}
+.card-header{padding:14px 18px;border-bottom:1px solid var(--border2);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
+.card-title{font-size:13px;font-weight:600;display:flex;align-items:center;gap:8px}
+.card-title i{font-size:16px;color:var(--green)}
+.card-body{padding:16px}
+
+/* ── FORM ── */
+.form-grid{display:grid;gap:14px}
+.g2{grid-template-columns:1fr 1fr}
+.g3{grid-template-columns:1fr 1fr 1fr}
+.field label{display:block;font-size:11px;color:var(--text3);margin-bottom:5px;font-weight:500;letter-spacing:.04em;text-transform:uppercase}
+.field input,.field select,.field textarea{
+  width:100%;background:var(--bg3);border:1px solid var(--border);
+  color:var(--text);padding:10px 12px;border-radius:var(--radius);
+  font-size:14px;font-family:'IBM Plex Sans',sans-serif;outline:none;
+  transition:border-color .15s;-webkit-appearance:none;
+}
+.field input:focus,.field select:focus{border-color:var(--green);background:var(--bg4)}
+.field select option{background:var(--bg3);color:var(--text)}
+.field input[readonly]{color:var(--text2)}
+
+/* ── SUMMARY BOXES ── */
+.summary-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:16px}
+.sum-box{background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius);padding:14px}
+.sum-box.hl{border-color:rgba(34,197,94,.35);background:rgba(34,197,94,.05)}
+.sum-label{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:6px}
+.sum-value{font-size:20px;font-weight:600;font-family:'IBM Plex Mono',monospace}
+.cv-green{color:var(--green)}
+.cv-orange{color:var(--orange)}
+.cv-yellow{color:var(--yellow)}
+.cv-red{color:var(--red)}
+
+/* ── TABS ── */
+.tabs{display:flex;overflow-x:auto;padding:0 16px;background:var(--bg2);border-bottom:1px solid var(--border2);scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{padding:12px 16px;font-size:13px;cursor:pointer;color:var(--text3);border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .15s;user-select:none;white-space:nowrap}
+.tab:hover{color:var(--text2)}
+.tab.active{color:var(--green);border-bottom-color:var(--green)}
+
+/* ── TABLE ── */
+.tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+table{width:100%;border-collapse:collapse;min-width:540px}
+thead th{font-size:10px;color:var(--text3);font-weight:500;text-transform:uppercase;letter-spacing:.07em;padding:10px 14px;text-align:left;border-bottom:1px solid var(--border2);white-space:nowrap}
+tbody td{padding:11px 14px;font-size:13px;border-bottom:1px solid rgba(255,255,255,.03)}
+tbody tr:last-child td{border-bottom:none}
+tbody tr:hover td{background:rgba(255,255,255,.02)}
+tbody tr.row-hl td{background:rgba(234,179,8,.04)}
+.mono{font-family:'IBM Plex Mono',monospace;font-size:12px}
+
+/* ── BADGES ── */
+.badge{display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:500}
+.bg-green{background:rgba(34,197,94,.13);color:var(--green)}
+.bg-orange{background:rgba(249,115,22,.13);color:var(--orange)}
+.bg-yellow{background:rgba(234,179,8,.13);color:var(--yellow)}
+.bg-red{background:rgba(239,68,68,.13);color:var(--red)}
+.bg-gray{background:rgba(255,255,255,.06);color:var(--text3)}
+
+/* ── MODAL ── */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:300;align-items:flex-end;justify-content:center}
+.modal-overlay.open{display:flex}
+@media(min-width:600px){.modal-overlay{align-items:center}}
+.modal{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius2) var(--radius2) 0 0;width:100%;max-width:580px;max-height:92vh;overflow-y:auto}
+@media(min-width:600px){.modal{border-radius:var(--radius2)}}
+.modal-header{padding:16px 18px;border-bottom:1px solid var(--border2);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:var(--bg2);z-index:10}
+.modal-title{font-size:14px;font-weight:600}
+.modal-close{background:none;border:none;color:var(--text3);cursor:pointer;font-size:22px;padding:2px;line-height:1}
+.modal-body{padding:18px}
+.modal-footer{padding:14px 18px;border-top:1px solid var(--border2);display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap}
+
+/* ── ALERT ── */
+.alert{padding:10px 14px;border-radius:var(--radius);font-size:13px;margin-bottom:14px;display:flex;align-items:flex-start;gap:8px;line-height:1.5}
+.alert i{font-size:16px;flex-shrink:0;margin-top:1px}
+.alert-green{background:rgba(34,197,94,.1);color:var(--green);border:1px solid rgba(34,197,94,.2)}
+.alert-orange{background:rgba(249,115,22,.1);color:var(--orange);border:1px solid rgba(249,115,22,.2)}
+
+/* ── SCREEN ── */
+.screen{display:none}.screen.active{display:block}
+@keyframes fi{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.screen.active{animation:fi .2s ease}
+
+/* ── DIVIDER ── */
+.divider{height:1px;background:var(--border2);margin:14px 0}
+
+/* ── RESPONSIVE ── */
+@media(max-width:768px){
+  .sidebar{transform:translateX(-100%)}
+  .sidebar.open{transform:translateX(0)}
+  .hamburger{display:block}
+  .main{margin-left:0}
+  .g3{grid-template-columns:1fr 1fr}
+  .g2{grid-template-columns:1fr}
+  .topbar-actions .btn span{display:none}
+  .topbar-actions .btn i{margin:0}
+  table{min-width:480px}
+  .content{padding:14px}
+}
+@media(max-width:420px){
+  .g3{grid-template-columns:1fr}
+  .summary-grid{grid-template-columns:1fr 1fr}
+  .sum-value{font-size:17px}
+}
+
+/* ── PRINT ── */
+@media print{
+  .sidebar,.topbar,.tabs,.no-print{display:none!important}
+  .main{margin-left:0}
+  .content{padding:0}
+  body{background:#fff;color:#000}
+  .card{border:1px solid #ddd;page-break-inside:avoid}
+  .sum-box{background:#f5f5f5}
+  tbody td,thead th{color:#000!important}
+  .badge{border:1px solid #ccc}
+  .print-header{display:block!important}
+}
+.print-header{display:none;text-align:center;margin-bottom:20px}
+.print-header h2{font-size:16px;font-weight:700}
+.print-header p{font-size:12px;color:#555;margin-top:4px}
+</style>
+</head>
+<body>
+
+<div class="app">
+
+<!-- SIDEBAR OVERLAY (mobile) -->
+<div class="sidebar-overlay" id="overlay" onclick="closeSidebar()"></div>
+
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+  <div class="logo-area">
+    <div class="logo-icon">EC</div>
+    <div class="logo-name">Caja de Ahorro y Crédito</div>
+    <div class="logo-sub">Éxito Compartido</div>
+  </div>
+
+  <nav class="nav">
+    <div class="nav-group">Principal</div>
+    <div class="nav-item" onclick="navClick(this,'Dashboard')"><i class="ti ti-layout-dashboard"></i>Dashboard</div>
+    <div class="nav-item" onclick="navClick(this,'Clientes')"><i class="ti ti-users"></i>Clientes<span class="nav-badge nb-green">18</span></div>
+    <div class="nav-item active" onclick="navClick(this,'Créditos')"><i class="ti ti-credit-card"></i>Créditos</div>
+    <div class="nav-item" onclick="navClick(this,'Pagos')"><i class="ti ti-cash"></i>Pagos<span class="nav-badge nb-orange">3</span></div>
+    <div class="nav-group">Administración</div>
+    <div class="nav-item" onclick="navClick(this,'Socios')"><i class="ti ti-briefcase"></i>Socios</div>
+    <div class="nav-item" onclick="navClick(this,'Reportes')"><i class="ti ti-chart-bar"></i>Reportes</div>
+    <div class="nav-item" onclick="navClick(this,'Estados Financieros')"><i class="ti ti-file-text"></i>Est. Financieros</div>
+    <div class="nav-group">Sistema</div>
+    <div class="nav-item" onclick="navClick(this,'Configuración')"><i class="ti ti-settings"></i>Configuración</div>
+  </nav>
+
+  <div class="sidebar-footer">
+    <div class="user-row">
+      <div class="avatar">AD</div>
+      <div>
+        <div class="user-name">Administrador</div>
+        <div class="user-role">Acceso total</div>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <button class="hamburger no-print" onclick="openSidebar()"><i class="ti ti-menu-2"></i></button>
+    <div class="topbar-left">
+      <div>
+        <div class="page-title">Módulo de Créditos</div>
+        <div class="page-sub">Éxito Compartido</div>
+      </div>
+    </div>
+    <div class="topbar-actions" style="display:flex;gap:8px">
+      <button class="btn btn-outline btn-sm no-print" onclick="window.print()"><i class="ti ti-printer"></i><span>Imprimir</span></button>
+      <button class="btn btn-green btn-sm no-print" onclick="openModal('modal-nuevo')"><i class="ti ti-plus"></i><span>Nuevo crédito</span></button>
+    </div>
+  </div>
+
+  <!-- TABS -->
+  <div class="tabs no-print">
+    <div class="tab active" onclick="showTab('calc',this)"><i class="ti ti-calculator" style="font-size:14px;vertical-align:-2px;margin-right:5px"></i>Calculadora</div>
+    <div class="tab" onclick="showTab('lista',this)"><i class="ti ti-list" style="font-size:14px;vertical-align:-2px;margin-right:5px"></i>Créditos activos</div>
+    <div class="tab" onclick="showTab('historial',this)"><i class="ti ti-history" style="font-size:14px;vertical-align:-2px;margin-right:5px"></i>Historial de pagos</div>
+  </div>
+
+  <div class="content">
+
+    <!-- PRINT HEADER -->
+    <div class="print-header">
+      <h2>Caja de Ahorro y Crédito Éxito Compartido</h2>
+      <p>Tabla de amortización generada el <span id="print-date"></span></p>
+    </div>
+
+    <!-- ── TAB CALCULADORA ── -->
+    <div class="screen active" id="screen-calc">
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title"><i class="ti ti-sliders"></i>Parámetros del crédito</div>
+        </div>
+        <div class="card-body">
+          <div class="form-grid g3">
+            <div class="field" style="grid-column:1/-1">
+              <label>Cliente</label>
+              <select id="f-cliente">
+                <option value="">— Seleccionar cliente —</option>
+                <option>María Torres — Cédula 1712345678</option>
+                <option>Jorge Ríos — Cédula 1798765432</option>
+                <option>Ana Mora — Cédula 1734567890</option>
+                <option>Carlos Vega — Cédula 1756781234</option>
+                <option>Luis Pinto — Cédula 1723456789</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Monto del crédito ($)</label>
+              <input type="number" id="f-monto" value="5000" min="1" step="100" inputmode="numeric" oninput="calcular()">
+            </div>
+            <div class="field">
+              <label>Tasa de interés mensual (%)</label>
+              <input type="number" id="f-tasa" value="1.5" min="0.01" step="0.01" inputmode="decimal" oninput="calcular()">
+            </div>
+            <div class="field">
+              <label>Número de cuotas</label>
+              <input type="number" id="f-plazo" value="12" min="1" max="360" inputmode="numeric" oninput="calcular()">
+            </div>
+            <div class="field">
+              <label>Frecuencia de pago</label>
+              <select id="f-tipo-plazo" onchange="calcular()">
+                <option value="mensual">Mensual</option>
+                <option value="quincenal">Quincenal</option>
+                <option value="semanal">Semanal</option>
+                <option value="diario">Diario</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Tabla de amortización</label>
+              <select id="f-tabla" onchange="calcular()">
+                <option value="francesa">Francesa — cuota fija</option>
+                <option value="alemana">Alemana — capital fijo</option>
+                <option value="americana">Americana — interés periódico</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Fecha de inicio</label>
+              <input type="date" id="f-fecha" oninput="calcular()">
+            </div>
+          </div>
+
+          <div class="summary-grid">
+            <div class="sum-box hl">
+              <div class="sum-label">Cuota a pagar</div>
+              <div class="sum-value cv-green" id="s-cuota">$0.00</div>
+            </div>
+            <div class="sum-box">
+              <div class="sum-label">Monto del crédito</div>
+              <div class="sum-value" id="s-monto">$0.00</div>
+            </div>
+            <div class="sum-box">
+              <div class="sum-label">Total intereses</div>
+              <div class="sum-value cv-orange" id="s-interes">$0.00</div>
+            </div>
+            <div class="sum-box">
+              <div class="sum-label">Total a pagar</div>
+              <div class="sum-value cv-yellow" id="s-total">$0.00</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" id="card-tabla">
+        <div class="card-header">
+          <div class="card-title"><i class="ti ti-table"></i>Tabla de amortización</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap" class="no-print">
+            <button class="btn btn-outline btn-sm" onclick="window.print()"><i class="ti ti-file-pdf"></i>PDF</button>
+            <button class="btn btn-green btn-sm" onclick="registrarCredito()"><i class="ti ti-device-floppy"></i>Registrar</button>
+          </div>
+        </div>
+        <div class="tbl-wrap">
+          <table id="tabla-amort">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Fecha</th>
+                <th>Cuota</th>
+                <th>Capital</th>
+                <th>Interés</th>
+                <th>Saldo</th>
+                <th>Estado</th>
+              </tr>
+            </thead>
+            <tbody id="tbody-amort">
+              <tr><td colspan="7" style="text-align:center;padding:32px;color:var(--text3)"><i class="ti ti-arrow-up" style="font-size:18px;display:block;margin:0 auto 8px"></i>Ingresa los parámetros para generar la tabla</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── TAB LISTA ── -->
+    <div class="screen" id="screen-lista">
+      <div class="alert alert-green no-print">
+        <i class="ti ti-info-circle"></i>
+        <span>Al conectar la base de datos, aquí aparecerán todos los créditos registrados en tiempo real.</span>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title"><i class="ti ti-credit-card"></i>Créditos activos</div>
+          <input type="search" placeholder="Buscar..." style="background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:8px 12px;border-radius:var(--radius);font-size:13px;width:160px;outline:none">
+        </div>
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr><th>#</th><th>Cliente</th><th>Monto orig.</th><th>Saldo</th><th>Cuota</th><th>Próx. pago</th><th>Estado</th><th class="no-print">Acción</th></tr></thead>
+            <tbody>
+              <tr>
+                <td class="mono">C-001</td><td>María Torres</td>
+                <td class="mono">$5,000.00</td><td class="mono">$3,240.00</td>
+                <td class="mono">$462.00</td><td class="mono">01/06/26</td>
+                <td><span class="badge bg-green">Al día</span></td>
+                <td class="no-print"><button class="btn btn-outline btn-sm">Ver</button></td>
+              </tr>
+              <tr>
+                <td class="mono">C-002</td><td>Jorge Ríos</td>
+                <td class="mono">$3,500.00</td><td class="mono">$2,100.00</td>
+                <td class="mono">$320.00</td><td class="mono">02/06/26</td>
+                <td><span class="badge bg-green">Al día</span></td>
+                <td class="no-print"><button class="btn btn-outline btn-sm">Ver</button></td>
+              </tr>
+              <tr>
+                <td class="mono">C-003</td><td>Luis Pinto</td>
+                <td class="mono">$2,000.00</td><td class="mono">$1,450.00</td>
+                <td class="mono">$185.00</td><td class="mono">28/05/26</td>
+                <td><span class="badge bg-red">En mora</span></td>
+                <td class="no-print"><button class="btn btn-outline btn-sm">Ver</button></td>
+              </tr>
+              <tr>
+                <td class="mono">C-004</td><td>Ana Mora</td>
+                <td class="mono">$8,000.00</td><td class="mono">$5,600.00</td>
+                <td class="mono">$742.00</td><td class="mono">05/06/26</td>
+                <td><span class="badge bg-green">Al día</span></td>
+                <td class="no-print"><button class="btn btn-outline btn-sm">Ver</button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── TAB HISTORIAL ── -->
+    <div class="screen" id="screen-historial">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title"><i class="ti ti-history"></i>Historial de pagos</div>
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap" class="no-print">
+            <input type="date" style="background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:8px 10px;border-radius:var(--radius);font-size:12px;outline:none">
+            <span style="color:var(--text3);font-size:12px">al</span>
+            <input type="date" style="background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:8px 10px;border-radius:var(--radius);font-size:12px;outline:none">
+            <button class="btn btn-green btn-sm"><i class="ti ti-filter"></i>Filtrar</button>
+          </div>
+        </div>
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr><th>Fecha</th><th>Cliente</th><th>Crédito</th><th>#</th><th>Capital</th><th>Interés</th><th>Total</th><th>Saldo rest.</th></tr></thead>
+            <tbody>
+              <tr><td class="mono">22/05/26</td><td>María Torres</td><td class="mono">C-001</td><td class="mono">4</td><td class="mono">$405.00</td><td class="mono cv-orange">$57.00</td><td class="mono">$462.00</td><td class="mono">$3,240.00</td></tr>
+              <tr><td class="mono">20/05/26</td><td>Jorge Ríos</td><td class="mono">C-002</td><td class="mono">3</td><td class="mono">$285.00</td><td class="mono cv-orange">$35.00</td><td class="mono">$320.00</td><td class="mono">$2,100.00</td></tr>
+              <tr><td class="mono">18/05/26</td><td>Ana Mora</td><td class="mono">C-004</td><td class="mono">3</td><td class="mono">$680.00</td><td class="mono cv-orange">$62.00</td><td class="mono">$742.00</td><td class="mono">$5,600.00</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</main>
+</div>
+
+<!-- MODAL NUEVO CRÉDITO -->
+<div class="modal-overlay" id="modal-nuevo">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title"><i class="ti ti-plus" style="color:var(--green);margin-right:6px"></i>Registrar nuevo crédito</div>
+      <button class="modal-close" onclick="closeModal('modal-nuevo')"><i class="ti ti-x"></i></button>
+    </div>
+    <div class="modal-body">
+      <div class="alert alert-orange">
+        <i class="ti ti-alert-triangle"></i>
+        <span>Usa primero la calculadora para ver la tabla de amortización antes de registrar.</span>
+      </div>
+      <div class="form-grid g2">
+        <div class="field" style="grid-column:1/-1">
+          <label>Cliente</label>
+          <select><option>María Torres</option><option>Jorge Ríos</option><option>Ana Mora</option><option>Carlos Vega</option></select>
+        </div>
+        <div class="field">
+          <label>Monto ($)</label>
+          <input type="number" value="5000" inputmode="numeric">
+        </div>
+        <div class="field">
+          <label>Tasa mensual (%)</label>
+          <input type="number" value="1.5" step="0.01" inputmode="decimal">
+        </div>
+        <div class="field">
+          <label>Número de cuotas</label>
+          <input type="number" value="12" inputmode="numeric">
+        </div>
+        <div class="field">
+          <label>Frecuencia</label>
+          <select><option>Mensual</option><option>Quincenal</option><option>Semanal</option></select>
+        </div>
+        <div class="field">
+          <label>Tabla de amortización</label>
+          <select><option>Francesa</option><option>Alemana</option><option>Americana</option></select>
+        </div>
+        <div class="field">
+          <label>Fecha de inicio</label>
+          <input type="date">
+        </div>
+      </div>
+      <div class="divider"></div>
+      <div class="field">
+        <label>Observaciones</label>
+        <textarea rows="2" style="width:100%;background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:10px 12px;border-radius:var(--radius);font-size:13px;resize:vertical;font-family:'IBM Plex Sans',sans-serif;outline:none"></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('modal-nuevo')">Cancelar</button>
+      <button class="btn btn-green" onclick="closeModal('modal-nuevo');showToast('Crédito registrado exitosamente')">
+        <i class="ti ti-check"></i>Registrar crédito
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast" style="position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--green);color:#000;padding:12px 20px;border-radius:var(--radius);font-size:13px;font-weight:500;z-index:400;transition:transform .3s ease;display:flex;align-items:center;gap:8px;box-shadow:0 4px 24px rgba(0,0,0,.5)">
+  <i class="ti ti-check"></i><span id="toast-msg"></span>
+</div>
+
+<script>
+// ── FORMATO ──────────────────────────────────────────────────
+const fmt = v => '$' + Number(v).toLocaleString('es-EC',{minimumFractionDigits:2,maximumFractionDigits:2});
+const fmtDate = d => {
+  const dd=String(d.getDate()).padStart(2,'0');
+  const mm=String(d.getMonth()+1).padStart(2,'0');
+  const yy=d.getFullYear();
+  return `${dd}/${mm}/${yy}`;
+};
+
+function addPeriod(date,tipo,n){
+  const d=new Date(date);
+  if(tipo==='mensual') d.setMonth(d.getMonth()+n);
+  else if(tipo==='quincenal') d.setDate(d.getDate()+n*15);
+  else if(tipo==='semanal') d.setDate(d.getDate()+n*7);
+  else d.setDate(d.getDate()+n);
+  return d;
+}
+
+// ── CALCULADORA ──────────────────────────────────────────────
+function calcular(){
+  const monto = parseFloat(document.getElementById('f-monto').value)||0;
+  const tasaMes = parseFloat(document.getElementById('f-tasa').value)||0;
+  const plazo = parseInt(document.getElementById('f-plazo').value)||0;
+  const tipoTabla = document.getElementById('f-tabla').value;
+  const tipoPlazo = document.getElementById('f-tipo-plazo').value;
+  const fechaStr = document.getElementById('f-fecha').value;
+  if(!monto||!tasaMes||!plazo) return;
+
+  let tasa;
+  const m={'mensual':1,'quincenal':2,'semanal':4,'diario':30};
+  tasa = tasaMes / (m[tipoPlazo]||1) / 100;
+
+  const fechaBase = fechaStr ? new Date(fechaStr+'T12:00:00') : new Date();
+  let filas=[];
+
+  if(tipoTabla==='francesa'){
+    const cuota = tasa===0 ? monto/plazo : monto*(tasa*Math.pow(1+tasa,plazo))/(Math.pow(1+tasa,plazo)-1);
+    let saldo=monto;
+    for(let i=1;i<=plazo;i++){
+      const interes=saldo*tasa;
+      const capital=cuota-interes;
+      saldo=Math.max(0,saldo-capital);
+      filas.push({n:i,fecha:addPeriod(fechaBase,tipoPlazo,i),cuota,capital,interes,saldo});
+    }
+  } else if(tipoTabla==='alemana'){
+    const capCuota=monto/plazo;
+    let saldo=monto;
+    for(let i=1;i<=plazo;i++){
+      const interes=saldo*tasa;
+      const cuota=capCuota+interes;
+      saldo=Math.max(0,saldo-capCuota);
+      filas.push({n:i,fecha:addPeriod(fechaBase,tipoPlazo,i),cuota,capital:capCuota,interes,saldo});
+    }
+  } else {
+    for(let i=1;i<=plazo;i++){
+      const interes=monto*tasa;
+      const capital=i===plazo?monto:0;
+      filas.push({n:i,fecha:addPeriod(fechaBase,tipoPlazo,i),cuota:interes+capital,capital,interes,saldo:i===plazo?0:monto});
+    }
+  }
+
+  const totalPagar=filas.reduce((a,f)=>a+f.cuota,0);
+  const totalIntereses=filas.reduce((a,f)=>a+f.interes,0);
+
+  document.getElementById('s-cuota').textContent = fmt(filas[0]?.cuota||0)+(tipoTabla==='alemana'?' var.':'');
+  document.getElementById('s-monto').textContent = fmt(monto);
+  document.getElementById('s-interes').textContent = fmt(totalIntereses);
+  document.getElementById('s-total').textContent = fmt(totalPagar);
+
+  const hoy=new Date();
+  let proximoEncontrado=false;
+  document.getElementById('tbody-amort').innerHTML = filas.map(f=>{
+    const pasado=f.fecha<hoy;
+    let esProx=false;
+    if(!pasado&&!proximoEncontrado){esProx=true;proximoEncontrado=true;}
+    const badge=pasado
+      ?'<span class="badge bg-green">Pagado</span>'
+      :esProx
+        ?'<span class="badge bg-yellow">Próximo</span>'
+        :'<span class="badge bg-gray">Pendiente</span>';
+    return `<tr class="${esProx?'row-hl':''}">
+      <td class="mono">${f.n}</td>
+      <td class="mono">${fmtDate(f.fecha)}</td>
+      <td class="mono">${fmt(f.cuota)}</td>
+      <td class="mono">${fmt(f.capital)}</td>
+      <td class="mono cv-orange">${fmt(f.interes)}</td>
+      <td class="mono">${fmt(f.saldo)}</td>
+      <td>${badge}</td>
+    </tr>`;
+  }).join('');
+}
+
+function registrarCredito(){
+  const cliente=document.getElementById('f-cliente').value;
+  if(!cliente){showToast('Selecciona un cliente primero');return;}
+  showToast('Crédito registrado para '+cliente.split(' — ')[0]);
+}
+
+// ── TABS ─────────────────────────────────────────────────────
+function showTab(id,el){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('screen-'+id).classList.add('active');
+  if(el) el.classList.add('active');
+}
+
+// ── SIDEBAR MOBILE ───────────────────────────────────────────
+function openSidebar(){
+  document.getElementById('sidebar').classList.add('open');
+  document.getElementById('overlay').classList.add('open');
+}
+function closeSidebar(){
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('overlay').classList.remove('open');
+}
+function navClick(el,name){
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  el.classList.add('active');
+  if(name!=='Créditos') showToast('Módulo "'+name+'" próximamente');
+  closeSidebar();
+}
+
+// ── MODAL ────────────────────────────────────────────────────
+function openModal(id){document.getElementById(id).classList.add('open')}
+function closeModal(id){document.getElementById(id).classList.remove('open')}
+document.querySelectorAll('.modal-overlay').forEach(m=>{
+  m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open')});
+});
+
+// ── TOAST ────────────────────────────────────────────────────
+let toastTimer;
+function showToast(msg){
+  const t=document.getElementById('toast');
+  document.getElementById('toast-msg').textContent=msg;
+  t.style.transform='translateX(-50%) translateY(0)';
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>{t.style.transform='translateX(-50%) translateY(80px)'},3000);
+}
+
+// ── INIT ─────────────────────────────────────────────────────
+document.getElementById('f-fecha').valueAsDate=new Date();
+document.getElementById('print-date').textContent=new Date().toLocaleDateString('es-EC');
+calcular();
+</script>
+</body>
+</html>

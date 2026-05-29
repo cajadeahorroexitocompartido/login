@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Caja de Ahorro y Crédito Éxito Compartido</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{
+  --bg:#000;
+  --bg2:#0d0d0d;
+  --bg3:#161616;
+  --bg4:#1f1f1f;
+  --green:#22c55e;
+  --green2:#16a34a;
+  --orange:#f97316;
+  --red:#ef4444;
+  --yellow:#eab308;
+  --text:#ffffff;
+  --text2:#a3a3a3;
+  --text3:#525252;
+  --border:rgba(255,255,255,0.08);
+  --radius:12px;
+}
+html,body{height:100%;font-family:'IBM Plex Sans',sans-serif;background:var(--bg);color:var(--text);font-size:14px}
+
+/* ── FONDO CON GRADIENTE SUTIL ── */
+.bg-glow{
+  position:fixed;inset:0;z-index:0;
+  background:
+    radial-gradient(ellipse 80% 60% at 50% -10%, rgba(34,197,94,0.08) 0%, transparent 70%),
+    radial-gradient(ellipse 50% 40% at 90% 90%, rgba(249,115,22,0.05) 0%, transparent 60%);
+  pointer-events:none;
+}
+
+/* ── LAYOUT ── */
+.page{
+  position:relative;z-index:1;
+  min-height:100vh;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  padding:24px 16px;
+}
+
+/* ── LOGO / HEADER ── */
+.logo-wrap{text-align:center;margin-bottom:32px}
+.logo-icon{
+  width:64px;height:64px;border-radius:18px;
+  background:var(--green);
+  display:inline-flex;align-items:center;justify-content:center;
+  font-size:28px;font-weight:700;color:#000;
+  margin-bottom:16px;
+  box-shadow:0 0 32px rgba(34,197,94,0.25);
+}
+.logo-name{
+  font-size:20px;font-weight:700;color:var(--text);
+  line-height:1.2;letter-spacing:-0.3px;
+}
+.logo-sub{
+  font-size:13px;color:var(--text3);margin-top:5px;
+  font-style:italic;letter-spacing:0.02em;
+}
+.logo-tag{
+  display:inline-block;margin-top:10px;
+  font-size:11px;font-weight:500;
+  background:rgba(34,197,94,0.1);color:var(--green);
+  border:1px solid rgba(34,197,94,0.2);
+  padding:3px 12px;border-radius:20px;
+  letter-spacing:0.05em;text-transform:uppercase;
+}
+
+/* ── CARD LOGIN ── */
+.login-card{
+  width:100%;max-width:400px;
+  background:var(--bg2);
+  border:1px solid var(--border);
+  border-radius:20px;
+  overflow:hidden;
+  box-shadow:0 24px 64px rgba(0,0,0,0.6);
+}
+.card-top{
+  padding:24px 24px 0;
+  border-bottom:1px solid var(--border);
+  padding-bottom:20px;
+}
+.card-top-title{font-size:16px;font-weight:600;margin-bottom:4px}
+.card-top-sub{font-size:13px;color:var(--text3)}
+
+.card-body{padding:24px}
+
+/* ── FORM ── */
+.field{margin-bottom:18px}
+.field:last-of-type{margin-bottom:0}
+.field label{
+  display:block;font-size:11px;font-weight:500;
+  color:var(--text3);text-transform:uppercase;
+  letter-spacing:0.07em;margin-bottom:7px;
+}
+.input-wrap{position:relative}
+.input-wrap i{
+  position:absolute;left:13px;top:50%;transform:translateY(-50%);
+  font-size:18px;color:var(--text3);pointer-events:none;
+}
+.input-wrap input{
+  width:100%;background:var(--bg3);
+  border:1px solid var(--border);
+  color:var(--text);
+  padding:12px 12px 12px 40px;
+  border-radius:var(--radius);
+  font-size:14px;font-family:'IBM Plex Sans',sans-serif;
+  outline:none;transition:border-color .2s,background .2s;
+  -webkit-appearance:none;
+}
+.input-wrap input:focus{border-color:var(--green);background:var(--bg4)}
+.input-wrap input::placeholder{color:var(--text3)}
+.toggle-pass{
+  position:absolute;right:12px;top:50%;transform:translateY(-50%);
+  background:none;border:none;color:var(--text3);cursor:pointer;
+  font-size:18px;padding:2px;line-height:1;
+}
+.toggle-pass:hover{color:var(--text2)}
+
+/* ── ERROR ── */
+.error-box{
+  display:none;
+  background:rgba(239,68,68,0.1);
+  border:1px solid rgba(239,68,68,0.25);
+  border-radius:var(--radius);
+  padding:10px 14px;
+  font-size:13px;color:var(--red);
+  margin-bottom:18px;
+  align-items:center;gap:8px;
+}
+.error-box.show{display:flex}
+
+/* ── BTN ── */
+.btn-login{
+  width:100%;padding:14px;
+  background:var(--green);color:#000;
+  border:none;border-radius:var(--radius);
+  font-size:15px;font-weight:600;
+  font-family:'IBM Plex Sans',sans-serif;
+  cursor:pointer;transition:all .2s;
+  margin-top:20px;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+}
+.btn-login:hover{background:var(--green2);transform:translateY(-1px);box-shadow:0 8px 24px rgba(34,197,94,0.2)}
+.btn-login:active{transform:translateY(0)}
+.btn-login.loading{opacity:.7;pointer-events:none}
+.spinner{
+  width:18px;height:18px;border:2px solid rgba(0,0,0,0.3);
+  border-top-color:#000;border-radius:50%;
+  animation:spin .7s linear infinite;display:none;
+}
+.btn-login.loading .spinner{display:block}
+.btn-login.loading .btn-label{display:none}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ── CREDENCIALES DEMO ── */
+.demo-hint{
+  margin-top:20px;
+  background:var(--bg3);border:1px solid var(--border);
+  border-radius:var(--radius);padding:14px;
+}
+.demo-title{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:10px;font-weight:500}
+.demo-row{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:7px 0;border-bottom:1px solid rgba(255,255,255,.04);
+  cursor:pointer;transition:all .15s;border-radius:6px;padding:7px 6px;
+}
+.demo-row:last-child{border-bottom:none}
+.demo-row:hover{background:var(--bg4)}
+.demo-role{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:500}
+.demo-role i{font-size:16px}
+.role-admin{color:var(--green)}
+.role-contador{color:var(--orange)}
+.role-socio{color:var(--yellow)}
+.demo-creds{font-size:11px;color:var(--text3);text-align:right;line-height:1.6}
+.demo-use{font-size:10px;color:var(--text3);margin-top:2px}
+
+/* ── FOOTER ── */
+.login-footer{
+  text-align:center;margin-top:24px;
+  font-size:12px;color:var(--text3);
+}
+
+/* ── BIENVENIDA (post-login) ── */
+.welcome-screen{
+  display:none;width:100%;max-width:400px;
+  text-align:center;animation:fi .4s ease;
+}
+.welcome-screen.show{display:block}
+.login-card.hide,.logo-wrap.hide{display:none}
+@keyframes fi{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+
+.welcome-icon{
+  width:72px;height:72px;border-radius:50%;
+  display:inline-flex;align-items:center;justify-content:center;
+  font-size:32px;margin-bottom:20px;
+}
+.welcome-icon.admin{background:rgba(34,197,94,.12);color:var(--green);border:2px solid rgba(34,197,94,.3)}
+.welcome-icon.contador{background:rgba(249,115,22,.12);color:var(--orange);border:2px solid rgba(249,115,22,.3)}
+.welcome-icon.socio{background:rgba(234,179,8,.12);color:var(--yellow);border:2px solid rgba(234,179,8,.3)}
+.welcome-name{font-size:22px;font-weight:700;margin-bottom:6px}
+.welcome-role{font-size:14px;color:var(--text3);margin-bottom:28px}
+.welcome-perms{
+  background:var(--bg2);border:1px solid var(--border);
+  border-radius:var(--radius);padding:16px;margin-bottom:24px;text-align:left;
+}
+.perm-item{display:flex;align-items:center;gap:10px;padding:7px 0;font-size:13px;color:var(--text2)}
+.perm-item i{font-size:16px;color:var(--green);flex-shrink:0}
+.btn-enter{
+  width:100%;padding:14px;
+  background:var(--green);color:#000;
+  border:none;border-radius:var(--radius);
+  font-size:15px;font-weight:600;
+  font-family:'IBM Plex Sans',sans-serif;
+  cursor:pointer;transition:all .2s;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+}
+.btn-enter:hover{background:var(--green2)}
+
+@media(max-width:420px){
+  .logo-name{font-size:17px}
+  .card-body{padding:18px}
+  .demo-creds{display:none}
+}
+</style>
+</head>
+<body>
+
+<div class="bg-glow"></div>
+
+<div class="page">
+
+  <!-- LOGO -->
+  <div class="logo-wrap" id="logo-wrap">
+    <div class="logo-icon">EC</div>
+    <div class="logo-name">Caja de Ahorro y Crédito</div>
+    <div class="logo-name" style="color:var(--green)">Éxito Compartido</div>
+    <div class="logo-sub">Sistema de gestión financiera</div>
+    <div class="logo-tag">Acceso seguro</div>
+  </div>
+
+  <!-- CARD LOGIN -->
+  <div class="login-card" id="login-card">
+    <div class="card-top">
+      <div class="card-top-title">Iniciar sesión</div>
+      <div class="card-top-sub">El sistema detectará tu rol automáticamente</div>
+    </div>
+    <div class="card-body">
+
+      <div class="error-box" id="error-box">
+        <i class="ti ti-alert-circle"></i>
+        <span id="error-msg">Usuario o contraseña incorrectos</span>
+      </div>
+
+      <div class="field">
+        <label>Correo electrónico</label>
+        <div class="input-wrap">
+          <i class="ti ti-mail"></i>
+          <input type="email" id="inp-email" placeholder="tucorreo@email.com" autocomplete="email" inputmode="email">
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Contraseña</label>
+        <div class="input-wrap">
+          <i class="ti ti-lock"></i>
+          <input type="password" id="inp-pass" placeholder="••••••••" autocomplete="current-password">
+          <button class="toggle-pass" onclick="togglePass()" id="toggle-btn" type="button">
+            <i class="ti ti-eye" id="eye-icon"></i>
+          </button>
+        </div>
+      </div>
+
+      <button class="btn-login" id="btn-login" onclick="doLogin()">
+        <span class="btn-label"><i class="ti ti-login" style="font-size:18px"></i>Ingresar al sistema</span>
+        <div class="spinner"></div>
+      </button>
+
+      <!-- DEMO HINT -->
+      <div class="demo-hint">
+        <div class="demo-title">Credenciales de demostración — clic para rellenar</div>
+        <div class="demo-row" onclick="fill('admin@exitocompartido.com','admin123')">
+          <div class="demo-role"><i class="ti ti-shield-check role-admin"></i><span class="role-admin">Administrador</span></div>
+          <div>
+            <div class="demo-creds">admin@exitocompartido.com<br>admin123</div>
+            <div class="demo-use">Clic para usar →</div>
+          </div>
+        </div>
+        <div class="demo-row" onclick="fill('contador@exitocompartido.com','conta123')">
+          <div class="demo-role"><i class="ti ti-calculator role-contador"></i><span class="role-contador">Contador / Tesorero</span></div>
+          <div>
+            <div class="demo-creds">contador@exitocompartido.com<br>conta123</div>
+            <div class="demo-use">Clic para usar →</div>
+          </div>
+        </div>
+        <div class="demo-row" onclick="fill('socio@exitocompartido.com','socio123')">
+          <div class="demo-role"><i class="ti ti-user role-socio"></i><span class="role-socio">Socio / Cliente</span></div>
+          <div>
+            <div class="demo-creds">socio@exitocompartido.com<br>socio123</div>
+            <div class="demo-use">Clic para usar →</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- PANTALLA BIENVENIDA POST-LOGIN -->
+  <div class="welcome-screen" id="welcome-screen">
+    <div class="welcome-icon" id="w-icon"><i id="w-icon-i"></i></div>
+    <div class="welcome-name" id="w-name"></div>
+    <div class="welcome-role" id="w-role"></div>
+    <div class="welcome-perms" id="w-perms"></div>
+    <button class="btn-enter" onclick="entrarPanel()">
+      <i class="ti ti-arrow-right"></i>Entrar al panel
+    </button>
+  </div>
+
+  <div class="login-footer">
+    Caja de Ahorro y Crédito Éxito Compartido &nbsp;·&nbsp; 2026
+  </div>
+
+</div>
+
+<script>
+// ── USUARIOS DEMO ────────────────────────────────────────────
+const USUARIOS = {
+  'admin@exitocompartido.com': {
+    pass: 'admin123',
+    rol: 'admin',
+    nombre: 'Administrador',
+    rolLabel: 'Administrador del sistema',
+    iconClass: 'admin',
+    icon: 'ti-shield-check',
+    panel: 'exito_compartido_creditos.html',
+    permisos: [
+      'Gestión completa de créditos y clientes',
+      'Registro y control de pagos',
+      'Administración de socios y capital',
+      'Reportes y estados financieros',
+      'Configuración del sistema',
+    ]
+  },
+  'contador@exitocompartido.com': {
+    pass: 'conta123',
+    rol: 'contador',
+    nombre: 'Contador / Tesorero',
+    rolLabel: 'Contador y Tesorero',
+    iconClass: 'contador',
+    icon: 'ti-calculator',
+    panel: 'exito_compartido_creditos.html',
+    permisos: [
+      'Ver y registrar pagos de créditos',
+      'Generación de reportes financieros',
+      'Estados financieros y balances',
+      'Consulta de cartera y socios',
+    ]
+  },
+  'socio@exitocompartido.com': {
+    pass: 'socio123',
+    rol: 'socio',
+    nombre: 'Socio',
+    rolLabel: 'Socio / Cliente',
+    iconClass: 'socio',
+    icon: 'ti-user',
+    panel: '#',
+    permisos: [
+      'Ver mi crédito activo y saldo',
+      'Consultar mis cuotas pendientes',
+      'Ver mis aportes de capital',
+      'Descargar mis comprobantes',
+    ]
+  }
+};
+
+// ── FUNCIONES ────────────────────────────────────────────────
+function fill(email, pass){
+  document.getElementById('inp-email').value = email;
+  document.getElementById('inp-pass').value = pass;
+  document.getElementById('error-box').classList.remove('show');
+  document.getElementById('inp-email').focus();
+}
+
+function togglePass(){
+  const inp = document.getElementById('inp-pass');
+  const icon = document.getElementById('eye-icon');
+  if(inp.type === 'password'){
+    inp.type = 'text';
+    icon.className = 'ti ti-eye-off';
+  } else {
+    inp.type = 'password';
+    icon.className = 'ti ti-eye';
+  }
+}
+
+function doLogin(){
+  const email = document.getElementById('inp-email').value.trim().toLowerCase();
+  const pass = document.getElementById('inp-pass').value;
+  const errBox = document.getElementById('error-box');
+  const btn = document.getElementById('btn-login');
+
+  errBox.classList.remove('show');
+
+  if(!email || !pass){
+    document.getElementById('error-msg').textContent = 'Completa el correo y la contraseña.';
+    errBox.classList.add('show');
+    return;
+  }
+
+  // Simular carga
+  btn.classList.add('loading');
+
+  setTimeout(()=>{
+    btn.classList.remove('loading');
+
+    const user = USUARIOS[email];
+    if(!user || user.pass !== pass){
+      document.getElementById('error-msg').textContent = 'Correo o contraseña incorrectos. Verifica tus datos.';
+      errBox.classList.add('show');
+      // Vibrar en móvil
+      if(navigator.vibrate) navigator.vibrate([60,40,60]);
+      return;
+    }
+
+    mostrarBienvenida(user);
+  }, 900);
+}
+
+function mostrarBienvenida(user){
+  // Ocultar login
+  document.getElementById('login-card').classList.add('hide');
+  document.getElementById('logo-wrap').classList.add('hide');
+
+  // Llenar bienvenida
+  document.getElementById('w-icon').className = 'welcome-icon ' + user.iconClass;
+  document.getElementById('w-icon-i').className = 'ti ' + user.icon;
+  document.getElementById('w-name').textContent = '¡Bienvenido, ' + user.nombre + '!';
+  document.getElementById('w-role').textContent = user.rolLabel + ' — acceso verificado';
+
+  document.getElementById('w-perms').innerHTML =
+    user.permisos.map(p=>`<div class="perm-item"><i class="ti ti-check"></i>${p}</div>`).join('');
+
+  // Guardar sesión temporal
+  sessionStorage.setItem('rol', user.rol);
+  sessionStorage.setItem('panel', user.panel);
+
+  document.getElementById('welcome-screen').classList.add('show');
+}
+
+function entrarPanel(){
+  const panel = sessionStorage.getItem('panel') || '#';
+  if(panel && panel !== '#'){
+    window.location.href = panel;
+  } else {
+    alert('El panel para este rol estará disponible pronto.');
+  }
+}
+
+// Enter para login
+document.addEventListener('keydown', e=>{
+  if(e.key === 'Enter') doLogin();
+});
+</script>
+</body>
+</html>
