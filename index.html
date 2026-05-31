@@ -3,134 +3,385 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Caja de Ahorro y Crédito Éxito Compartido</title>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
+<title>Éxito Compartido — Acceso</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-:root{--bg:#000;--bg2:#0d0d0d;--bg3:#161616;--bg4:#1f1f1f;--green:#22c55e;--green2:#16a34a;--red:#ef4444;--text:#fff;--text2:#a3a3a3;--text3:#525252;--border:rgba(255,255,255,0.08);--radius:12px}
-html,body{height:100%;font-family:'IBM Plex Sans',sans-serif;background:var(--bg);color:var(--text);font-size:14px}
-.bg-glow{position:fixed;inset:0;z-index:0;pointer-events:none;background:radial-gradient(ellipse 80% 50% at 50% -5%, rgba(34,197,94,0.09) 0%, transparent 70%)}
-.page{position:relative;z-index:1;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 16px}
-.logo-wrap{text-align:center;margin-bottom:36px}
-.logo-icon{width:68px;height:68px;border-radius:20px;background:var(--green);display:inline-flex;align-items:center;justify-content:center;font-size:26px;font-weight:700;color:#000;margin-bottom:18px;box-shadow:0 0 40px rgba(34,197,94,0.2)}
-.logo-title{font-size:13px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:6px}
-.logo-name{font-size:22px;font-weight:700;line-height:1.25;letter-spacing:-0.3px}
-.logo-name span{color:var(--green)}
-.logo-tag{display:inline-block;margin-top:12px;font-size:11px;font-weight:500;background:rgba(34,197,94,0.08);color:var(--green);border:1px solid rgba(34,197,94,0.18);padding:4px 14px;border-radius:20px;letter-spacing:0.06em;text-transform:uppercase}
-.card{width:100%;max-width:400px;background:var(--bg2);border:1px solid var(--border);border-radius:20px;overflow:hidden;box-shadow:0 24px 64px rgba(0,0,0,0.5)}
-.card-head{padding:22px 24px 18px;border-bottom:1px solid rgba(255,255,255,0.05)}
-.card-head-title{font-size:16px;font-weight:600;margin-bottom:3px}
-.card-head-sub{font-size:13px;color:var(--text3)}
-.card-body{padding:24px}
+:root{
+  --bg:#080c10;
+  --surface:#0e1318;
+  --surface2:#141b22;
+  --border:rgba(255,255,255,0.07);
+  --green:#2ecc71;
+  --green2:#27ae60;
+  --green-glow:rgba(46,204,113,0.15);
+  --text:#f0f4f8;
+  --text2:#8896a4;
+  --text3:#4a5568;
+  --red:#e74c3c;
+  --radius:14px;
+}
+html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);font-size:14px;overflow:hidden}
+
+/* FONDO ANIMADO */
+.bg-canvas{position:fixed;inset:0;z-index:0;overflow:hidden}
+.bg-canvas::before{
+  content:'';position:absolute;width:600px;height:600px;
+  border-radius:50%;
+  background:radial-gradient(circle, rgba(46,204,113,0.08) 0%, transparent 70%);
+  top:-100px;right:-100px;
+  animation:pulse 8s ease-in-out infinite;
+}
+.bg-canvas::after{
+  content:'';position:absolute;width:400px;height:400px;
+  border-radius:50%;
+  background:radial-gradient(circle, rgba(46,204,113,0.05) 0%, transparent 70%);
+  bottom:-50px;left:-50px;
+  animation:pulse 8s ease-in-out infinite reverse;
+}
+@keyframes pulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.1);opacity:.7}}
+
+/* GRID PATTERN */
+.bg-grid{
+  position:fixed;inset:0;z-index:0;
+  background-image:linear-gradient(rgba(255,255,255,.015) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.015) 1px, transparent 1px);
+  background-size:40px 40px;
+}
+
+/* LAYOUT */
+.page{
+  position:relative;z-index:1;
+  min-height:100vh;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+}
+
+/* LADO IZQUIERDO */
+.left-panel{
+  display:flex;flex-direction:column;justify-content:center;
+  padding:60px;
+  border-right:1px solid var(--border);
+  position:relative;overflow:hidden;
+}
+.left-panel::after{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg, rgba(46,204,113,0.03) 0%, transparent 60%);
+  pointer-events:none;
+}
+.brand{margin-bottom:60px}
+.brand-badge{
+  display:inline-flex;align-items:center;gap:8px;
+  background:var(--green-glow);border:1px solid rgba(46,204,113,0.2);
+  padding:6px 14px;border-radius:30px;margin-bottom:28px;
+}
+.brand-badge-dot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:blink 2s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.brand-badge-text{font-size:11px;color:var(--green);font-weight:500;letter-spacing:.08em;text-transform:uppercase}
+.brand-logo{
+  width:64px;height:64px;border-radius:18px;
+  background:linear-gradient(135deg,var(--green) 0%,var(--green2) 100%);
+  display:flex;align-items:center;justify-content:center;
+  font-size:22px;font-weight:700;color:#fff;
+  margin-bottom:24px;
+  box-shadow:0 8px 32px rgba(46,204,113,0.3);
+  font-family:'DM Mono',monospace;
+}
+.brand-title{font-size:32px;font-weight:700;line-height:1.2;margin-bottom:12px;letter-spacing:-0.5px}
+.brand-title em{color:var(--green);font-style:normal}
+.brand-sub{font-size:15px;color:var(--text2);line-height:1.6;max-width:320px}
+
+/* STATS */
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:auto}
+.stat-card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:12px;padding:16px;
+}
+.stat-val{font-size:24px;font-weight:700;font-family:'DM Mono',monospace;color:var(--green);margin-bottom:4px}
+.stat-label{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em}
+
+/* LADO DERECHO — FORMULARIO */
+.right-panel{
+  display:flex;flex-direction:column;justify-content:center;align-items:center;
+  padding:60px 40px;
+}
+.form-wrap{width:100%;max-width:380px}
+.form-title{font-size:26px;font-weight:700;margin-bottom:6px;letter-spacing:-0.3px}
+.form-sub{font-size:14px;color:var(--text2);margin-bottom:36px}
+
+/* CAMPO */
 .field{margin-bottom:16px}
-.field label{display:block;font-size:11px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:7px}
+.field label{
+  display:block;font-size:11px;font-weight:600;
+  color:var(--text3);text-transform:uppercase;
+  letter-spacing:.08em;margin-bottom:8px;
+}
 .input-wrap{position:relative}
-.input-wrap .ico{position:absolute;left:13px;top:50%;transform:translateY(-50%);font-size:18px;color:var(--text3);pointer-events:none}
-.input-wrap input{width:100%;background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:13px 42px 13px 40px;border-radius:var(--radius);font-size:15px;font-family:'IBM Plex Sans',sans-serif;outline:none;transition:border-color .2s;-webkit-appearance:none}
-.input-wrap input:focus{border-color:var(--green);background:var(--bg4)}
+.input-icon{
+  position:absolute;left:14px;top:50%;transform:translateY(-50%);
+  color:var(--text3);font-size:16px;pointer-events:none;
+}
+.input-wrap input{
+  width:100%;
+  background:var(--surface);
+  border:1px solid var(--border);
+  color:var(--text);
+  padding:13px 44px 13px 42px;
+  border-radius:var(--radius);
+  font-size:14px;font-family:'DM Sans',sans-serif;
+  outline:none;
+  transition:border-color .2s, background .2s, box-shadow .2s;
+  -webkit-appearance:none;
+}
+.input-wrap input:focus{
+  border-color:var(--green);
+  background:var(--surface2);
+  box-shadow:0 0 0 3px rgba(46,204,113,0.08);
+}
 .input-wrap input::placeholder{color:var(--text3)}
-.toggle-pass{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--text3);cursor:pointer;font-size:19px;padding:4px;line-height:1}
-.error-box{display:none;background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.22);border-radius:var(--radius);padding:11px 14px;font-size:13px;color:var(--red);margin-bottom:16px;align-items:center;gap:8px;line-height:1.4}
+.toggle-pass{
+  position:absolute;right:14px;top:50%;transform:translateY(-50%);
+  background:none;border:none;color:var(--text3);cursor:pointer;
+  font-size:16px;padding:4px;line-height:1;transition:color .15s;
+}
+.toggle-pass:hover{color:var(--text2)}
+
+/* ERROR */
+.error-box{
+  display:none;
+  background:rgba(231,76,60,0.08);
+  border:1px solid rgba(231,76,60,0.2);
+  border-radius:10px;padding:11px 14px;
+  font-size:13px;color:var(--red);
+  margin-bottom:16px;
+  align-items:center;gap:9px;line-height:1.4;
+}
 .error-box.show{display:flex}
-.btn-login{width:100%;padding:15px;background:var(--green);color:#000;border:none;border-radius:var(--radius);font-size:15px;font-weight:700;font-family:'IBM Plex Sans',sans-serif;cursor:pointer;transition:all .2s;margin-top:8px;display:flex;align-items:center;justify-content:center;gap:8px}
-.btn-login:hover{background:var(--green2)}
-.btn-login.loading{opacity:.65;pointer-events:none}
-.spinner{width:18px;height:18px;border:2px solid rgba(0,0,0,0.25);border-top-color:#000;border-radius:50%;animation:spin .7s linear infinite;display:none}
+
+/* BOTÓN */
+.btn-login{
+  width:100%;padding:15px;
+  background:linear-gradient(135deg,var(--green) 0%,var(--green2) 100%);
+  color:#fff;border:none;border-radius:var(--radius);
+  font-size:15px;font-weight:600;
+  font-family:'DM Sans',sans-serif;
+  cursor:pointer;
+  transition:all .2s;
+  margin-top:8px;
+  display:flex;align-items:center;justify-content:center;gap:9px;
+  letter-spacing:.01em;
+  box-shadow:0 4px 20px rgba(46,204,113,0.25);
+}
+.btn-login:hover{transform:translateY(-1px);box-shadow:0 8px 28px rgba(46,204,113,0.35)}
+.btn-login:active{transform:translateY(0)}
+.btn-login.loading{opacity:.7;pointer-events:none}
+.spinner{
+  width:18px;height:18px;
+  border:2px solid rgba(255,255,255,.3);
+  border-top-color:#fff;
+  border-radius:50%;
+  animation:spin .7s linear infinite;
+  display:none;
+}
 .btn-login.loading .spinner{display:block}
-.btn-login.loading .lbl{display:none}
+.btn-login.loading .btn-lbl{display:none}
 @keyframes spin{to{transform:rotate(360deg)}}
-.footer{margin-top:28px;font-size:12px;color:var(--text3);text-align:center;line-height:1.7}
+
+/* ROLES INFO */
+.roles-hint{
+  margin-top:28px;padding:16px;
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:12px;
+}
+.roles-hint-title{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px;font-weight:600}
+.role-row{display:flex;align-items:center;gap:10px;padding:6px 0;font-size:12px;color:var(--text2)}
+.role-row:not(:last-child){border-bottom:1px solid rgba(255,255,255,.04)}
+.role-badge{font-size:10px;font-weight:600;padding:2px 8px;border-radius:6px;white-space:nowrap}
+.rb-admin{background:rgba(46,204,113,.12);color:var(--green)}
+.rb-contador{background:rgba(52,152,219,.12);color:#3498db}
+.role-perms{font-size:11px;color:var(--text3);margin-left:auto}
+
+/* FOOTER */
+.form-footer{margin-top:32px;font-size:11px;color:var(--text3);text-align:center;line-height:1.8}
+
+/* RESPONSIVE */
+@media(max-width:768px){
+  .page{grid-template-columns:1fr}
+  .left-panel{display:none}
+  .right-panel{padding:40px 24px}
+}
 </style>
 </head>
 <body>
-<div class="bg-glow"></div>
+
+<div class="bg-canvas"></div>
+<div class="bg-grid"></div>
+
 <div class="page">
-  <div class="logo-wrap">
-    <div class="logo-icon">EC</div>
-    <div class="logo-title">Ingreso al portal</div>
-    <div class="logo-name">Caja de Ahorro y Crédito<br><span>Éxito Compartido</span></div>
-    <div class="logo-tag">Sistema de gestión financiera</div>
-  </div>
-  <div class="card">
-    <div class="card-head">
-      <div class="card-head-title">Iniciar sesión</div>
-      <div class="card-head-sub">Ingresa tus credenciales para continuar</div>
+
+  <!-- PANEL IZQUIERDO -->
+  <div class="left-panel">
+    <div class="brand">
+      <div class="brand-badge">
+        <div class="brand-badge-dot"></div>
+        <span class="brand-badge-text">Sistema activo</span>
+      </div>
+      <div class="brand-logo">EC</div>
+      <div class="brand-title">Caja de Ahorro<br>y Crédito <em>Éxito<br>Compartido</em></div>
+      <div class="brand-sub">Plataforma integral de gestión financiera cooperativa. Créditos, cobros, socios y contabilidad en un solo lugar.</div>
     </div>
-    <div class="card-body">
-      <div class="error-box" id="error-box"><i class="ti ti-alert-circle"></i><span id="error-msg">Correo o contraseña incorrectos.</span></div>
+    <div class="stats">
+      <div class="stat-card">
+        <div class="stat-val" id="stat-creditos">—</div>
+        <div class="stat-label">Créditos activos</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-val" id="stat-socios">—</div>
+        <div class="stat-label">Socios registrados</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-val" id="stat-cobros">—</div>
+        <div class="stat-label">Cobros hoy</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-val" id="stat-capital">—</div>
+        <div class="stat-label">Capital social</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PANEL DERECHO -->
+  <div class="right-panel">
+    <div class="form-wrap">
+      <div class="form-title">Bienvenido</div>
+      <div class="form-sub">Ingresa tus credenciales para continuar</div>
+
+      <div class="error-box" id="error-box">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        <span id="error-msg">Correo o contraseña incorrectos.</span>
+      </div>
+
       <div class="field">
         <label>Correo electrónico</label>
-        <div class="input-wrap"><i class="ti ti-mail ico"></i><input type="email" id="inp-email" placeholder="tucorreo@email.com" autocomplete="email" inputmode="email"></div>
+        <div class="input-wrap">
+          <svg class="input-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><polyline points="2,4 12,13 22,4"/></svg>
+          <input type="email" id="inp-email" placeholder="tucorreo@email.com" autocomplete="email" inputmode="email">
+        </div>
       </div>
+
       <div class="field">
         <label>Contraseña</label>
-        <div class="input-wrap"><i class="ti ti-lock ico"></i><input type="password" id="inp-pass" placeholder="••••••••"><button class="toggle-pass" onclick="togglePass()" type="button"><i class="ti ti-eye" id="eye-icon"></i></button></div>
+        <div class="input-wrap">
+          <svg class="input-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          <input type="password" id="inp-pass" placeholder="••••••••" autocomplete="current-password">
+          <button class="toggle-pass" onclick="togglePass()" type="button" id="toggle-btn">
+            <svg id="eye-show" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            <svg id="eye-hide" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+          </button>
+        </div>
       </div>
+
       <button class="btn-login" id="btn-login" onclick="doLogin()">
-        <span class="lbl"><i class="ti ti-login" style="font-size:18px"></i>Ingresar al sistema</span>
+        <span class="btn-lbl">Ingresar al sistema</span>
         <div class="spinner"></div>
       </button>
+
+      <!-- HINT DE ROLES -->
+      <div class="roles-hint">
+        <div class="roles-hint-title">Perfiles de acceso</div>
+        <div class="role-row">
+          <span class="role-badge rb-admin">Admin</span>
+          <span>Administrador</span>
+          <span class="role-perms">Ver · Agregar · Editar · Eliminar</span>
+        </div>
+        <div class="role-row">
+          <span class="role-badge rb-contador">Contador</span>
+          <span>Contador / Tesorero</span>
+          <span class="role-perms">Ver · Agregar</span>
+        </div>
+      </div>
+
+      <div class="form-footer">
+        Caja de Ahorro y Crédito Éxito Compartido &nbsp;·&nbsp; 2026<br>
+        Solo personal autorizado
+      </div>
     </div>
   </div>
-  <div class="footer">Caja de Ahorro y Crédito Éxito Compartido · 2026<br>Solo personal autorizado</div>
+
 </div>
 
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getFirestore, collection, query, where, getDocs, addDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+<script>
+const API = 'https://script.google.com/macros/s/AKfycbznlQ44EJd9K0rrrTj6ScfDdE0UShqo5MtrAHG__Sio-ONk8AT1Kh94YwOuVlsFQwm7/exec';
 
-const firebaseConfig = {
-  apiKey: "AIzaSyAh3p9Wx8LVGzt-sF4TnSmr75dzpRTek1Q",
-  authDomain: "caja-de-ahorro-exito.firebaseapp.com",
-  projectId: "caja-de-ahorro-exito",
-  storageBucket: "caja-de-ahorro-exito.firebasestorage.app",
-  messagingSenderId: "290669234871",
-  appId: "1:290669234871:web:be3b083dc2c45e26475b32"
-};
+// Cargar estadísticas del dashboard en el panel izquierdo
+async function cargarStats(){
+  try{
+    const r = await fetch(`${API}?accion=dashboard`);
+    const j = await r.json();
+    if(j.ok && j.data){
+      const d = j.data;
+      const fmt = v => '$'+Number(v||0).toLocaleString('es-EC',{minimumFractionDigits:0,maximumFractionDigits:0});
+      document.getElementById('stat-creditos').textContent = d.creditosActivos || '0';
+      document.getElementById('stat-socios').textContent   = d.totalSocios    || '0';
+      document.getElementById('stat-cobros').textContent   = fmt(d.cobrosHoy  || 0);
+      document.getElementById('stat-capital').textContent  = fmt(d.capitalSocial || 0);
+    }
+  }catch(e){ /* silencioso */ }
+}
+cargarStats();
 
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
+function togglePass(){
+  const inp  = document.getElementById('inp-pass');
+  const show = document.getElementById('eye-show');
+  const hide = document.getElementById('eye-hide');
+  const oculto = inp.type === 'password';
+  inp.type = oculto ? 'text' : 'password';
+  show.style.display = oculto ? 'none'  : 'block';
+  hide.style.display = oculto ? 'block' : 'none';
+}
 
-// Crear usuarios iniciales si no existen
-async function initUsuarios(){
-  const snap = await getDocs(collection(db,'usuarios'));
-  if(snap.empty){
-    await addDoc(collection(db,'usuarios'),{nombre:'Administrador',email:'admin@exitocompartido.com',pass:'admin123',rol:'admin',activo:true});
-    await addDoc(collection(db,'usuarios'),{nombre:'Contador Tesorero',email:'contador@exitocompartido.com',pass:'conta123',rol:'contador',activo:true});
+async function doLogin(){
+  const email = document.getElementById('inp-email').value.trim().toLowerCase();
+  const pass  = document.getElementById('inp-pass').value;
+  const err   = document.getElementById('error-box');
+  const btn   = document.getElementById('btn-login');
+
+  err.classList.remove('show');
+
+  if(!email || !pass){
+    document.getElementById('error-msg').textContent = 'Completa el correo y la contraseña.';
+    err.classList.add('show'); return;
+  }
+
+  btn.classList.add('loading');
+
+  try{
+    const r = await fetch(`${API}?accion=login`, {
+      method:'POST',
+      body: JSON.stringify({accion:'login', email, pass})
+    });
+    const j = await r.json();
+
+    if(j.ok && j.data && j.data.ok){
+      const u = j.data.usuario;
+      sessionStorage.setItem('ec_user', JSON.stringify(u));
+      sessionStorage.setItem('ec_rol',  u.rol);
+      sessionStorage.setItem('api_url', API);
+      window.location.href = 'dashboard.html';
+    } else {
+      document.getElementById('error-msg').textContent = (j.data && j.data.msg) || 'Correo o contraseña incorrectos.';
+      err.classList.add('show');
+      if(navigator.vibrate) navigator.vibrate([60,40,60]);
+      btn.classList.remove('loading');
+    }
+  }catch(e){
+    document.getElementById('error-msg').textContent = 'Error de conexión. Verifica tu internet.';
+    err.classList.add('show');
+    btn.classList.remove('loading');
   }
 }
-initUsuarios();
 
-window.togglePass = function(){
-  const i=document.getElementById('inp-pass'),ic=document.getElementById('eye-icon'),o=i.type==='password';
-  i.type=o?'text':'password';ic.className=o?'ti ti-eye-off':'ti ti-eye';
-};
-
-window.doLogin = async function(){
-  const email=document.getElementById('inp-email').value.trim().toLowerCase();
-  const pass=document.getElementById('inp-pass').value;
-  const err=document.getElementById('error-box');
-  const btn=document.getElementById('btn-login');
-  err.classList.remove('show');
-  if(!email||!pass){document.getElementById('error-msg').textContent='Completa el correo y la contraseña.';err.classList.add('show');return;}
-  btn.classList.add('loading');
-  try{
-    const q=query(collection(db,'usuarios'),where('email','==',email),where('activo','==',true));
-    const snap=await getDocs(q);
-    if(snap.empty||snap.docs[0].data().pass!==pass){
-      document.getElementById('error-msg').textContent='Correo o contraseña incorrectos.';
-      err.classList.add('show');if(navigator.vibrate)navigator.vibrate([60,40,60]);btn.classList.remove('loading');return;
-    }
-    const u=snap.docs[0].data();
-    sessionStorage.setItem('ec_user',JSON.stringify({id:snap.docs[0].id,nombre:u.nombre,rol:u.rol,email:u.email}));
-    window.location.href='panel_exito_compartido.html';
-  }catch(e){
-    document.getElementById('error-msg').textContent='Error de conexión: '+e.message;
-    err.classList.add('show');btn.classList.remove('loading');
-  }
-};
-document.addEventListener('keydown',e=>{if(e.key==='Enter')window.doLogin();});
+document.addEventListener('keydown', e => { if(e.key === 'Enter') doLogin(); });
 </script>
 </body>
 </html>
