@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Éxito Compartido — Panel</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#000;--bg2:#0a0a0a;--bg3:#111;--bg4:#1a1a1a;--bg5:#222;
+  --green:#22c55e;--green2:#16a34a;--green3:rgba(34,197,94,.12);
+  --orange:#f97316;--red:#ef4444;--blue:#3b82f6;--purple:#a855f7;--yellow:#eab308;
+  --text:#fff;--text2:#a3a3a3;--text3:#525252;
+  --border:rgba(255,255,255,.08);--border2:rgba(255,255,255,.05);
+  --radius:10px;--radius2:14px;--sidebar:240px;
+}
+html,body{height:100%;font-family:'IBM Plex Sans',sans-serif;background:var(--bg);color:var(--text);font-size:14px;overflow-x:hidden}
+.app{display:flex;min-height:100vh}
+.sidebar{width:var(--sidebar);flex-shrink:0;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:200;transition:transform .25s;overflow-y:auto}
+.logo-area{padding:18px 16px 14px;border-bottom:1px solid var(--border)}
+.logo-icon{width:40px;height:40px;border-radius:10px;background:var(--green);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:#000;margin-bottom:9px}
+.logo-name{font-size:12px;font-weight:600}.logo-sub{font-size:10px;color:var(--text3);margin-top:2px}
+.nav{padding:10px 8px;flex:1}
+.nav-group{font-size:10px;font-weight:500;color:var(--text3);letter-spacing:.1em;text-transform:uppercase;padding:10px 8px 4px}
+.nav-item{display:flex;align-items:center;gap:9px;padding:9px 10px;border-radius:var(--radius);cursor:pointer;color:var(--text2);font-size:13px;margin-bottom:1px;transition:all .15s;user-select:none}
+.nav-item:hover{background:var(--bg4);color:var(--text)}
+.nav-item.active{background:var(--green3);color:var(--green);font-weight:500}
+.nav-item i{font-size:17px;width:20px}
+.nav-badge{margin-left:auto;font-size:10px;font-weight:700;padding:2px 6px;border-radius:10px;background:var(--orange);color:#000}
+.sidebar-footer{padding:12px;border-top:1px solid var(--border)}
+.user-row{display:flex;align-items:center;gap:9px}
+.avatar{width:34px;height:34px;border-radius:50%;background:var(--green2);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#000}
+.user-name{font-size:12px;font-weight:600}.user-role{font-size:10px;color:var(--text3)}
+.logout-btn{margin-top:8px;width:100%;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.15);color:var(--red);padding:7px;border-radius:var(--radius);font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;font-family:'IBM Plex Sans',sans-serif}
+.hamburger{display:none;background:none;border:none;color:var(--text);cursor:pointer;padding:8px;font-size:22px}
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:190}
+.overlay.open{display:block}
+.main{flex:1;margin-left:var(--sidebar);display:flex;flex-direction:column;min-height:100vh}
+.topbar{padding:11px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;background:var(--bg);position:sticky;top:0;z-index:100}
+.topbar-left{flex:1}.page-title{font-size:15px;font-weight:600}.page-sub{font-size:11px;color:var(--text3)}
+.topbar-actions{display:flex;gap:8px}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:var(--radius);font-size:13px;font-weight:500;cursor:pointer;border:none;font-family:'IBM Plex Sans',sans-serif;transition:all .15s;white-space:nowrap}
+.btn i{font-size:15px}
+.btn-green{background:var(--green);color:#000}.btn-green:hover{background:var(--green2)}
+.btn-outline{background:transparent;color:var(--text2);border:1px solid var(--border)}.btn-outline:hover{background:var(--bg4);color:var(--text)}
+.btn-sm{padding:6px 11px;font-size:12px}.btn-xs{padding:4px 8px;font-size:11px}
+.content{padding:18px 20px;flex:1}
+.screen{display:none}.screen.active{display:block;animation:fi .2s ease}
+@keyframes fi{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius2);overflow:hidden;margin-bottom:16px}
+.card-header{padding:13px 16px;border-bottom:1px solid var(--border2);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+.card-title{font-size:13px;font-weight:600;display:flex;align-items:center;gap:7px}
+.card-title i{font-size:15px;color:var(--green)}
+.card-body{padding:16px}
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
+.kpi{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius2);padding:16px;position:relative;overflow:hidden}
+.kpi::before{content:'';position:absolute;top:0;left:0;right:0;height:2px}
+.kpi.k-green::before{background:var(--green)}.kpi.k-orange::before{background:var(--orange)}
+.kpi.k-blue::before{background:var(--blue)}.kpi.k-purple::before{background:var(--purple)}
+.kpi.k-yellow::before{background:var(--yellow)}.kpi.k-red::before{background:var(--red)}
+.kpi-icon{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:18px;margin-bottom:12px}
+.ki-green{background:rgba(34,197,94,.12);color:var(--green)}.ki-orange{background:rgba(249,115,22,.12);color:var(--orange)}
+.ki-blue{background:rgba(59,130,246,.12);color:var(--blue)}.ki-purple{background:rgba(168,85,247,.12);color:var(--purple)}
+.ki-yellow{background:rgba(234,179,8,.1);color:var(--yellow)}.ki-red{background:rgba(239,68,68,.12);color:var(--red)}
+.kpi-label{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px}
+.kpi-value{font-size:22px;font-weight:700;font-family:'IBM Plex Mono',monospace;line-height:1}
+.kpi-sub{font-size:11px;color:var(--text3);margin-top:5px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+.col-span-2{grid-column:span 2}
+.field label{display:block;font-size:11px;color:var(--text3);margin-bottom:5px;font-weight:500;letter-spacing:.04em;text-transform:uppercase}
+.field input,.field select,.field textarea{width:100%;background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:9px 11px;border-radius:var(--radius);font-size:13px;font-family:'IBM Plex Sans',sans-serif;outline:none;transition:border-color .15s;-webkit-appearance:none}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--green);background:var(--bg4)}
+.field select option{background:var(--bg3)}
+.field input[readonly]{color:var(--text2);cursor:default}
+.tbl-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;min-width:500px}
+thead th{font-size:10px;color:var(--text3);font-weight:500;text-transform:uppercase;letter-spacing:.06em;padding:9px 13px;text-align:left;border-bottom:1px solid var(--border2);white-space:nowrap}
+tbody td{padding:10px 13px;font-size:13px;border-bottom:1px solid rgba(255,255,255,.025)}
+tbody tr:last-child td{border-bottom:none}
+tbody tr:hover td{background:rgba(255,255,255,.02)}
+.mono{font-family:'IBM Plex Mono',monospace;font-size:12px}
+.td-actions{display:flex;gap:5px}
+.badge{display:inline-flex;align-items:center;padding:2px 9px;border-radius:20px;font-size:11px;font-weight:500}
+.bg-green{background:rgba(34,197,94,.13);color:var(--green)}.bg-orange{background:rgba(249,115,22,.13);color:var(--orange)}
+.bg-red{background:rgba(239,68,68,.13);color:var(--red)}.bg-blue{background:rgba(59,130,246,.13);color:var(--blue)}
+.bg-purple{background:rgba(168,85,247,.13);color:var(--purple)}.bg-gray{background:rgba(255,255,255,.06);color:var(--text3)}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:300;align-items:flex-end;justify-content:center}
+.modal-overlay.open{display:flex}
+@media(min-width:600px){.modal-overlay{align-items:center}}
+.modal{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius2) var(--radius2) 0 0;width:100%;max-width:600px;max-height:92vh;overflow-y:auto}
+.modal.modal-lg{max-width:780px}
+@media(min-width:600px){.modal{border-radius:var(--radius2)}}
+.modal-header{padding:15px 16px;border-bottom:1px solid var(--border2);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:var(--bg2);z-index:10}
+.modal-title{font-size:14px;font-weight:600;display:flex;align-items:center;gap:7px}
+.modal-title i{color:var(--green)}
+.modal-close{background:none;border:none;color:var(--text3);cursor:pointer;font-size:20px;padding:2px}
+.modal-body{padding:16px}.modal-footer{padding:13px 16px;border-top:1px solid var(--border2);display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap}
+.alert{padding:10px 13px;border-radius:var(--radius);font-size:12px;margin-bottom:13px;display:flex;align-items:flex-start;gap:8px;line-height:1.5}
+.alert i{font-size:15px;flex-shrink:0;margin-top:1px}
+.alert-blue{background:rgba(59,130,246,.08);color:var(--blue);border:1px solid rgba(59,130,246,.18)}
+.search-bar{position:relative}
+.search-bar i{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--text3);font-size:15px;pointer-events:none}
+.search-bar input{background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:8px 10px 8px 32px;border-radius:var(--radius);font-size:13px;font-family:'IBM Plex Sans',sans-serif;outline:none;width:180px}
+.tabs{display:flex;overflow-x:auto;padding:0 16px;background:var(--bg2);border-bottom:1px solid var(--border2);scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{padding:11px 14px;font-size:13px;cursor:pointer;color:var(--text3);border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .15s;user-select:none;white-space:nowrap;display:flex;align-items:center;gap:5px}
+.tab.active{color:var(--green);border-bottom-color:var(--green)}
+.sub-screen{display:none}.sub-screen.active{display:block}
+.sum-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px}
+.sum-box{background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius);padding:13px}
+.sum-box.hl{border-color:rgba(34,197,94,.3);background:rgba(34,197,94,.04)}
+.sum-label{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px}
+.sum-value{font-size:18px;font-weight:600;font-family:'IBM Plex Mono',monospace}
+.socio-card{background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius2);padding:14px;display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:8px;cursor:pointer;transition:border-color .15s}
+.socio-card:hover{border-color:rgba(34,197,94,.3)}
+.socio-avatar{width:42px;height:42px;border-radius:50%;background:var(--green2);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#000;flex-shrink:0}
+.socio-info{flex:1}.socio-name{font-size:13px;font-weight:600;margin-bottom:2px}.socio-meta{font-size:11px;color:var(--text3)}
+.socio-aporte{text-align:right;flex-shrink:0}
+.socio-aporte-val{font-size:15px;font-weight:700;font-family:'IBM Plex Mono',monospace;color:var(--green)}
+.socio-aporte-lbl{font-size:10px;color:var(--text3)}
+.progress-bar{height:4px;background:var(--bg5);border-radius:2px;overflow:hidden;margin-top:6px}
+.progress-fill{height:100%;border-radius:2px;background:var(--green)}
+.reporte-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;font-size:13px;border-bottom:1px solid rgba(255,255,255,.02)}
+.reporte-row.total{font-weight:700;color:var(--green);font-size:14px;padding-top:10px;border-top:1px solid rgba(34,197,94,.2);border-bottom:none}
+.reporte-row .val{font-family:'IBM Plex Mono',monospace}
+.user-card{background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius2);padding:14px;display:flex;align-items:center;gap:13px;margin-bottom:8px}
+.user-card-avatar{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;color:#000;flex-shrink:0}
+.ua-admin{background:var(--green)}.ua-contador{background:var(--blue)}.ua-socio{background:var(--purple)}
+.user-card-info{flex:1}.user-card-name{font-size:13px;font-weight:600;margin-bottom:2px}.user-card-email{font-size:11px;color:var(--text3)}
+.loading-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:400;align-items:center;justify-content:center;flex-direction:column;gap:12px}
+.loading-overlay.show{display:flex}
+.loading-spinner{width:36px;height:36px;border:3px solid rgba(34,197,94,.3);border-top-color:var(--green);border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-msg{font-size:13px;color:var(--text2)}
+#toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--green);color:#000;padding:11px 18px;border-radius:var(--radius);font-size:13px;font-weight:500;z-index:500;transition:transform .3s;display:flex;align-items:center;gap:7px;box-shadow:0 4px 24px rgba(0,0,0,.5);white-space:nowrap}
+#toast.error{background:var(--red);color:#fff}
+.divider-label{display:flex;align-items:center;gap:10px;margin:14px 0;font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.07em}
+.divider-label::before,.divider-label::after{content:'';flex:1;height:1px;background:var(--border2)}
+@media(max-width:900px){.kpi-grid{grid-template-columns:repeat(2,1fr)}.sum-row{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:768px){.sidebar{transform:translateX(-100%)}.sidebar.open{transform:translateX(0)}.hamburger{display:block}.main{margin-left:0}.g3,.g2{grid-template-columns:1fr}.col-span-2{grid-column:span 1}.topbar-actions .btn span{display:none}.kpi-grid{grid-template-columns:repeat(2,1fr)}.content{padding:13px}}
+</style>
+</head>
+<body>
+<div class="loading-overlay" id="loading-overlay"><div class="loading-spinner"></div><div class="loading-msg" id="loading-msg">Cargando...</div></div>
+<div class="overlay" id="overlay" onclick="closeSidebar()"></div>
+<aside class="sidebar" id="sidebar">
+  <div class="logo-area"><div class="logo-icon">EC</div><div class="logo-name">Caja de Ahorro y Crédito</div><div class="logo-sub">Éxito Compartido</div></div>
+  <nav class="nav">
+    <div class="nav-group">Principal</div>
+    <div class="nav-item active" id="nav-dashboard" onclick="goTo('dashboard',this)"><i class="ti ti-layout-dashboard"></i>Dashboard</div>
+    <div class="nav-item" id="nav-clientes" onclick="goTo('clientes',this)"><i class="ti ti-users"></i>Clientes</div>
+    <div class="nav-item" id="nav-creditos" onclick="goTo('creditos',this)"><i class="ti ti-credit-card"></i>Créditos<span class="nav-badge" id="badge-mora">0</span></div>
+    <div class="nav-item" id="nav-pagos" onclick="goTo('pagos',this)"><i class="ti ti-cash"></i>Cobros / Pagos</div>
+    <div class="nav-group">Administración</div>
+    <div class="nav-item" id="nav-socios" onclick="goTo('socios',this)"><i class="ti ti-briefcase"></i>Socios &amp; Capital</div>
+    <div class="nav-item" id="nav-reportes" onclick="goTo('reportes',this)"><i class="ti ti-chart-bar"></i>Reportes</div>
+    <div class="nav-group">Sistema</div>
+    <div class="nav-item" id="nav-usuarios" onclick="goTo('usuarios',this)"><i class="ti ti-shield-check"></i>Usuarios &amp; Accesos</div>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="user-row"><div class="avatar" id="sb-avatar">AD</div><div><div class="user-name" id="sb-name">Cargando...</div><div class="user-role" id="sb-role"></div></div></div>
+    <button class="logout-btn" onclick="cerrarSesion()"><i class="ti ti-logout"></i>Cerrar sesión</button>
+  </div>
+</aside>
+<main class="main">
+  <div class="topbar">
+    <button class="hamburger" onclick="openSidebar()"><i class="ti ti-menu-2"></i></button>
+    <div class="topbar-left"><div class="page-title" id="page-title">Dashboard</div><div class="page-sub">Éxito Compartido · <span id="fecha-hoy"></span></div></div>
+    <div class="topbar-actions" id="topbar-actions"></div>
+  </div>
+  <div class="content">
+
+    <!-- DASHBOARD -->
+    <div class="screen active" id="screen-dashboard">
+      <div class="kpi-grid">
+        <div class="kpi k-green"><div class="kpi-icon ki-green"><i class="ti ti-cash"></i></div><div class="kpi-label">Cobros hoy</div><div class="kpi-value" style="color:var(--green)" id="kpi-cobros-hoy">$0.00</div><div class="kpi-sub" id="kpi-cobros-n">0 pagos</div></div>
+        <div class="kpi k-blue"><div class="kpi-icon ki-blue"><i class="ti ti-device-mobile"></i></div><div class="kpi-label">Transferencias hoy</div><div class="kpi-value" style="color:var(--blue)" id="kpi-trans-hoy">$0.00</div><div class="kpi-sub" id="kpi-trans-n">0 ops</div></div>
+        <div class="kpi k-orange"><div class="kpi-icon ki-orange"><i class="ti ti-credit-card"></i></div><div class="kpi-label">Créditos activos</div><div class="kpi-value" style="color:var(--orange)" id="kpi-creditos">0</div><div class="kpi-sub" id="kpi-cartera">Cartera: $0.00</div></div>
+        <div class="kpi k-red"><div class="kpi-icon ki-red"><i class="ti ti-alert-triangle"></i></div><div class="kpi-label">En mora</div><div class="kpi-value" style="color:var(--red)" id="kpi-mora">0</div><div class="kpi-sub" id="kpi-mora-val">$0.00 en riesgo</div></div>
+      </div>
+      <div class="g2" style="margin-bottom:16px">
+        <div class="kpi k-purple" style="margin-bottom:0"><div class="kpi-icon ki-purple"><i class="ti ti-users"></i></div><div class="kpi-label">Aportes socios</div><div class="kpi-value" style="color:var(--purple)" id="kpi-aportes">$0.00</div><div class="kpi-sub" id="kpi-socios-n">0 socios</div></div>
+        <div class="kpi k-yellow" style="margin-bottom:0"><div class="kpi-icon ki-yellow"><i class="ti ti-trending-up"></i></div><div class="kpi-label">Cobros mes actual</div><div class="kpi-value" style="color:var(--yellow)" id="kpi-mes">$0.00</div><div class="kpi-sub">Efectivo + Transferencia</div></div>
+      </div>
+      <div class="g2">
+        <div class="card" style="margin-bottom:0"><div class="card-header"><div class="card-title"><i class="ti ti-clock"></i>Últimos cobros</div><button class="btn btn-outline btn-xs" onclick="goTo('pagos',document.getElementById('nav-pagos'))">Ver todos</button></div><div class="tbl-wrap"><table><thead><tr><th>Cliente</th><th>Monto</th><th>Método</th><th>Fecha</th></tr></thead><tbody id="tbody-recientes"><tr><td colspan="4" style="text-align:center;padding:24px;color:var(--text3)">Cargando...</td></tr></tbody></table></div></div>
+        <div class="card" style="margin-bottom:0"><div class="card-header"><div class="card-title"><i class="ti ti-alert-circle" style="color:var(--red)"></i>En mora</div></div><div class="tbl-wrap"><table><thead><tr><th>Cliente</th><th>Saldo</th><th>Estado</th></tr></thead><tbody id="tbody-mora-dash"><tr><td colspan="3" style="text-align:center;padding:24px;color:var(--text3)">Cargando...</td></tr></tbody></table></div></div>
+      </div>
+    </div>
+
+    <!-- CLIENTES -->
+    <div class="screen" id="screen-clientes">
+      <div class="card"><div class="card-header"><div class="card-title"><i class="ti ti-users"></i>Clientes <span class="badge bg-gray" id="badge-total-clientes">0</span></div><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><div class="search-bar"><i class="ti ti-search"></i><input type="text" placeholder="Buscar..." oninput="filtrarClientes(this.value)"></div><button class="btn btn-green btn-sm" onclick="openModal('modal-nuevo-cliente')"><i class="ti ti-user-plus"></i><span>Nuevo cliente</span></button></div></div>
+      <div class="tbl-wrap"><table><thead><tr><th>#</th><th>Nombre completo</th><th>Cédula</th><th>Teléfono</th><th>Créditos</th><th>Acciones</th></tr></thead><tbody id="tbody-clientes"><tr><td colspan="6" style="text-align:center;padding:30px;color:var(--text3)">Cargando...</td></tr></tbody></table></div></div>
+    </div>
+
+    <!-- CRÉDITOS -->
+    <div class="screen" id="screen-creditos">
+      <div class="tabs">
+        <div class="tab active" onclick="showSubTab('creditos','calc',this)"><i class="ti ti-calculator"></i>Calculadora</div>
+        <div class="tab" onclick="showSubTab('creditos','lista',this)"><i class="ti ti-list"></i>Créditos activos</div>
+        <div class="tab" onclick="showSubTab('creditos','hist',this)"><i class="ti ti-history"></i>Historial</div>
+      </div>
+      <div class="sub-screen active" id="sub-creditos-calc" style="padding-top:16px">
+        <div class="card"><div class="card-header"><div class="card-title"><i class="ti ti-sliders"></i>Parámetros del crédito</div></div><div class="card-body">
+          <div class="g3">
+            <div class="field" style="grid-column:1/-1"><label>Cliente</label><select id="f-cliente"><option value="">— Seleccionar cliente —</option></select></div>
+            <div class="field"><label>Monto ($)</label><input type="number" id="f-monto" value="5000" min="1" step="100" oninput="calcular()"></div>
+            <div class="field"><label>Tasa mensual (%)</label><input type="number" id="f-tasa" value="1.5" min="0.01" step="0.01" oninput="calcular()"></div>
+            <div class="field"><label>Número de cuotas</label><input type="number" id="f-plazo" value="12" min="1" max="360" oninput="calcular()"></div>
+            <div class="field"><label>Frecuencia</label><select id="f-frec" onchange="calcular()"><option value="mensual">Mensual</option><option value="quincenal">Quincenal</option><option value="semanal">Semanal</option><option value="diario">Diario</option></select></div>
+            <div class="field"><label>Tabla</label><select id="f-tabla" onchange="calcular()"><option value="francesa">Francesa (cuota fija)</option><option value="alemana">Alemana (capital fijo)</option><option value="americana">Americana</option></select></div>
+            <div class="field"><label>Fecha inicio</label><input type="date" id="f-fecha" oninput="calcular()"></div>
+          </div>
+          <div class="sum-row" style="margin-top:14px">
+            <div class="sum-box hl"><div class="sum-label">Cuota a pagar</div><div class="sum-value" style="color:var(--green)" id="s-cuota">$0.00</div></div>
+            <div class="sum-box"><div class="sum-label">Monto crédito</div><div class="sum-value" id="s-monto">$0.00</div></div>
+            <div class="sum-box"><div class="sum-label">Total intereses</div><div class="sum-value" style="color:var(--orange)" id="s-interes">$0.00</div></div>
+            <div class="sum-box"><div class="sum-label">Total a pagar</div><div class="sum-value" style="color:var(--yellow)" id="s-total">$0.00</div></div>
+          </div>
+        </div></div>
+        <div class="card"><div class="card-header"><div class="card-title"><i class="ti ti-table"></i>Tabla de amortización</div><div style="display:flex;gap:8px"><button class="btn btn-outline btn-sm" onclick="window.print()"><i class="ti ti-printer"></i><span>Imprimir</span></button><button class="btn btn-green btn-sm" onclick="registrarCredito()"><i class="ti ti-device-floppy"></i><span>Registrar crédito</span></button></div></div>
+        <div class="tbl-wrap"><table><thead><tr><th>#</th><th>Fecha</th><th>Cuota</th><th>Capital</th><th>Interés</th><th>Saldo</th></tr></thead><tbody id="tbody-amort"></tbody></table></div></div>
+      </div>
+      <div class="sub-screen" id="sub-creditos-lista" style="padding-top:16px">
+        <div class="card"><div class="card-header"><div class="card-title"><i class="ti ti-credit-card"></i>Créditos activos</div></div>
+        <div class="tbl-wrap"><table><thead><tr><th>Código</th><th>Cliente</th><th>Monto orig.</th><th>Saldo</th><th>Tasa</th><th>Cuotas</th><th>Estado</th><th>Acciones</th></tr></thead><tbody id="tbody-creditos-lista"></tbody></table></div></div>
+      </div>
+      <div class="sub-screen" id="sub-creditos-hist" style="padding-top:16px">
+        <div class="card"><div class="card-header"><div class="card-title"><i class="ti ti-history"></i>Historial de pagos</div></div>
+        <div class="tbl-wrap"><table><thead><tr><th>Fecha</th><th>Cliente</th><th>Crédito</th><th>Capital</th><th>Interés</th><th>Total</th><th>Método</th></tr></thead><tbody id="tbody-hist-cred"></tbody></table></div></div>
+      </div>
+    </div>
+
+    <!-- PAGOS -->
+    <div class="screen" id="screen-pagos">
+      <div class="sum-row">
+        <div class="sum-box hl"><div class="sum-label">Total cobrado hoy</div><div class="sum-value" style="color:var(--green)" id="p-hoy-total">$0.00</div></div>
+        <div class="sum-box"><div class="sum-label">Efectivo hoy</div><div class="sum-value" id="p-hoy-ef">$0.00</div></div>
+        <div class="sum-box"><div class="sum-label">Transferencia hoy</div><div class="sum-value" id="p-hoy-tr">$0.00</div></div>
+        <div class="sum-box"><div class="sum-label">Pagos hoy</div><div class="sum-value" id="p-hoy-n">0</div></div>
+      </div>
+      <div class="card"><div class="card-header"><div class="card-title"><i class="ti ti-cash"></i>Registro de cobros</div><button class="btn btn-green btn-sm" onclick="openModal('modal-nuevo-pago')"><i class="ti ti-plus"></i><span>Registrar cobro</span></button></div>
+      <div class="tbl-wrap"><table><thead><tr><th>Fecha</th><th>Cliente</th><th>Crédito</th><th>Capital</th><th>Interés</th><th>Total</th><th>Método</th><th>Comprobante</th></tr></thead><tbody id="tbody-pagos"></tbody></table></div></div>
+    </div>
+
+    <!-- SOCIOS -->
+    <div class="screen" id="screen-socios">
+      <div class="sum-row">
+        <div class="sum-box hl"><div class="sum-label">Capital social total</div><div class="sum-value" style="color:var(--green)" id="cap-total">$0.00</div></div>
+        <div class="sum-box"><div class="sum-label">Total socios</div><div class="sum-value" id="cap-socios">0</div></div>
+        <div class="sum-box"><div class="sum-label">Aporte promedio</div><div class="sum-value" id="cap-promedio">$0.00</div></div>
+        <div class="sum-box"><div class="sum-label">Retiros totales</div><div class="sum-value" style="color:var(--red)" id="cap-retiros">$0.00</div></div>
+      </div>
+      <div class="card"><div class="card-header"><div class="card-title"><i class="ti ti-briefcase"></i>Socios</div><div style="display:flex;gap:8px"><div class="search-bar"><i class="ti ti-search"></i><input type="text" placeholder="Buscar..." oninput="filtrarSocios(this.value)"></div><button class="btn btn-green btn-sm" onclick="openModal('modal-nuevo-socio')"><i class="ti ti-user-plus"></i><span>Nuevo socio</span></button></div></div>
+      <div class="card-body" id="lista-socios"></div></div>
+    </div>
+
+    <!-- REPORTES -->
+    <div class="screen" id="screen-reportes">
+      <div class="card"><div class="card-header"><div class="card-title"><i class="ti ti-filter"></i>Período</div><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><input type="date" id="rep-desde" style="background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:7px 10px;border-radius:var(--radius);font-size:12px;outline:none"><span style="color:var(--text3);font-size:12px">al</span><input type="date" id="rep-hasta" style="background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:7px 10px;border-radius:var(--radius);font-size:12px;outline:none"><button class="btn btn-green btn-sm" onclick="generarReporte()"><i class="ti ti-refresh"></i><span>Generar</span></button><button class="btn btn-outline btn-sm" onclick="window.print()"><i class="ti ti-printer"></i><span>Imprimir</span></button></div></div></div>
+      <div class="g2">
+        <div class="card" style="margin-bottom:0"><div class="card-header"><div class="card-title"><i class="ti ti-cash"></i>Cobros en el período</div></div><div class="card-body">
+          <div class="reporte-row"><span>Cobros en efectivo</span><span class="val" id="rep-ef">$0.00</span></div>
+          <div class="reporte-row"><span>Cobros por transferencia</span><span class="val" id="rep-tr">$0.00</span></div>
+          <div class="reporte-row"><span>Otros métodos</span><span class="val" id="rep-otro">$0.00</span></div>
+          <div class="reporte-row total"><span>TOTAL COBRADO</span><span class="val" id="rep-total-cobros">$0.00</span></div>
+        </div></div>
+        <div class="card" style="margin-bottom:0"><div class="card-header"><div class="card-title"><i class="ti ti-briefcase"></i>Capital social</div></div><div class="card-body">
+          <div class="reporte-row"><span>Aportes recibidos</span><span class="val" id="rep-aportes">$0.00</span></div>
+          <div class="reporte-row"><span>Retiros</span><span class="val" style="color:var(--red)" id="rep-retiros-rep">$0.00</span></div>
+          <div class="reporte-row"><span>Dividendos pagados</span><span class="val" id="rep-dividendos">$0.00</span></div>
+          <div class="reporte-row total"><span>CAPITAL NETO</span><span class="val" id="rep-cap-neto">$0.00</span></div>
+        </div></div>
+      </div>
+      <div class="card" style="margin-top:16px"><div class="card-header"><div class="card-title"><i class="ti ti-chart-bar"></i>Cartera de créditos</div></div><div class="card-body"><div class="g3">
+        <div><div class="reporte-row"><span>Créditos otorgados</span><span class="val" id="rep-cred-n">0</span></div><div class="reporte-row"><span>Monto total</span><span class="val" id="rep-cred-monto">$0.00</span></div><div class="reporte-row"><span>Saldo pendiente</span><span class="val" id="rep-cred-saldo">$0.00</span></div></div>
+        <div><div class="reporte-row"><span>Al día</span><span class="val" style="color:var(--green)" id="rep-al-dia">0</span></div><div class="reporte-row"><span>En mora</span><span class="val" style="color:var(--red)" id="rep-en-mora">0</span></div></div>
+        <div><div class="reporte-row"><span>Intereses cobrados</span><span class="val" style="color:var(--orange)" id="rep-int-cobrados">$0.00</span></div><div class="reporte-row"><span>Capital recuperado</span><span class="val" id="rep-cap-rec">$0.00</span></div></div>
+      </div></div></div>
+    </div>
+
+    <!-- USUARIOS -->
+    <div class="screen" id="screen-usuarios">
+      <div class="alert alert-blue"><i class="ti ti-info-circle"></i>Los usuarios creados aquí podrán ingresar al sistema con su correo y contraseña.</div>
+      <div class="g2">
+        <div><div style="font-size:13px;font-weight:600;margin-bottom:12px;display:flex;align-items:center;gap:7px"><i class="ti ti-shield-check" style="color:var(--green);font-size:16px"></i>Administradores</div><div id="lista-admins"></div></div>
+        <div><div style="font-size:13px;font-weight:600;margin-bottom:12px;display:flex;align-items:center;gap:7px"><i class="ti ti-calculator" style="color:var(--blue);font-size:16px"></i>Contadores / Tesoreros</div><div id="lista-contadores"></div></div>
+      </div>
+      <div style="margin-top:16px"><div style="font-size:13px;font-weight:600;margin-bottom:12px;display:flex;align-items:center;gap:7px"><i class="ti ti-briefcase" style="color:var(--purple);font-size:16px"></i>Socios con acceso</div><div id="lista-usuarios-socios"></div></div>
+      <div style="margin-top:16px"><button class="btn btn-green" onclick="openModal('modal-nuevo-usuario')"><i class="ti ti-user-plus"></i>Crear nuevo usuario</button></div>
+    </div>
+
+  </div>
+</main>
+
+<!-- MODALES -->
+<div class="modal-overlay" id="modal-nuevo-cliente"><div class="modal"><div class="modal-header"><div class="modal-title"><i class="ti ti-user-plus"></i>Nuevo cliente</div><button class="modal-close" onclick="closeModal('modal-nuevo-cliente')"><i class="ti ti-x"></i></button></div><div class="modal-body"><div class="g2"><div class="field"><label>Nombres</label><input type="text" id="nc-nombres" placeholder="Nombres"></div><div class="field"><label>Apellidos</label><input type="text" id="nc-apellidos" placeholder="Apellidos"></div><div class="field"><label>Cédula</label><input type="text" id="nc-cedula" placeholder="1700000000" maxlength="10"></div><div class="field"><label>Teléfono</label><input type="text" id="nc-telefono" placeholder="0999000000"></div><div class="field"><label>Email</label><input type="email" id="nc-email" placeholder="cliente@email.com"></div><div class="field"><label>Ocupación</label><input type="text" id="nc-ocupacion" placeholder="Comerciante..."></div><div class="field"><label>Ingresos mensuales ($)</label><input type="number" id="nc-ingresos" placeholder="0.00" step="0.01"></div><div class="field"><label>Dirección</label><input type="text" id="nc-direccion" placeholder="Dirección completa"></div></div></div><div class="modal-footer"><button class="btn btn-outline" onclick="closeModal('modal-nuevo-cliente')">Cancelar</button><button class="btn btn-green" onclick="guardarCliente()"><i class="ti ti-check"></i>Registrar</button></div></div></div>
+
+<div class="modal-overlay" id="modal-nuevo-pago"><div class="modal"><div class="modal-header"><div class="modal-title"><i class="ti ti-cash"></i>Registrar cobro</div><button class="modal-close" onclick="closeModal('modal-nuevo-pago')"><i class="ti ti-x"></i></button></div><div class="modal-body"><div class="g2"><div class="field col-span-2"><label>Cliente</label><select id="np-cliente" onchange="cargarCreditosCliente(this.value)"><option value="">— Seleccionar cliente —</option></select></div><div class="field col-span-2"><label>Crédito</label><select id="np-credito"><option value="">— Seleccionar crédito —</option></select></div><div class="field"><label>Capital ($)</label><input type="number" id="np-capital" placeholder="0.00" step="0.01" oninput="actualizarTotal()"></div><div class="field"><label>Interés ($)</label><input type="number" id="np-interes" placeholder="0.00" step="0.01" oninput="actualizarTotal()"></div><div class="field"><label>Total ($)</label><input type="number" id="np-total" readonly style="color:var(--green);font-weight:600"></div><div class="field"><label>Fecha</label><input type="date" id="np-fecha"></div><div class="field"><label>Método</label><select id="np-metodo"><option value="efectivo">Efectivo</option><option value="transferencia">Transferencia</option><option value="cheque">Cheque</option><option value="otro">Otro</option></select></div><div class="field col-span-2"><label>Comprobante</label><input type="text" id="np-comprobante" placeholder="Número de comprobante (opcional)"></div><div class="field col-span-2"><label>Observaciones</label><textarea id="np-obs" rows="2" placeholder="Notas..."></textarea></div></div></div><div class="modal-footer"><button class="btn btn-outline" onclick="closeModal('modal-nuevo-pago')">Cancelar</button><button class="btn btn-green" onclick="guardarPago()"><i class="ti ti-check"></i>Registrar cobro</button></div></div></div>
+
+<div class="modal-overlay" id="modal-nuevo-socio"><div class="modal"><div class="modal-header"><div class="modal-title"><i class="ti ti-user-plus"></i>Nuevo socio</div><button class="modal-close" onclick="closeModal('modal-nuevo-socio')"><i class="ti ti-x"></i></button></div><div class="modal-body"><div class="g2"><div class="field"><label>Nombres</label><input type="text" id="ns-nombres" placeholder="Nombres"></div><div class="field"><label>Apellidos</label><input type="text" id="ns-apellidos" placeholder="Apellidos"></div><div class="field"><label>Cédula</label><input type="text" id="ns-cedula" placeholder="1700000000" maxlength="10"></div><div class="field"><label>Teléfono</label><input type="text" id="ns-telefono" placeholder="0999000000"></div><div class="field"><label>Fecha de ingreso</label><input type="date" id="ns-fecha"></div><div class="field"><label>Aporte inicial ($)</label><input type="number" id="ns-aporte" placeholder="0.00" step="0.01"></div></div></div><div class="modal-footer"><button class="btn btn-outline" onclick="closeModal('modal-nuevo-socio')">Cancelar</button><button class="btn btn-green" onclick="guardarSocio()"><i class="ti ti-check"></i>Registrar</button></div></div></div>
+
+<div class="modal-overlay" id="modal-aporte"><div class="modal"><div class="modal-header"><div class="modal-title"><i class="ti ti-plus"></i>Movimiento de capital</div><button class="modal-close" onclick="closeModal('modal-aporte')"><i class="ti ti-x"></i></button></div><div class="modal-body"><input type="hidden" id="aporte-socio-id"><div class="g2"><div class="field"><label>Socio</label><input type="text" id="aporte-socio-nombre" readonly></div><div class="field"><label>Tipo</label><select id="aporte-tipo"><option value="aporte">Aporte de capital</option><option value="retiro">Retiro de capital</option><option value="dividendo">Pago de dividendo</option></select></div><div class="field"><label>Monto ($)</label><input type="number" id="aporte-monto" placeholder="0.00" step="0.01"></div><div class="field"><label>Fecha</label><input type="date" id="aporte-fecha"></div><div class="field col-span-2"><label>Descripción</label><input type="text" id="aporte-desc" placeholder="Descripción del movimiento"></div></div></div><div class="modal-footer"><button class="btn btn-outline" onclick="closeModal('modal-aporte')">Cancelar</button><button class="btn btn-green" onclick="guardarAporte()"><i class="ti ti-check"></i>Registrar</button></div></div></div>
+
+<div class="modal-overlay" id="modal-detalle-socio"><div class="modal modal-lg"><div class="modal-header"><div class="modal-title"><i class="ti ti-briefcase"></i>Detalle del socio</div><button class="modal-close" onclick="closeModal('modal-detalle-socio')"><i class="ti ti-x"></i></button></div><div class="modal-body"><div class="g2" style="margin-bottom:16px"><div class="field"><label>Nombre</label><input type="text" id="ds-nombre" readonly></div><div class="field"><label>Cédula</label><input type="text" id="ds-cedula" readonly></div><div class="field"><label>Total aportado</label><input type="text" id="ds-total" readonly style="color:var(--green);font-weight:700"></div><div class="field"><label>Desde</label><input type="text" id="ds-fecha" readonly></div></div><div class="divider-label">Movimientos</div><div class="tbl-wrap"><table><thead><tr><th>Fecha</th><th>Tipo</th><th>Monto</th><th>Descripción</th></tr></thead><tbody id="tbody-movimientos"></tbody></table></div></div><div class="modal-footer"><button class="btn btn-green" onclick="abrirAporte(currentSocioId)"><i class="ti ti-plus"></i>Añadir movimiento</button></div></div></div>
+
+<div class="modal-overlay" id="modal-nuevo-usuario"><div class="modal"><div class="modal-header"><div class="modal-title"><i class="ti ti-user-plus"></i>Crear usuario de acceso</div><button class="modal-close" onclick="closeModal('modal-nuevo-usuario')"><i class="ti ti-x"></i></button></div><div class="modal-body"><div class="alert alert-blue"><i class="ti ti-lock"></i>Este usuario podrá ingresar al sistema con su correo y contraseña.</div><div class="g2"><div class="field"><label>Nombre completo</label><input type="text" id="nu-nombre" placeholder="Nombre"></div><div class="field"><label>Rol</label><select id="nu-rol"><option value="admin">Administrador</option><option value="contador">Contador / Tesorero</option><option value="socio">Socio (solo consulta)</option></select></div><div class="field col-span-2"><label>Correo electrónico</label><input type="email" id="nu-email" placeholder="usuario@exitocompartido.com"></div><div class="field"><label>Contraseña</label><input type="password" id="nu-pass" placeholder="Mínimo 6 caracteres"></div><div class="field"><label>Confirmar contraseña</label><input type="password" id="nu-pass2" placeholder="Repetir contraseña"></div></div></div><div class="modal-footer"><button class="btn btn-outline" onclick="closeModal('modal-nuevo-usuario')">Cancelar</button><button class="btn btn-green" onclick="guardarUsuario()"><i class="ti ti-check"></i>Crear usuario</button></div></div></div>
+
+<div id="toast"><i class="ti ti-check"></i><span id="toast-msg"></span></div>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getFirestore, collection, doc, addDoc, getDocs, getDoc, updateDoc, query, where, orderBy, limit, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAh3p9Wx8LVGzt-sF4TnSmr75dzpRTek1Q",
+  authDomain: "caja-de-ahorro-exito.firebaseapp.com",
+  projectId: "caja-de-ahorro-exito",
+  storageBucket: "caja-de-ahorro-exito.firebasestorage.app",
+  messagingSenderId: "290669234871",
+  appId: "1:290669234871:web:be3b083dc2c45e26475b32"
+};
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+// ═══ UTILS ═══
+const SESSION = JSON.parse(sessionStorage.getItem('ec_user')||'null');
+const fmt = v => '$'+Number(v||0).toLocaleString('es-EC',{minimumFractionDigits:2,maximumFractionDigits:2});
+const fmtDate = s => { if(!s)return''; if(s.toDate) s=s.toDate().toISOString(); const p=s.split('T')[0].split('-'); return `${p[2]}/${p[1]}/${p[0]}`; };
+const hoyStr = () => new Date().toISOString().split('T')[0];
+const nc = (n,a) => ((n||'')+' '+(a||'')).trim();
+
+function showLoading(m='Cargando...'){document.getElementById('loading-msg').textContent=m;document.getElementById('loading-overlay').classList.add('show');}
+function hideLoading(){document.getElementById('loading-overlay').classList.remove('show');}
+let tt;
+function showToast(m,t=''){const el=document.getElementById('toast');el.className=t==='error'?'error':'';el.querySelector('i').className=t==='error'?'ti ti-alert-circle':'ti ti-check';document.getElementById('toast-msg').textContent=m;el.style.transform='translateX(-50%) translateY(0)';clearTimeout(tt);tt=setTimeout(()=>{el.style.transform='translateX(-50%) translateY(80px)'},3200);}
+window.cerrarSesion=()=>{sessionStorage.clear();window.location.href='index.html';};
+function addPeriod(d,t,n){const dt=new Date(d+'T12:00:00');if(t==='mensual')dt.setMonth(dt.getMonth()+n);else if(t==='quincenal')dt.setDate(dt.getDate()+n*15);else if(t==='semanal')dt.setDate(dt.getDate()+n*7);else dt.setDate(dt.getDate()+n);return dt.toISOString().split('T')[0];}
+
+// ═══ HELPER FIRESTORE ═══
+async function getAll(col, ...constraints){
+  try{ const q=constraints.length?query(collection(db,col),...constraints):collection(db,col);const s=await getDocs(q);return s.docs.map(d=>({id:d.id,...d.data()})); }catch(e){console.error(e);return[];}
+}
+async function addOne(col, data){ const r=await addDoc(collection(db,col),{...data,creadoEn:serverTimestamp()}); return r.id; }
+async function updateOne(col,id,data){ await updateDoc(doc(db,col,id),data); }
+
+// ═══ NAVEGACIÓN ═══
+const TITULOS={dashboard:'Dashboard',clientes:'Clientes',creditos:'Módulo de Créditos',pagos:'Cobros y Pagos',socios:'Socios & Capital Social',reportes:'Reportes Financieros',usuarios:'Usuarios & Accesos'};
+window.goTo=function(name,el){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('screen-'+name).classList.add('active');
+  if(el)el.classList.add('active');
+  document.getElementById('page-title').textContent=TITULOS[name]||name;
+  closeSidebar();renderScreen(name);
+};
+async function renderScreen(n){
+  if(n==='dashboard')await renderDashboard();
+  else if(n==='clientes')await renderClientes();
+  else if(n==='creditos')await renderCreditos();
+  else if(n==='pagos')await renderPagos();
+  else if(n==='socios')await renderSocios();
+  else if(n==='reportes')initReportes();
+  else if(n==='usuarios')await renderUsuarios();
+}
+window.showSubTab=function(s,sub,el){
+  document.querySelectorAll(`#screen-${s} .sub-screen`).forEach(x=>x.classList.remove('active'));
+  document.querySelectorAll(`#screen-${s} .tab`).forEach(x=>x.classList.remove('active'));
+  document.getElementById(`sub-${s}-${sub}`).classList.add('active');
+  if(el)el.classList.add('active');
+};
+window.openSidebar=()=>{document.getElementById('sidebar').classList.add('open');document.getElementById('overlay').classList.add('open');};
+window.closeSidebar=()=>{document.getElementById('sidebar').classList.remove('open');document.getElementById('overlay').classList.remove('open');};
+window.openModal=id=>document.getElementById(id).classList.add('open');
+window.closeModal=id=>document.getElementById(id).classList.remove('open');
+document.querySelectorAll('.modal-overlay').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open');}));
+
+// ═══ DASHBOARD ═══
+async function renderDashboard(){
+  const hoy=hoyStr(),mes=hoy.substr(0,7)+'-01';
+  const [pagos,creditos,socios,movs]=await Promise.all([
+    getAll('pagos'),getAll('creditos'),getAll('socios',where('activo','==',true)),getAll('capital_social')
+  ]);
+  const pHoy=pagos.filter(p=>p.fecha===hoy);
+  const pMes=pagos.filter(p=>p.fecha>=mes);
+  const totHoy=pHoy.reduce((a,p)=>a+(+p.capital||0)+(+p.interes||0),0);
+  const efHoy=pHoy.filter(p=>p.metodo==='efectivo').reduce((a,p)=>a+(+p.capital||0)+(+p.interes||0),0);
+  const trHoy=pHoy.filter(p=>p.metodo==='transferencia').reduce((a,p)=>a+(+p.capital||0)+(+p.interes||0),0);
+  const totMes=pMes.reduce((a,p)=>a+(+p.capital||0)+(+p.interes||0),0);
+  const activos=creditos.filter(c=>c.estado!=='cancelado');
+  const mora=creditos.filter(c=>c.estado==='en_mora');
+  const cartera=activos.reduce((a,c)=>a+(+c.saldo||0),0);
+  const moraMonto=mora.reduce((a,c)=>a+(+c.saldo||0),0);
+  const totalAp=movs.reduce((a,m)=>m.tipo==='aporte'?a+(+m.monto||0):m.tipo==='retiro'?a-(+m.monto||0):a,0);
+  document.getElementById('kpi-cobros-hoy').textContent=fmt(totHoy);
+  document.getElementById('kpi-cobros-n').textContent=pHoy.length+' pagos';
+  document.getElementById('kpi-trans-hoy').textContent=fmt(trHoy);
+  document.getElementById('kpi-trans-n').textContent=pHoy.filter(p=>p.metodo==='transferencia').length+' ops';
+  document.getElementById('kpi-creditos').textContent=activos.length;
+  document.getElementById('kpi-cartera').textContent='Cartera: '+fmt(cartera);
+  document.getElementById('kpi-mora').textContent=mora.length;
+  document.getElementById('kpi-mora-val').textContent=fmt(moraMonto)+' en riesgo';
+  document.getElementById('kpi-aportes').textContent=fmt(totalAp);
+  document.getElementById('kpi-socios-n').textContent=socios.length+' socios';
+  document.getElementById('kpi-mes').textContent=fmt(totMes);
+  document.getElementById('badge-mora').textContent=mora.length;
+  const ultPagos=pagos.sort((a,b)=>b.fecha.localeCompare(a.fecha)).slice(0,5);
+  document.getElementById('tbody-recientes').innerHTML=ultPagos.length?ultPagos.map(p=>`<tr><td>${p.clienteNombre||'—'}</td><td class="mono">${fmt(+p.capital+(+p.interes))}</td><td><span class="badge ${p.metodo==='efectivo'?'bg-green':'bg-blue'}">${p.metodo}</span></td><td class="mono">${p.fecha}</td></tr>`).join(''):'<tr><td colspan="4" style="text-align:center;padding:24px;color:var(--text3)">Sin cobros</td></tr>';
+  document.getElementById('tbody-mora-dash').innerHTML=mora.length?mora.map(c=>`<tr><td>${c.clienteNombre||'—'}</td><td class="mono" style="color:var(--red)">${fmt(c.saldo)}</td><td><span class="badge bg-red">En mora</span></td></tr>`).join(''):'<tr><td colspan="3" style="text-align:center;padding:24px;color:var(--text3)">Sin mora ✓</td></tr>';
+}
+
+// ═══ CLIENTES ═══
+let allClientes=[];
+async function renderClientes(filtro=''){
+  if(!filtro)allClientes=await getAll('clientes',orderBy('apellidos'));
+  const lista=filtro?allClientes.filter(c=>nc(c.nombres,c.apellidos).toLowerCase().includes(filtro.toLowerCase())||c.cedula?.includes(filtro)):allClientes;
+  document.getElementById('badge-total-clientes').textContent=allClientes.length;
+  const creditos=await getAll('creditos',where('estado','!=','cancelado'));
+  const cnt={};creditos.forEach(c=>{cnt[c.clienteId]=(cnt[c.clienteId]||0)+1;});
+  document.getElementById('tbody-clientes').innerHTML=lista.length?lista.map((c,i)=>`<tr><td class="mono">${i+1}</td><td><strong>${nc(c.nombres,c.apellidos)}</strong></td><td class="mono">${c.cedula}</td><td>${c.telefono||'—'}</td><td><span class="badge ${cnt[c.id]?'bg-orange':'bg-gray'}">${cnt[c.id]||0} crédito(s)</span></td><td><button class="btn btn-green btn-xs" onclick="irACredito('${c.id}','${nc(c.nombres,c.apellidos)}')"><i class="ti ti-plus"></i>Crédito</button></td></tr>`).join(''):'<tr><td colspan="6" style="text-align:center;padding:30px;color:var(--text3)">No se encontraron clientes</td></tr>';
+  cargarSelectClientes();
+}
+window.filtrarClientes=v=>renderClientes(v);
+window.guardarCliente=async function(){
+  const n=document.getElementById('nc-nombres').value.trim(),a=document.getElementById('nc-apellidos').value.trim(),c=document.getElementById('nc-cedula').value.trim();
+  if(!n||!a||!c){showToast('Nombre, apellido y cédula son obligatorios','error');return;}
+  showLoading('Registrando cliente...');
+  await addOne('clientes',{nombres:n,apellidos:a,cedula:c,telefono:document.getElementById('nc-telefono').value||'',email:document.getElementById('nc-email').value||'',ocupacion:document.getElementById('nc-ocupacion').value||'',ingresos:parseFloat(document.getElementById('nc-ingresos').value)||0,direccion:document.getElementById('nc-direccion').value||'',activo:true});
+  hideLoading();closeModal('modal-nuevo-cliente');
+  ['nc-nombres','nc-apellidos','nc-cedula','nc-telefono','nc-email','nc-ocupacion','nc-ingresos','nc-direccion'].forEach(id=>document.getElementById(id).value='');
+  await renderClientes();showToast('Cliente registrado exitosamente');
+};
+function cargarSelectClientes(){
+  const cl=allClientes;
+  ['f-cliente','np-cliente'].forEach(id=>{const s=document.getElementById(id);if(!s)return;const v=s.value;s.innerHTML='<option value="">— Seleccionar cliente —</option>'+cl.map(c=>`<option value="${c.id}|${nc(c.nombres,c.apellidos)}">${nc(c.nombres,c.apellidos)} — ${c.cedula}</option>`).join('');if(v)s.value=v;});
+}
+window.irACredito=function(id,nombre){document.getElementById('f-cliente').value=`${id}|${nombre}`;goTo('creditos',document.getElementById('nav-creditos'));};
+
+// ═══ CRÉDITOS ═══
+let allCreditos=[];
+async function renderCreditos(){cargarSelectClientes();allCreditos=await getAll('creditos',orderBy('creadoEn','desc'));renderListaCreditos();renderHistCred();calcular();}
+function renderListaCreditos(f=''){
+  const lista=f?allCreditos.filter(c=>nc(c.clienteNombre||'','').toLowerCase().includes(f.toLowerCase())||(c.codigo||'').includes(f)):allCreditos;
+  const b={activo:'bg-green',al_dia:'bg-green',en_mora:'bg-red',cancelado:'bg-gray'};
+  const l={activo:'Al día',al_dia:'Al día',en_mora:'En mora',cancelado:'Cancelado'};
+  document.getElementById('tbody-creditos-lista').innerHTML=lista.length?lista.map(c=>`<tr><td class="mono">${c.codigo||'—'}</td><td><strong>${c.clienteNombre||'—'}</strong></td><td class="mono">${fmt(c.monto)}</td><td class="mono" style="color:var(--orange)">${fmt(c.saldo)}</td><td class="mono">${c.tasa}%</td><td class="mono">${c.plazo}</td><td><span class="badge ${b[c.estado]||'bg-gray'}">${l[c.estado]||c.estado}</span></td><td><button class="btn btn-green btn-xs" onclick="prepararPago('${c.id}','${c.clienteId}','${c.clienteNombre}','${c.codigo}',${c.saldo})"><i class="ti ti-cash"></i>Cobrar</button></td></tr>`).join(''):'<tr><td colspan="8" style="text-align:center;padding:30px;color:var(--text3)">No hay créditos</td></tr>';
+}
+function renderHistCred(){
+  const pagos=allCreditos.length?[]:[];
+  getAll('pagos',orderBy('fecha','desc'),limit(100)).then(pagos=>{
+    document.getElementById('tbody-hist-cred').innerHTML=pagos.length?pagos.map(p=>`<tr><td class="mono">${p.fecha}</td><td>${p.clienteNombre||'—'}</td><td class="mono">${p.creditoCodigo||'—'}</td><td class="mono">${fmt(p.capital)}</td><td class="mono" style="color:var(--orange)">${fmt(p.interes)}</td><td class="mono" style="color:var(--green)">${fmt(+p.capital+(+p.interes))}</td><td><span class="badge ${p.metodo==='efectivo'?'bg-green':'bg-blue'}">${p.metodo}</span></td></tr>`).join(''):'<tr><td colspan="7" style="text-align:center;padding:30px;color:var(--text3)">Sin pagos</td></tr>';
+  });
+}
+window.calcular=function(){
+  const monto=parseFloat(document.getElementById('f-monto').value)||0,tMes=parseFloat(document.getElementById('f-tasa').value)||0,plazo=parseInt(document.getElementById('f-plazo').value)||0,tabla=document.getElementById('f-tabla').value,frec=document.getElementById('f-frec').value,fecha=document.getElementById('f-fecha').value||hoyStr();
+  if(!monto||!tMes||!plazo)return;
+  const m={mensual:1,quincenal:2,semanal:4,diario:30},tasa=tMes/(m[frec]||1)/100;
+  let filas=[];
+  if(tabla==='francesa'){const cuota=tasa===0?monto/plazo:monto*(tasa*Math.pow(1+tasa,plazo))/(Math.pow(1+tasa,plazo)-1);let s=monto;for(let i=1;i<=plazo;i++){const int=s*tasa,cap=cuota-int;s=Math.max(0,s-cap);filas.push({n:i,fecha:addPeriod(fecha,frec,i),cuota,cap,int,saldo:s});}}
+  else if(tabla==='alemana'){const capC=monto/plazo;let s=monto;for(let i=1;i<=plazo;i++){const int=s*tasa,cuota=capC+int;s=Math.max(0,s-capC);filas.push({n:i,fecha:addPeriod(fecha,frec,i),cuota,cap:capC,int,saldo:s});}}
+  else{for(let i=1;i<=plazo;i++){const int=monto*tasa,cap=i===plazo?monto:0;filas.push({n:i,fecha:addPeriod(fecha,frec,i),cuota:int+cap,cap,int,saldo:i===plazo?0:monto});}}
+  const totP=filas.reduce((a,f)=>a+f.cuota,0),totI=filas.reduce((a,f)=>a+f.int,0);
+  document.getElementById('s-cuota').textContent=fmt(filas[0]?.cuota||0);document.getElementById('s-monto').textContent=fmt(monto);document.getElementById('s-interes').textContent=fmt(totI);document.getElementById('s-total').textContent=fmt(totP);
+  document.getElementById('tbody-amort').innerHTML=filas.map(f=>`<tr><td class="mono">${f.n}</td><td class="mono">${f.fecha}</td><td class="mono">${fmt(f.cuota)}</td><td class="mono">${fmt(f.cap)}</td><td class="mono" style="color:var(--orange)">${fmt(f.int)}</td><td class="mono">${fmt(f.saldo)}</td></tr>`).join('');
+  window._amort=filas;
+};
+window.registrarCredito=async function(){
+  const clienteVal=document.getElementById('f-cliente').value;if(!clienteVal){showToast('Selecciona un cliente','error');return;}
+  const [clienteId,clienteNombre]=clienteVal.split('|');
+  const monto=parseFloat(document.getElementById('f-monto').value)||0,tasa=parseFloat(document.getElementById('f-tasa').value)||0,plazo=parseInt(document.getElementById('f-plazo').value)||0;
+  if(!monto||!tasa||!plazo){showToast('Completa todos los parámetros','error');return;}
+  showLoading('Registrando crédito...');
+  const num=allCreditos.length+1;
+  const codigo='C-'+String(num).padStart(3,'0');
+  const crId=await addOne('creditos',{codigo,clienteId,clienteNombre,monto,saldo:monto,tasa,plazo,frecuencia:document.getElementById('f-frec').value,tabla:document.getElementById('f-tabla').value,fechaInicio:document.getElementById('f-fecha').value||hoyStr(),estado:'activo'});
+  hideLoading();showToast('Crédito '+codigo+' registrado exitosamente');
+  allCreditos=await getAll('creditos',orderBy('creadoEn','desc'));renderListaCreditos();
+};
+window.prepararPago=function(cid,clid,clnombre,ccodigo,saldo){
+  document.getElementById('np-cliente').value=`${clid}|${clnombre}`;
+  cargarCreditosCliente(`${clid}|${clnombre}`);
+  setTimeout(()=>{document.getElementById('np-credito').value=`${cid}|${ccodigo}|${saldo}`;},100);
+  goTo('pagos',document.getElementById('nav-pagos'));
+  setTimeout(()=>openModal('modal-nuevo-pago'),200);
+};
+
+// ═══ PAGOS ═══
+async function renderPagos(){
+  cargarSelectClientes();document.getElementById('np-fecha').value=hoyStr();
+  const pagos=await getAll('pagos',orderBy('fecha','desc'),limit(200));
+  const hoy=hoyStr();
+  const pHoy=pagos.filter(p=>p.fecha===hoy);
+  const totH=pHoy.reduce((a,p)=>a+(+p.capital||0)+(+p.interes||0),0);
+  const ef=pHoy.filter(p=>p.metodo==='efectivo').reduce((a,p)=>a+(+p.capital||0)+(+p.interes||0),0);
+  const tr=pHoy.filter(p=>p.metodo==='transferencia').reduce((a,p)=>a+(+p.capital||0)+(+p.interes||0),0);
+  document.getElementById('p-hoy-total').textContent=fmt(totH);document.getElementById('p-hoy-ef').textContent=fmt(ef);document.getElementById('p-hoy-tr').textContent=fmt(tr);document.getElementById('p-hoy-n').textContent=pHoy.length;
+  document.getElementById('tbody-pagos').innerHTML=pagos.length?pagos.map(p=>`<tr><td class="mono">${p.fecha}</td><td>${p.clienteNombre||'—'}</td><td class="mono">${p.creditoCodigo||'—'}</td><td class="mono">${fmt(p.capital)}</td><td class="mono" style="color:var(--orange)">${fmt(p.interes)}</td><td class="mono" style="color:var(--green);font-weight:600">${fmt(+p.capital+(+p.interes))}</td><td><span class="badge ${p.metodo==='efectivo'?'bg-green':p.metodo==='transferencia'?'bg-blue':'bg-gray'}">${p.metodo}</span></td><td class="mono">${p.comprobante||'—'}</td></tr>`).join(''):'<tr><td colspan="8" style="text-align:center;padding:30px;color:var(--text3)">No hay cobros registrados</td></tr>';
+}
+window.cargarCreditosCliente=async function(v){
+  const sel=document.getElementById('np-credito');sel.innerHTML='<option value="">— Seleccionar crédito —</option>';if(!v)return;
+  const [clid]=v.split('|');
+  const creds=await getAll('creditos',where('clienteId','==',clid),where('estado','!=','cancelado'));
+  creds.forEach(c=>{const o=document.createElement('option');o.value=`${c.id}|${c.codigo}|${c.saldo}`;o.textContent=`${c.codigo} — Saldo: ${fmt(c.saldo)}`;sel.appendChild(o);});
+};
+window.actualizarTotal=function(){document.getElementById('np-total').value=(parseFloat(document.getElementById('np-capital').value||0)+parseFloat(document.getElementById('np-interes').value||0)).toFixed(2);};
+window.guardarPago=async function(){
+  const cv=document.getElementById('np-cliente').value,crv=document.getElementById('np-credito').value;
+  const cap=parseFloat(document.getElementById('np-capital').value)||0,int=parseFloat(document.getElementById('np-interes').value)||0;
+  const fecha=document.getElementById('np-fecha').value||hoyStr(),metodo=document.getElementById('np-metodo').value;
+  if(!cv||!crv){showToast('Selecciona cliente y crédito','error');return;}if(!cap&&!int){showToast('Ingresa el monto a cobrar','error');return;}
+  const [clid,clnombre]=cv.split('|');const [cid,ccodigo,saldo]=crv.split('|');
+  showLoading('Registrando cobro...');
+  await addOne('pagos',{clienteId:clid,clienteNombre:clnombre,creditoId:cid,creditoCodigo:ccodigo,fecha,capital:cap,interes:int,metodo,comprobante:document.getElementById('np-comprobante').value||'',observaciones:document.getElementById('np-obs').value||''});
+  await updateOne('creditos',cid,{saldo:Math.max(0,parseFloat(saldo)-cap)});
+  hideLoading();closeModal('modal-nuevo-pago');await renderPagos();showToast('Cobro registrado: '+fmt(cap+int));
+  ['np-capital','np-interes','np-total','np-comprobante','np-obs'].forEach(id=>document.getElementById(id).value='');
+};
+
+// ═══ SOCIOS ═══
+let allSocios=[],currentSocioId=null;
+window.currentSocioId=null;
+async function renderSocios(filtro=''){
+  if(!filtro)allSocios=await getAll('socios',where('activo','==',true),orderBy('apellidos'));
+  const movs=await getAll('capital_social');
+  const totAp=movs.reduce((a,m)=>m.tipo==='aporte'?a+(+m.monto||0):m.tipo==='retiro'?a-(+m.monto||0):a,0);
+  const totRet=movs.filter(m=>m.tipo==='retiro').reduce((a,m)=>a+(+m.monto||0),0);
+  document.getElementById('cap-total').textContent=fmt(totAp);document.getElementById('cap-socios').textContent=allSocios.length;document.getElementById('cap-promedio').textContent=allSocios.length?fmt(totAp/allSocios.length):fmt(0);document.getElementById('cap-retiros').textContent=fmt(totRet);
+  const lista=filtro?allSocios.filter(s=>nc(s.nombres,s.apellidos).toLowerCase().includes(filtro.toLowerCase())):allSocios;
+  document.getElementById('lista-socios').innerHTML=lista.map(s=>{
+    const sm=movs.filter(m=>m.socioId===s.id),ap=sm.reduce((a,m)=>m.tipo==='aporte'?a+(+m.monto||0):m.tipo==='retiro'?a-(+m.monto||0):a,0),pct=totAp>0?Math.round(ap/totAp*100):0,ini=((s.nombres||'')[0]||'')+((s.apellidos||'')[0]||'');
+    return `<div class="socio-card" onclick="abrirDetalleSocio('${s.id}')"><div class="socio-avatar">${ini.toUpperCase()}</div><div class="socio-info"><div class="socio-name">${nc(s.nombres,s.apellidos)}</div><div class="socio-meta">Cédula ${s.cedula} · Desde ${s.fechaIngreso||'—'}</div><div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div></div><div class="socio-aporte"><div class="socio-aporte-val">${fmt(ap)}</div><div class="socio-aporte-lbl">${pct}% del capital</div><div style="margin-top:6px;display:flex;gap:5px;justify-content:flex-end"><button class="btn btn-green btn-xs" onclick="event.stopPropagation();abrirAporte('${s.id}')"><i class="ti ti-plus"></i>Aporte</button><button class="btn btn-outline btn-xs" onclick="event.stopPropagation();abrirDetalleSocio('${s.id}')"><i class="ti ti-eye"></i></button></div></div></div>`;
+  }).join('');
+}
+window.filtrarSocios=v=>renderSocios(v);
+window.guardarSocio=async function(){
+  const n=document.getElementById('ns-nombres').value.trim(),a=document.getElementById('ns-apellidos').value.trim(),c=document.getElementById('ns-cedula').value.trim();
+  if(!n||!a||!c){showToast('Nombre, apellido y cédula son obligatorios','error');return;}
+  showLoading('Registrando socio...');
+  const sid=await addOne('socios',{nombres:n,apellidos:a,cedula:c,telefono:document.getElementById('ns-telefono').value||'',fechaIngreso:document.getElementById('ns-fecha').value||hoyStr(),activo:true});
+  const ap=parseFloat(document.getElementById('ns-aporte').value)||0;
+  if(ap>0)await addOne('capital_social',{socioId:sid,socioNombre:nc(n,a),tipo:'aporte',monto:ap,fecha:hoyStr(),descripcion:'Aporte inicial'});
+  hideLoading();closeModal('modal-nuevo-socio');await renderSocios();showToast('Socio registrado exitosamente');
+};
+window.abrirDetalleSocio=async function(sid){
+  currentSocioId=sid;window.currentSocioId=sid;
+  const [s,movs]=await Promise.all([getAll('socios',where('__name__','==',sid)),getAll('capital_social',where('socioId','==',sid),orderBy('fecha','desc'))]);
+  const socio=s[0]||{},tot=movs.reduce((a,m)=>m.tipo==='aporte'?a+(+m.monto||0):m.tipo==='retiro'?a-(+m.monto||0):a,0);
+  document.getElementById('ds-nombre').value=nc(socio.nombres,socio.apellidos);document.getElementById('ds-cedula').value=socio.cedula||'';document.getElementById('ds-total').value=fmt(tot);document.getElementById('ds-fecha').value=socio.fechaIngreso||'';
+  document.getElementById('tbody-movimientos').innerHTML=movs.length?movs.map(m=>`<tr><td class="mono">${m.fecha}</td><td><span class="badge ${m.tipo==='aporte'?'bg-green':m.tipo==='retiro'?'bg-red':'bg-blue'}">${m.tipo}</span></td><td class="mono">${m.tipo==='retiro'?'-':''}${fmt(m.monto)}</td><td>${m.descripcion||'—'}</td></tr>`).join(''):'<tr><td colspan="4" style="text-align:center;padding:20px;color:var(--text3)">Sin movimientos</td></tr>';
+  openModal('modal-detalle-socio');
+};
+window.abrirAporte=function(sid){
+  currentSocioId=sid;window.currentSocioId=sid;
+  const s=allSocios.find(x=>x.id===sid)||{};
+  document.getElementById('aporte-socio-id').value=sid;document.getElementById('aporte-socio-nombre').value=nc(s.nombres,s.apellidos);document.getElementById('aporte-fecha').value=hoyStr();document.getElementById('aporte-monto').value='';document.getElementById('aporte-desc').value='';
+  openModal('modal-aporte');
+};
+window.guardarAporte=async function(){
+  const sid=document.getElementById('aporte-socio-id').value,tipo=document.getElementById('aporte-tipo').value,monto=parseFloat(document.getElementById('aporte-monto').value)||0,fecha=document.getElementById('aporte-fecha').value||hoyStr(),desc=document.getElementById('aporte-desc').value;
+  if(!monto){showToast('Ingresa el monto','error');return;}
+  const s=allSocios.find(x=>x.id===sid)||{};
+  showLoading('Registrando...');await addOne('capital_social',{socioId:sid,socioNombre:nc(s.nombres,s.apellidos),tipo,monto,fecha,descripcion:desc||''});
+  hideLoading();closeModal('modal-aporte');await renderSocios();if(window.currentSocioId)await window.abrirDetalleSocio(window.currentSocioId);showToast('Movimiento registrado');
+};
+
+// ═══ REPORTES ═══
+window.initReportes=function(){const h=hoyStr();document.getElementById('rep-desde').value=h.substr(0,8)+'01';document.getElementById('rep-hasta').value=h;generarReporte();};
+window.generarReporte=async function(){
+  const d=document.getElementById('rep-desde').value,h=document.getElementById('rep-hasta').value;
+  showLoading('Generando reporte...');
+  const [pagos,movs,creditos]=await Promise.all([getAll('pagos'),getAll('capital_social'),getAll('creditos')]);
+  hideLoading();
+  const pPer=pagos.filter(p=>p.fecha>=d&&p.fecha<=h);
+  const ef=pPer.filter(p=>p.metodo==='efectivo').reduce((a,p)=>a+(+p.capital||0)+(+p.interes||0),0);
+  const tr=pPer.filter(p=>p.metodo==='transferencia').reduce((a,p)=>a+(+p.capital||0)+(+p.interes||0),0);
+  const otro=pPer.filter(p=>p.metodo!=='efectivo'&&p.metodo!=='transferencia').reduce((a,p)=>a+(+p.capital||0)+(+p.interes||0),0);
+  const intC=pPer.reduce((a,p)=>a+(+p.interes||0),0),capR=pPer.reduce((a,p)=>a+(+p.capital||0),0);
+  const mPer=movs.filter(m=>m.fecha>=d&&m.fecha<=h);
+  const ap=mPer.filter(m=>m.tipo==='aporte').reduce((a,m)=>a+(+m.monto||0),0);
+  const ret=mPer.filter(m=>m.tipo==='retiro').reduce((a,m)=>a+(+m.monto||0),0);
+  const div=mPer.filter(m=>m.tipo==='dividendo').reduce((a,m)=>a+(+m.monto||0),0);
+  const act=creditos.filter(c=>c.estado!=='cancelado'),mora=creditos.filter(c=>c.estado==='en_mora');
+  const crPer=creditos.filter(c=>c.fechaInicio>=d&&c.fechaInicio<=h);
+  document.getElementById('rep-ef').textContent=fmt(ef);document.getElementById('rep-tr').textContent=fmt(tr);document.getElementById('rep-otro').textContent=fmt(otro);document.getElementById('rep-total-cobros').textContent=fmt(ef+tr+otro);
+  document.getElementById('rep-aportes').textContent=fmt(ap);document.getElementById('rep-retiros-rep').textContent=fmt(ret);document.getElementById('rep-dividendos').textContent=fmt(div);document.getElementById('rep-cap-neto').textContent=fmt(ap-ret-div);
+  document.getElementById('rep-cred-n').textContent=crPer.length;document.getElementById('rep-cred-monto').textContent=fmt(crPer.reduce((a,c)=>a+(+c.monto||0),0));document.getElementById('rep-cred-saldo').textContent=fmt(act.reduce((a,c)=>a+(+c.saldo||0),0));
+  document.getElementById('rep-al-dia').textContent=act.length-mora.length;document.getElementById('rep-en-mora').textContent=mora.length;
+  document.getElementById('rep-int-cobrados').textContent=fmt(intC);document.getElementById('rep-cap-rec').textContent=fmt(capR);
+};
+
+// ═══ USUARIOS ═══
+async function renderUsuarios(){
+  const us=await getAll('usuarios',where('activo','==',true),orderBy('nombre'));
+  const ad=us.filter(u=>u.rol==='admin'),co=us.filter(u=>u.rol==='contador'),so=us.filter(u=>u.rol==='socio');
+  const uc=u=>{const cls={admin:'ua-admin',contador:'ua-contador',socio:'ua-socio'}[u.rol]||'ua-admin',ini=u.nombre.split(' ').map(n=>n[0]).slice(0,2).join('').toUpperCase(),rl={admin:'Administrador',contador:'Contador / Tesorero',socio:'Socio (consulta)'}[u.rol];return `<div class="user-card"><div class="user-card-avatar ${cls}">${ini}</div><div class="user-card-info"><div class="user-card-name">${u.nombre}</div><div class="user-card-email">${u.email}</div><span class="badge ${u.rol==='admin'?'bg-green':u.rol==='contador'?'bg-blue':'bg-purple'}" style="margin-top:4px">${rl}</span></div><button class="btn btn-outline btn-xs" onclick="desactivarUsuario('${u.id}')"><i class="ti ti-trash" style="color:var(--red)"></i></button></div>`;};
+  document.getElementById('lista-admins').innerHTML=ad.length?ad.map(uc).join(''):'<div style="color:var(--text3);font-size:13px;padding:8px">Sin administradores</div>';
+  document.getElementById('lista-contadores').innerHTML=co.length?co.map(uc).join(''):'<div style="color:var(--text3);font-size:13px;padding:8px">Sin contadores</div>';
+  document.getElementById('lista-usuarios-socios').innerHTML=so.length?so.map(uc).join(''):'<div style="color:var(--text3);font-size:13px;padding:8px">Sin socios con acceso</div>';
+}
+window.guardarUsuario=async function(){
+  const n=document.getElementById('nu-nombre').value.trim(),e=document.getElementById('nu-email').value.trim().toLowerCase(),r=document.getElementById('nu-rol').value,p=document.getElementById('nu-pass').value,p2=document.getElementById('nu-pass2').value;
+  if(!n||!e){showToast('Nombre y correo son obligatorios','error');return;}if(p!==p2){showToast('Las contraseñas no coinciden','error');return;}if(p.length<6){showToast('Contraseña mínimo 6 caracteres','error');return;}
+  showLoading('Creando usuario...');await addOne('usuarios',{nombre:n,email:e,rol:r,pass:p,activo:true});hideLoading();
+  closeModal('modal-nuevo-usuario');await renderUsuarios();showToast('Usuario '+n+' creado exitosamente');['nu-nombre','nu-email','nu-pass','nu-pass2'].forEach(id=>document.getElementById(id).value='');
+};
+window.desactivarUsuario=async function(id){if(!confirm('¿Desactivar este usuario?'))return;await updateOne('usuarios',id,{activo:false});await renderUsuarios();showToast('Usuario desactivado');};
+
+// ═══ INIT ═══
+(async function init(){
+  if(!SESSION){window.location.href='index.html';return;}
+  const ini=SESSION.nombre.split(' ').map(n=>n[0]).slice(0,2).join('').toUpperCase();
+  document.getElementById('sb-avatar').textContent=ini;document.getElementById('sb-name').textContent=SESSION.nombre;document.getElementById('sb-role').textContent={admin:'Administrador',contador:'Contador / Tesorero',socio:'Solo consulta'}[SESSION.rol]||SESSION.rol;
+  document.getElementById('fecha-hoy').textContent=new Date().toLocaleDateString('es-EC',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  ['f-fecha','ns-fecha','np-fecha'].forEach(id=>document.getElementById(id).value=hoyStr());
+  showLoading('Cargando datos...');await renderDashboard();hideLoading();
+})();
+document.addEventListener('keydown',e=>{if(e.key==='Escape')document.querySelectorAll('.modal-overlay.open').forEach(m=>m.classList.remove('open'));});
+</script>
+</body>
+</html>
