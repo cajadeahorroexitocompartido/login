@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Créditos — Éxito Compartido</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#080c10;--surface:#0e1318;--surface2:#141b22;--surface3:#1a2330;--border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.04);--green:#2ecc71;--green2:#27ae60;--green-glow:rgba(46,204,113,0.12);--orange:#f39c12;--red:#e74c3c;--blue:#3498db;--purple:#9b59b6;--yellow:#f1c40f;--text:#f0f4f8;--text2:#8896a4;--text3:#4a5568;--radius:12px}
+html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);font-size:14px;overflow-x:hidden}
+.bg-grid{position:fixed;inset:0;z-index:0;background-image:linear-gradient(rgba(255,255,255,.012) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.012) 1px,transparent 1px);background-size:40px 40px;pointer-events:none}
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:100;backdrop-filter:blur(2px)}.overlay.open{display:block}
+.sidebar{position:fixed;top:0;left:0;bottom:0;width:260px;background:var(--surface);border-right:1px solid var(--border);z-index:200;transform:translateX(-100%);transition:transform .3s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column;overflow-y:auto}.sidebar.open{transform:translateX(0)}
+.sidebar-header{padding:20px 20px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.sidebar-logo{display:flex;align-items:center;gap:12px}
+.sidebar-logo-icon{width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,var(--green),var(--green2));display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#fff;font-family:'DM Mono',monospace;box-shadow:0 4px 12px rgba(46,204,113,0.25);flex-shrink:0}
+.sidebar-logo-text{font-size:12px;font-weight:600;line-height:1.3}.sidebar-logo-sub{font-size:10px;color:var(--text3);margin-top:1px}
+.sidebar-close{background:none;border:none;color:var(--text3);cursor:pointer;padding:6px;border-radius:8px;transition:all .15s;line-height:1}.sidebar-close:hover{background:var(--surface2);color:var(--text)}
+.sidebar-nav{padding:12px 10px;flex:1}
+.nav-group-label{font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.1em;padding:10px 10px 6px}
+.nav-item{display:flex;align-items:center;gap:11px;padding:10px 12px;border-radius:10px;cursor:pointer;color:var(--text2);font-size:13px;margin-bottom:2px;transition:all .15s;text-decoration:none;position:relative}
+.nav-item:hover{background:var(--surface2);color:var(--text)}.nav-item.active{background:var(--green-glow);color:var(--green);font-weight:500}
+.nav-item.active::before{content:'';position:absolute;left:0;top:20%;bottom:20%;width:3px;border-radius:0 3px 3px 0;background:var(--green)}
+.nav-item svg{width:17px;height:17px;flex-shrink:0;opacity:.7}.nav-item.active svg,.nav-item:hover svg{opacity:1}
+.nav-badge{margin-left:auto;font-size:10px;font-weight:700;padding:2px 7px;border-radius:8px;background:var(--red);color:#fff}
+.sidebar-footer{padding:14px;border-top:1px solid var(--border)}
+.user-card{display:flex;align-items:center;gap:10px;padding:10px;border-radius:10px;background:var(--surface2);margin-bottom:10px}
+.user-avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--green),var(--green2));display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;flex-shrink:0}
+.user-name{font-size:12px;font-weight:600}.user-role{font-size:10px;color:var(--text3);margin-top:1px}
+.btn-logout{width:100%;padding:9px;background:rgba(231,76,60,.08);border:1px solid rgba(231,76,60,.15);color:var(--red);border-radius:10px;font-size:12px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;display:flex;align-items:center;justify-content:center;gap:7px;transition:all .15s}.btn-logout:hover{background:rgba(231,76,60,.15)}
+.topbar{position:sticky;top:0;z-index:50;padding:12px 20px;background:rgba(8,12,16,.9);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:14px}
+.btn-hamburger{background:none;border:none;color:var(--text2);cursor:pointer;padding:7px;border-radius:9px;transition:all .15s;line-height:1;display:flex;align-items:center;justify-content:center}.btn-hamburger:hover{background:var(--surface2);color:var(--text)}
+.topbar-title{font-size:15px;font-weight:600}.topbar-sub{font-size:11px;color:var(--text3);margin-top:1px}
+.main{position:relative;z-index:1;min-height:100vh;display:flex;flex-direction:column}
+.content{padding:20px;flex:1}
+/* TABS */
+.tabs-bar{display:flex;gap:4px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:5px;margin-bottom:20px;overflow-x:auto;scrollbar-width:none}
+.tabs-bar::-webkit-scrollbar{display:none}
+.tab-btn{padding:8px 16px;border-radius:9px;font-size:13px;font-weight:500;cursor:pointer;border:none;background:transparent;color:var(--text2);font-family:'DM Sans',sans-serif;transition:all .15s;white-space:nowrap;display:flex;align-items:center;gap:7px}
+.tab-btn svg{width:15px;height:15px}
+.tab-btn:hover{background:var(--surface2);color:var(--text)}
+.tab-btn.active{background:var(--green-glow);color:var(--green);font-weight:600}
+.tab-content{display:none}.tab-content.active{display:block;animation:fi .2s ease}
+@keyframes fi{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+/* CARD */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:16px}
+.card-header{padding:14px 16px;border-bottom:1px solid var(--border2);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
+.card-title{font-size:13px;font-weight:600;display:flex;align-items:center;gap:8px}
+.card-title svg{width:15px;height:15px;color:var(--green)}
+.card-body{padding:16px}
+/* CALCULADORA */
+.calc-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+.field label{display:block;font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:7px}
+.field input,.field select{width:100%;background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:10px 12px;border-radius:10px;font-size:13px;font-family:'DM Sans',sans-serif;outline:none;transition:border-color .2s,box-shadow .2s;-webkit-appearance:none}
+.field input:focus,.field select:focus{border-color:var(--green);box-shadow:0 0 0 3px rgba(46,204,113,.08)}
+.field select option{background:var(--surface2)}
+.span-full{grid-column:1/-1}
+.resumen-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:16px}
+.resumen-box{background:var(--surface2);border:1px solid var(--border2);border-radius:10px;padding:14px}
+.resumen-box.hl{border-color:rgba(46,204,113,.3);background:rgba(46,204,113,.04)}
+.resumen-label{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px}
+.resumen-val{font-size:20px;font-weight:700;font-family:'DM Mono',monospace}
+/* TABLA */
+.tbl-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;min-width:600px}
+thead th{font-size:10px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.07em;padding:10px 14px;text-align:left;border-bottom:1px solid var(--border2);white-space:nowrap}
+tbody td{padding:11px 14px;font-size:13px;border-bottom:1px solid var(--border2);vertical-align:middle}
+tbody tr:last-child td{border-bottom:none}
+tbody tr:hover td{background:rgba(255,255,255,.02)}
+.mono{font-family:'DM Mono',monospace;font-size:12px}
+.td-actions{display:flex;gap:6px;align-items:center}
+/* BADGE */
+.badge{display:inline-flex;align-items:center;padding:3px 9px;border-radius:6px;font-size:11px;font-weight:500}
+.b-green{background:rgba(46,204,113,.12);color:var(--green)}.b-orange{background:rgba(243,156,18,.12);color:var(--orange)}.b-red{background:rgba(231,76,60,.12);color:var(--red)}.b-blue{background:rgba(52,152,219,.12);color:var(--blue)}.b-gray{background:rgba(255,255,255,.06);color:var(--text3)}.b-yellow{background:rgba(241,196,15,.12);color:var(--yellow)}
+/* BTN */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:9px;font-size:13px;font-weight:500;cursor:pointer;border:none;font-family:'DM Sans',sans-serif;transition:all .15s;white-space:nowrap}
+.btn svg{width:15px;height:15px}
+.btn-green{background:linear-gradient(135deg,var(--green),var(--green2));color:#fff;box-shadow:0 2px 10px rgba(46,204,113,.2)}.btn-green:hover{box-shadow:0 4px 16px rgba(46,204,113,.3);transform:translateY(-1px)}
+.btn-outline{background:transparent;color:var(--text2);border:1px solid var(--border)}.btn-outline:hover{background:var(--surface2);color:var(--text)}
+.btn-red{background:rgba(231,76,60,.1);color:var(--red);border:1px solid rgba(231,76,60,.2)}.btn-red:hover{background:rgba(231,76,60,.2)}
+.btn-blue{background:rgba(52,152,219,.1);color:var(--blue);border:1px solid rgba(52,152,219,.2)}.btn-blue:hover{background:rgba(52,152,219,.2)}
+.btn-sm{padding:6px 12px;font-size:12px}.btn-xs{padding:5px 9px;font-size:11px}
+/* MODAL */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:300;align-items:flex-end;justify-content:center;backdrop-filter:blur(4px)}.modal-overlay.open{display:flex}
+@media(min-width:600px){.modal-overlay{align-items:center}}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:16px 16px 0 0;width:100%;max-width:680px;max-height:92vh;overflow-y:auto;animation:slideUp .25s ease}
+@keyframes slideUp{from{transform:translateY(30px);opacity:0}to{transform:translateY(0);opacity:1}}
+@media(min-width:600px){.modal{border-radius:16px}}
+.modal-lg{max-width:800px}
+.modal-header{padding:16px 18px;border-bottom:1px solid var(--border2);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:var(--surface);z-index:10}
+.modal-title{font-size:14px;font-weight:600;display:flex;align-items:center;gap:8px}
+.modal-title svg{width:16px;height:16px;color:var(--green)}
+.modal-close{background:none;border:none;color:var(--text3);cursor:pointer;padding:4px;border-radius:6px;transition:all .15s;line-height:1}.modal-close:hover{background:var(--surface2);color:var(--text)}
+.modal-body{padding:18px}.modal-footer{padding:14px 18px;border-top:1px solid var(--border2);display:flex;gap:8px;justify-content:flex-end}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}.col-span-2{grid-column:span 2}
+/* PROGRESS */
+.progress-wrap{margin-top:8px}
+.progress-bg{height:6px;background:var(--surface3);border-radius:3px;overflow:hidden}
+.progress-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--green),var(--green2));transition:width .5s ease}
+/* CONFIRM */
+.confirm-modal{max-width:400px}
+.confirm-body{padding:24px 18px;text-align:center}
+.confirm-icon{width:56px;height:56px;border-radius:50%;background:rgba(231,76,60,.1);border:2px solid rgba(231,76,60,.2);display:flex;align-items:center;justify-content:center;margin:0 auto 16px}
+.confirm-title{font-size:16px;font-weight:700;margin-bottom:8px}.confirm-msg{font-size:13px;color:var(--text2);line-height:1.6}
+/* LOADING */
+.loading-overlay{display:none;position:fixed;inset:0;background:rgba(8,12,16,.85);z-index:400;align-items:center;justify-content:center;flex-direction:column;gap:14px;backdrop-filter:blur(4px)}.loading-overlay.show{display:flex}
+.loading-spinner{width:36px;height:36px;border:3px solid rgba(46,204,113,.2);border-top-color:var(--green);border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-text{font-size:13px;color:var(--text2)}
+.empty-cell{text-align:center;padding:40px;color:var(--text3);font-size:13px}
+.divider{height:1px;background:var(--border2);margin:16px 0}
+@media(max-width:768px){.calc-grid{grid-template-columns:1fr 1fr}.resumen-grid{grid-template-columns:1fr 1fr}.form-grid{grid-template-columns:1fr}.col-span-2{grid-column:span 1}}
+@media(max-width:480px){.calc-grid{grid-template-columns:1fr}.resumen-grid{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+<script src="auth.js"></script>
+<div class="bg-grid"></div>
+<div class="loading-overlay" id="loading-overlay"><div class="loading-spinner"></div><div class="loading-text" id="loading-text">Cargando...</div></div>
+<div class="overlay" id="overlay" onclick="EC.closeSidebar()"></div>
+
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <div class="sidebar-logo"><div class="sidebar-logo-icon">EC</div><div><div class="sidebar-logo-text">Éxito Compartido</div><div class="sidebar-logo-sub">Caja de Ahorro y Crédito</div></div></div>
+    <button class="sidebar-close" onclick="EC.closeSidebar()"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-group-label">Principal</div>
+    <a href="dashboard.html" class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>Dashboard</a>
+    <a href="clientes.html" class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>Clientes</a>
+    <a href="creditos.html" class="nav-item active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>Créditos<span class="nav-badge" id="badge-mora">0</span></a>
+    <a href="pagos.html" class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 1 0 0 7h5a3.5 3.5 0 1 1 0 7H6"/></svg>Cobros / Pagos</a>
+    <div class="nav-group-label">Administración</div>
+    <a href="socios.html" class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 7H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>Socios &amp; Capital</a>
+    <a href="contabilidad.html" class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>Contabilidad</a>
+    <a href="reportes.html" class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>Reportes</a>
+    <div class="nav-group-label" id="nav-admin-group">Sistema</div>
+    <a href="usuarios.html" class="nav-item" id="nav-usuarios"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>Usuarios &amp; Accesos</a>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="user-card"><div class="user-avatar" id="sb-avatar">AD</div><div><div class="user-name" id="sb-name">—</div><div class="user-role" id="sb-role"></div></div></div>
+    <button class="btn-logout" onclick="EC.cerrarSesion()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>Cerrar sesión</button>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="topbar">
+    <button class="btn-hamburger" onclick="EC.openSidebar()"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
+    <div style="flex:1"><div class="topbar-title">Créditos</div><div class="topbar-sub">Gestión de créditos y calculadora</div></div>
+    <button class="btn btn-green btn-sm" onclick="abrirModalNuevo()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Nuevo crédito
+    </button>
+  </div>
+
+  <div class="content">
+    <!-- TABS -->
+    <div class="tabs-bar">
+      <button class="tab-btn active" onclick="switchTab('calculadora',this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="10" x2="16" y2="10"/><line x1="8" y1="14" x2="11" y2="14"/></svg>
+        Calculadora
+      </button>
+      <button class="tab-btn" onclick="switchTab('activos',this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+        Créditos activos
+      </button>
+      <button class="tab-btn" onclick="switchTab('historial',this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        Historial completo
+      </button>
+    </div>
+
+    <!-- TAB: CALCULADORA -->
+    <div class="tab-content active" id="tab-calculadora">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/></svg>Parámetros del crédito</div>
+        </div>
+        <div class="card-body">
+          <div class="calc-grid">
+            <div class="field span-full">
+              <label>Cliente</label>
+              <select id="c-cliente"><option value="">— Seleccionar cliente —</option></select>
+            </div>
+            <div class="field"><label>Monto del crédito ($)</label><input type="number" id="c-monto" value="5000" min="1" step="100" oninput="calcular()"></div>
+            <div class="field"><label>Tasa mensual (%)</label><input type="number" id="c-tasa" value="1.5" min="0.01" step="0.01" oninput="calcular()"></div>
+            <div class="field"><label>Número de cuotas</label><input type="number" id="c-plazo" value="12" min="1" max="360" oninput="calcular()"></div>
+            <div class="field">
+              <label>Frecuencia de pago</label>
+              <select id="c-frec" onchange="calcular()">
+                <option value="mensual">Mensual</option>
+                <option value="quincenal">Quincenal</option>
+                <option value="semanal">Semanal</option>
+                <option value="diario">Diario</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Tabla de amortización</label>
+              <select id="c-tabla" onchange="calcular()">
+                <option value="francesa">Francesa (cuota fija)</option>
+                <option value="alemana">Alemana (capital fijo)</option>
+                <option value="americana">Americana (interés periódico)</option>
+              </select>
+            </div>
+            <div class="field"><label>Fecha de inicio</label><input type="date" id="c-fecha" oninput="calcular()"></div>
+          </div>
+          <div class="resumen-grid">
+            <div class="resumen-box hl"><div class="resumen-label">Cuota a pagar</div><div class="resumen-val" style="color:var(--green)" id="r-cuota">$0.00</div></div>
+            <div class="resumen-box"><div class="resumen-label">Monto del crédito</div><div class="resumen-val" id="r-monto">$0.00</div></div>
+            <div class="resumen-box"><div class="resumen-label">Total intereses</div><div class="resumen-val" style="color:var(--orange)" id="r-intereses">$0.00</div></div>
+            <div class="resumen-box"><div class="resumen-label">Total a pagar</div><div class="resumen-val" style="color:var(--yellow)" id="r-total">$0.00</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Tabla de amortización</div>
+          <div style="display:flex;gap:8px">
+            <button class="btn btn-outline btn-sm" onclick="imprimirTabla()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>Imprimir</button>
+            <button class="btn btn-green btn-sm" onclick="registrarDesdeCalc()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>Registrar crédito</button>
+          </div>
+        </div>
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr><th>#</th><th>Fecha de vencimiento</th><th>Cuota total</th><th>Capital</th><th>Interés</th><th>Saldo restante</th></tr></thead>
+            <tbody id="tbody-amort"><tr><td colspan="6" class="empty-cell">Ingresa los parámetros para calcular</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB: ACTIVOS -->
+    <div class="tab-content" id="tab-activos">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>Créditos activos <span class="badge b-gray" id="badge-activos">0</span></div>
+        </div>
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr><th>Código</th><th>Cliente</th><th>Monto original</th><th>Saldo pendiente</th><th>Progreso</th><th>Tasa</th><th>Estado</th><th>Acciones</th></tr></thead>
+            <tbody id="tbody-activos"><tr><td colspan="8" class="empty-cell">Cargando créditos...</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB: HISTORIAL -->
+    <div class="tab-content" id="tab-historial">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Historial de créditos</div>
+        </div>
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr><th>Código</th><th>Cliente</th><th>Monto</th><th>Saldo</th><th>Tasa</th><th>Cuotas</th><th>Frecuencia</th><th>Inicio</th><th>Estado</th><th>Acciones</th></tr></thead>
+            <tbody id="tbody-historial"><tr><td colspan="10" class="empty-cell">Cargando historial...</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL NUEVO CRÉDITO -->
+<div class="modal-overlay" id="modal-credito">
+  <div class="modal modal-lg">
+    <div class="modal-header">
+      <div class="modal-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg><span id="modal-cred-title">Nuevo crédito</span></div>
+      <button class="modal-close" onclick="cerrarModalCred()"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="m-id">
+      <div class="form-grid">
+        <div class="field col-span-2"><label>Cliente *</label><select id="m-cliente"><option value="">— Seleccionar cliente —</option></select></div>
+        <div class="field"><label>Monto del crédito ($) *</label><input type="number" id="m-monto" placeholder="0.00" step="0.01" min="1"></div>
+        <div class="field"><label>Tasa mensual (%) *</label><input type="number" id="m-tasa" placeholder="1.5" step="0.01" min="0.01"></div>
+        <div class="field"><label>Número de cuotas *</label><input type="number" id="m-plazo" placeholder="12" min="1" max="360"></div>
+        <div class="field"><label>Frecuencia de pago</label><select id="m-frec"><option value="mensual">Mensual</option><option value="quincenal">Quincenal</option><option value="semanal">Semanal</option><option value="diario">Diario</option></select></div>
+        <div class="field"><label>Tabla de amortización</label><select id="m-tabla"><option value="francesa">Francesa (cuota fija)</option><option value="alemana">Alemana (capital fijo)</option><option value="americana">Americana</option></select></div>
+        <div class="field"><label>Fecha de inicio</label><input type="date" id="m-fecha"></div>
+        <div class="field col-span-2"><label>Observaciones</label><input type="text" id="m-obs" placeholder="Notas del crédito..."></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="cerrarModalCred()">Cancelar</button>
+      <button class="btn btn-green" onclick="guardarCredito()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>Guardar crédito</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL CONFIRMAR ELIMINAR -->
+<div class="modal-overlay" id="modal-confirmar">
+  <div class="modal confirm-modal">
+    <div class="modal-header"><div class="modal-title">Confirmar eliminación</div><button class="modal-close" onclick="cerrarConfirm()"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>
+    <div class="confirm-body">
+      <div class="confirm-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></div>
+      <div class="confirm-title">¿Eliminar crédito?</div>
+      <div class="confirm-msg" id="confirm-msg">Esta acción no se puede deshacer.</div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="cerrarConfirm()">Cancelar</button>
+      <button class="btn btn-red" id="btn-confirmar-eliminar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>Sí, eliminar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+EC.initSidebar();
+EC.aplicarPermisos();
+
+let todosLosCreditos = [];
+let todosLosClientes = [];
+let creditoAEliminar = null;
+let amortizacion     = [];
+
+// ── INIT ────────────────────────────────────────────────────
+(async function init(){
+  document.getElementById('c-fecha').value = EC.hoy();
+  document.getElementById('m-fecha').value = EC.hoy();
+  // Verificar si viene con cliente preseleccionado por URL
+  const params = new URLSearchParams(window.location.search);
+  const clientePre = params.get('cliente');
+  await Promise.all([cargarClientes(), cargarCreditos()]);
+  if(clientePre){
+    document.getElementById('c-cliente').value = clientePre;
+    document.getElementById('m-cliente').value = clientePre;
+    switchTab('calculadora', document.querySelector('.tab-btn'));
+  }
+  calcular();
+})();
+
+// ── CLIENTES ────────────────────────────────────────────────
+async function cargarClientes(){
+  try{
+    const r = await fetch(`${EC.api}?accion=leer&tab=clientes`);
+    const j = await r.json();
+    if(j.ok){
+      todosLosClientes = (j.data||[]).filter(c=>c.Activo==='true'||c.Activo===true);
+      const opts = '<option value="">— Seleccionar cliente —</option>' +
+        todosLosClientes.map(c=>`<option value="${c.ID}">${c.Nombres} ${c.Apellidos} — ${c.Cedula}</option>`).join('');
+      ['c-cliente','m-cliente'].forEach(id=>{ const s=document.getElementById(id); if(s) s.innerHTML=opts; });
+    }
+  }catch(e){ EC.toast('Error cargando clientes','error'); }
+}
+
+// ── CRÉDITOS ────────────────────────────────────────────────
+async function cargarCreditos(){
+  EC.showLoading('Cargando créditos...');
+  try{
+    const r = await fetch(`${EC.api}?accion=leer&tab=creditos`);
+    const j = await r.json();
+    if(j.ok){
+      todosLosCreditos = j.data||[];
+      renderActivos();
+      renderHistorial();
+      const mora = todosLosCreditos.filter(c=>c.Estado==='en_mora').length;
+      document.getElementById('badge-mora').textContent = mora;
+    }
+  }catch(e){ EC.toast('Error cargando créditos','error'); }
+  EC.hideLoading();
+}
+
+// ── RENDER ACTIVOS ───────────────────────────────────────────
+function renderActivos(){
+  const activos = todosLosCreditos.filter(c=>c.Estado!=='cancelado');
+  document.getElementById('badge-activos').textContent = activos.length;
+  document.getElementById('tbody-activos').innerHTML = activos.length
+    ? activos.map(c=>{
+        const monto  = parseFloat(c.MontoOriginal||0);
+        const saldo  = parseFloat(c.Saldo||0);
+        const pct    = monto>0 ? Math.round((1-saldo/monto)*100) : 0;
+        const badge  = {activo:'b-green',al_dia:'b-green',en_mora:'b-red',cancelado:'b-gray'}[c.Estado]||'b-gray';
+        const label  = {activo:'Al día',al_dia:'Al día',en_mora:'En mora',cancelado:'Cancelado'}[c.Estado]||c.Estado;
+        return `<tr>
+          <td class="mono" style="color:var(--green)">${c.Codigo||'—'}</td>
+          <td><strong>${c.ClienteNombre||'—'}</strong></td>
+          <td class="mono">${EC.fmt(monto)}</td>
+          <td class="mono" style="color:var(--orange)">${EC.fmt(saldo)}</td>
+          <td style="min-width:100px">
+            <div style="font-size:11px;color:var(--text3);margin-bottom:4px">${pct}% pagado</div>
+            <div class="progress-bg"><div class="progress-fill" style="width:${pct}%"></div></div>
+          </td>
+          <td class="mono">${c.TasaMensual||'—'}%</td>
+          <td><span class="badge ${badge}">${label}</span></td>
+          <td>
+            <div class="td-actions">
+              <button class="btn btn-blue btn-xs" onclick="verDetalle('${c.ID}')">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                Ver
+              </button>
+              <button class="btn btn-outline btn-xs solo-admin" onclick="abrirModalEditar('${c.ID}')">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                Editar
+              </button>
+              <button class="btn btn-red btn-xs solo-admin" onclick="confirmarEliminar('${c.ID}','${c.Codigo}')">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+                Eliminar
+              </button>
+            </div>
+          </td>
+        </tr>`;
+      }).join('')
+    : '<tr><td colspan="8" class="empty-cell">No hay créditos activos</td></tr>';
+  EC.aplicarPermisos();
+}
+
+// ── RENDER HISTORIAL ─────────────────────────────────────────
+function renderHistorial(){
+  document.getElementById('tbody-historial').innerHTML = todosLosCreditos.length
+    ? todosLosCreditos.map(c=>{
+        const badge = {activo:'b-green',al_dia:'b-green',en_mora:'b-red',cancelado:'b-gray'}[c.Estado]||'b-gray';
+        const label = {activo:'Al día',al_dia:'Al día',en_mora:'En mora',cancelado:'Cancelado'}[c.Estado]||c.Estado;
+        return `<tr>
+          <td class="mono" style="color:var(--green)">${c.Codigo||'—'}</td>
+          <td>${c.ClienteNombre||'—'}</td>
+          <td class="mono">${EC.fmt(c.MontoOriginal||0)}</td>
+          <td class="mono" style="color:var(--orange)">${EC.fmt(c.Saldo||0)}</td>
+          <td class="mono">${c.TasaMensual||'—'}%</td>
+          <td class="mono">${c.NumCuotas||'—'}</td>
+          <td>${c.Frecuencia||'—'}</td>
+          <td class="mono">${c.FechaInicio||'—'}</td>
+          <td><span class="badge ${badge}">${label}</span></td>
+          <td>
+            <div class="td-actions">
+              <button class="btn btn-blue btn-xs" onclick="verDetalle('${c.ID}')">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>Ver
+              </button>
+              <button class="btn btn-red btn-xs solo-admin" onclick="confirmarEliminar('${c.ID}','${c.Codigo}')">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>Eliminar
+              </button>
+            </div>
+          </td>
+        </tr>`;
+      }).join('')
+    : '<tr><td colspan="10" class="empty-cell">No hay créditos registrados</td></tr>';
+  EC.aplicarPermisos();
+}
+
+// ── CALCULADORA ──────────────────────────────────────────────
+function calcular(){
+  const monto = parseFloat(document.getElementById('c-monto').value)||0;
+  const tasa  = parseFloat(document.getElementById('c-tasa').value)||0;
+  const plazo = parseInt(document.getElementById('c-plazo').value)||0;
+  const tabla = document.getElementById('c-tabla').value;
+  const frec  = document.getElementById('c-frec').value;
+  const fecha = document.getElementById('c-fecha').value||EC.hoy();
+  if(!monto||!tasa||!plazo) return;
+  const m = {mensual:1,quincenal:2,semanal:4,diario:30};
+  const t = tasa/(m[frec]||1)/100;
+  amortizacion = [];
+  if(tabla==='francesa'){
+    const cuota = t===0 ? monto/plazo : monto*(t*Math.pow(1+t,plazo))/(Math.pow(1+t,plazo)-1);
+    let s = monto;
+    for(let i=1;i<=plazo;i++){
+      const int=s*t, cap=cuota-int; s=Math.max(0,s-cap);
+      amortizacion.push({n:i,fecha:addPer(fecha,frec,i),cuota,cap,int,saldo:s});
+    }
+  } else if(tabla==='alemana'){
+    const capC=monto/plazo; let s=monto;
+    for(let i=1;i<=plazo;i++){
+      const int=s*t,cuota=capC+int; s=Math.max(0,s-capC);
+      amortizacion.push({n:i,fecha:addPer(fecha,frec,i),cuota,cap:capC,int,saldo:s});
+    }
+  } else {
+    for(let i=1;i<=plazo;i++){
+      const int=monto*t,cap=i===plazo?monto:0;
+      amortizacion.push({n:i,fecha:addPer(fecha,frec,i),cuota:int+cap,cap,int,saldo:i===plazo?0:monto});
+    }
+  }
+  const totP = amortizacion.reduce((a,f)=>a+f.cuota,0);
+  const totI = amortizacion.reduce((a,f)=>a+f.int,0);
+  document.getElementById('r-cuota').textContent    = EC.fmt(amortizacion[0]?.cuota||0);
+  document.getElementById('r-monto').textContent    = EC.fmt(monto);
+  document.getElementById('r-intereses').textContent= EC.fmt(totI);
+  document.getElementById('r-total').textContent    = EC.fmt(totP);
+  document.getElementById('tbody-amort').innerHTML  = amortizacion.map(f=>`
+    <tr>
+      <td class="mono">${f.n}</td>
+      <td class="mono">${f.fecha}</td>
+      <td class="mono">${EC.fmt(f.cuota)}</td>
+      <td class="mono">${EC.fmt(f.cap)}</td>
+      <td class="mono" style="color:var(--orange)">${EC.fmt(f.int)}</td>
+      <td class="mono">${EC.fmt(f.saldo)}</td>
+    </tr>`).join('');
+}
+
+function addPer(d,t,n){
+  const dt=new Date(d+'T12:00:00');
+  if(t==='mensual') dt.setMonth(dt.getMonth()+n);
+  else if(t==='quincenal') dt.setDate(dt.getDate()+n*15);
+  else if(t==='semanal') dt.setDate(dt.getDate()+n*7);
+  else dt.setDate(dt.getDate()+n);
+  return dt.toISOString().split('T')[0];
+}
+
+function imprimirTabla(){ window.print(); }
+
+function registrarDesdeCalc(){
+  const cid = document.getElementById('c-cliente').value;
+  document.getElementById('m-cliente').value  = cid;
+  document.getElementById('m-monto').value    = document.getElementById('c-monto').value;
+  document.getElementById('m-tasa').value     = document.getElementById('c-tasa').value;
+  document.getElementById('m-plazo').value    = document.getElementById('c-plazo').value;
+  document.getElementById('m-frec').value     = document.getElementById('c-frec').value;
+  document.getElementById('m-tabla').value    = document.getElementById('c-tabla').value;
+  document.getElementById('m-fecha').value    = document.getElementById('c-fecha').value;
+  document.getElementById('modal-cred-title').textContent = 'Registrar crédito';
+  document.getElementById('m-id').value = '';
+  document.getElementById('modal-credito').classList.add('open');
+}
+
+// ── MODAL NUEVO ──────────────────────────────────────────────
+function abrirModalNuevo(){
+  document.getElementById('modal-cred-title').textContent = 'Nuevo crédito';
+  document.getElementById('m-id').value='';
+  ['m-monto','m-tasa','m-plazo','m-obs'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('m-cliente').value='';
+  document.getElementById('m-fecha').value=EC.hoy();
+  document.getElementById('m-frec').value='mensual';
+  document.getElementById('m-tabla').value='francesa';
+  document.getElementById('modal-credito').classList.add('open');
+}
+
+function abrirModalEditar(id){
+  if(!EC.esAdmin){ EC.toast('Solo el administrador puede editar créditos','error'); return; }
+  const c = todosLosCreditos.find(x=>x.ID===id);
+  if(!c) return;
+  document.getElementById('modal-cred-title').textContent = 'Editar crédito';
+  document.getElementById('m-id').value     = c.ID;
+  document.getElementById('m-cliente').value= c.ClienteID||'';
+  document.getElementById('m-monto').value  = c.MontoOriginal||'';
+  document.getElementById('m-tasa').value   = c.TasaMensual||'';
+  document.getElementById('m-plazo').value  = c.NumCuotas||'';
+  document.getElementById('m-frec').value   = c.Frecuencia||'mensual';
+  document.getElementById('m-tabla').value  = c.Tabla||'francesa';
+  document.getElementById('m-fecha').value  = c.FechaInicio||EC.hoy();
+  document.getElementById('m-obs').value    = c.Observaciones||'';
+  document.getElementById('modal-credito').classList.add('open');
+}
+
+function cerrarModalCred(){ document.getElementById('modal-credito').classList.remove('open'); }
+
+// ── GUARDAR CRÉDITO ──────────────────────────────────────────
+async function guardarCredito(){
+  const id       = document.getElementById('m-id').value;
+  const clienteId= document.getElementById('m-cliente').value;
+  const monto    = parseFloat(document.getElementById('m-monto').value)||0;
+  const tasa     = parseFloat(document.getElementById('m-tasa').value)||0;
+  const plazo    = parseInt(document.getElementById('m-plazo').value)||0;
+  if(!clienteId||!monto||!tasa||!plazo){ EC.toast('Cliente, monto, tasa y cuotas son obligatorios','error'); return; }
+  if(id && !EC.esAdmin){ EC.toast('Solo el administrador puede editar créditos','error'); return; }
+  const cliente = todosLosClientes.find(c=>c.ID===clienteId)||{};
+  const num = todosLosCreditos.length+1;
+  const datos = {
+    Codigo        : id ? (todosLosCreditos.find(c=>c.ID===id)||{}).Codigo : 'C-'+String(num).padStart(3,'0'),
+    ClienteID     : clienteId,
+    ClienteNombre : (cliente.Nombres||'')+' '+(cliente.Apellidos||''),
+    MontoOriginal : monto,
+    Saldo         : id ? undefined : monto,
+    TasaMensual   : tasa,
+    NumCuotas     : plazo,
+    Frecuencia    : document.getElementById('m-frec').value,
+    Tabla         : document.getElementById('m-tabla').value,
+    FechaInicio   : document.getElementById('m-fecha').value||EC.hoy(),
+    Estado        : 'activo',
+    Observaciones : document.getElementById('m-obs').value,
+  };
+  if(id) delete datos.Saldo;
+  EC.showLoading(id?'Actualizando crédito...':'Registrando crédito...');
+  try{
+    const body = id
+      ? {accion:'actualizar',tab:'creditos',id,datos}
+      : {accion:'agregar',tab:'creditos',datos};
+    const r = await fetch(EC.api,{method:'POST',body:JSON.stringify(body)});
+    const j = await r.json();
+    if(j.ok){ cerrarModalCred(); await cargarCreditos(); EC.toast(id?'Crédito actualizado':'Crédito registrado exitosamente'); }
+    else EC.toast('Error: '+(j.error||'Error desconocido'),'error');
+  }catch(e){ EC.toast('Error de conexión: '+e.message,'error'); }
+  EC.hideLoading();
+}
+
+// ── VER DETALLE ──────────────────────────────────────────────
+function verDetalle(id){
+  const c = todosLosCreditos.find(x=>x.ID===id);
+  if(!c) return;
+  EC.toast(`Crédito ${c.Codigo} — Saldo: ${EC.fmt(c.Saldo||0)} — ${c.ClienteNombre}`);
+}
+
+// ── ELIMINAR ────────────────────────────────────────────────
+function confirmarEliminar(id, codigo){
+  if(!EC.esAdmin){ EC.toast('Solo el administrador puede eliminar créditos','error'); return; }
+  creditoAEliminar = id;
+  document.getElementById('confirm-msg').textContent = `¿Seguro que deseas eliminar el crédito "${codigo}"? Esta acción no se puede deshacer.`;
+  document.getElementById('modal-confirmar').classList.add('open');
+  document.getElementById('btn-confirmar-eliminar').onclick = ejecutarEliminar;
+}
+
+function cerrarConfirm(){ document.getElementById('modal-confirmar').classList.remove('open'); creditoAEliminar=null; }
+
+async function ejecutarEliminar(){
+  if(!creditoAEliminar) return;
+  EC.showLoading('Eliminando crédito...');
+  cerrarConfirm();
+  try{
+    const r = await fetch(EC.api,{method:'POST',body:JSON.stringify({accion:'actualizar',tab:'creditos',id:creditoAEliminar,datos:{Estado:'cancelado'}})});
+    const j = await r.json();
+    if(j.ok){ await cargarCreditos(); EC.toast('Crédito cancelado correctamente'); }
+    else EC.toast('Error al eliminar','error');
+  }catch(e){ EC.toast('Error de conexión: '+e.message,'error'); }
+  EC.hideLoading();
+}
+
+// ── TABS ────────────────────────────────────────────────────
+function switchTab(name, el){
+  document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+  if(el) el.classList.add('active');
+}
+
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){ cerrarModalCred(); cerrarConfirm(); EC.closeSidebar(); }
+});
+document.querySelectorAll('.modal-overlay').forEach(m=>{
+  m.addEventListener('click',e=>{ if(e.target===m){ cerrarModalCred(); cerrarConfirm(); } });
+});
+</script>
+</body>
+</html>
