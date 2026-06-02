@@ -61,6 +61,49 @@ tbody tr:hover td{background:rgba(255,255,255,.02)}
 .btn-whatsapp{background:#25D366;color:#fff}.btn-whatsapp:hover{background:#1da851}
 .btn-red{background:rgba(231,76,60,.1);color:var(--red);border:1px solid rgba(231,76,60,.2)}.btn-red:hover{background:rgba(231,76,60,.2)}
 .btn-sm{padding:6px 12px;font-size:12px}.btn-xs{padding:5px 9px;font-size:11px}
+
+/* TIPO PAGO TOGGLE */
+.tipo-pago-wrap{display:flex;gap:10px;margin-bottom:4px}
+.tipo-pago-btn{flex:1;padding:12px 10px;border-radius:10px;border:1px solid var(--border);background:var(--surface2);color:var(--text2);font-size:13px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .2s}
+.tipo-pago-btn svg{width:16px;height:16px}
+.tipo-pago-btn.selected{border-color:var(--green);background:var(--green-glow);color:var(--green)}
+.tipo-pago-btn.selected-abono{border-color:var(--orange);background:rgba(243,156,18,.1);color:var(--orange)}
+
+/* INFO CUOTA */
+.cuota-info-box{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:14px}
+.cuota-info-row{display:flex;justify-content:space-between;align-items:center;padding:4px 0;font-size:12px}
+.cuota-info-row:not(:last-child){border-bottom:1px solid var(--border2)}
+.cuota-info-label{color:var(--text3)}
+.cuota-info-val{font-family:'DM Mono',monospace;font-weight:600;color:var(--text)}
+.cuota-info-val.green{color:var(--green)}
+.cuota-info-val.orange{color:var(--orange)}
+
+/* FORMAS DE PAGO */
+.formas-pago-section{margin-top:6px}
+.formas-pago-title{font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.forma-pago-item{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:8px;position:relative}
+.forma-pago-header{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.forma-pago-header select{flex:1;background:var(--surface3);border:1px solid var(--border);color:var(--text);padding:8px 10px;border-radius:8px;font-size:13px;font-family:'DM Sans',sans-serif;outline:none;-webkit-appearance:none}
+.forma-pago-header select:focus{border-color:var(--green)}
+.forma-pago-monto-wrap{display:flex;align-items:center;gap:8px}
+.forma-pago-monto-wrap label{font-size:11px;color:var(--text3);white-space:nowrap}
+.forma-pago-monto-wrap input{background:var(--surface3);border:1px solid var(--border);color:var(--text);padding:8px 10px;border-radius:8px;font-size:13px;font-family:'DM Mono',monospace;outline:none;width:130px;transition:border-color .2s}
+.forma-pago-monto-wrap input:focus{border-color:var(--green)}
+.btn-remove-forma{background:none;border:none;color:var(--text3);cursor:pointer;padding:4px;border-radius:6px;transition:all .15s;line-height:1;position:absolute;top:10px;right:10px}
+.btn-remove-forma:hover{background:rgba(231,76,60,.1);color:var(--red)}
+.btn-add-forma{width:100%;padding:10px;background:transparent;border:1px dashed var(--border);color:var(--text3);border-radius:10px;font-size:12px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;display:flex;align-items:center;justify-content:center;gap:7px;transition:all .15s;margin-top:4px}
+.btn-add-forma:hover{border-color:var(--green);color:var(--green);background:var(--green-glow)}
+.btn-add-forma svg{width:14px;height:14px}
+
+/* RESUMEN PAGO */
+.resumen-pago-box{background:var(--green-glow);border:1px solid rgba(46,204,113,.2);border-radius:10px;padding:12px 14px;margin-top:8px}
+.resumen-row{display:flex;justify-content:space-between;font-size:12px;padding:3px 0}
+.resumen-row.total{font-size:14px;font-weight:700;color:var(--green);border-top:1px solid rgba(46,204,113,.2);margin-top:6px;padding-top:8px}
+.resumen-label{color:var(--text2)}
+.resumen-val{font-family:'DM Mono',monospace;color:var(--text)}
+.diferencia-warn{font-size:11px;color:var(--orange);margin-top:6px;display:none;align-items:center;gap:5px}
+.diferencia-warn svg{width:13px;height:13px;flex-shrink:0}
+
 /* MODAL */
 .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:300;align-items:flex-end;justify-content:center;backdrop-filter:blur(4px)}.modal-overlay.open{display:flex}
 @media(min-width:600px){.modal-overlay{align-items:center}}
@@ -72,39 +115,24 @@ tbody tr:hover td{background:rgba(255,255,255,.02)}
 .modal-title svg{width:16px;height:16px;color:var(--green)}
 .modal-close{background:none;border:none;color:var(--text3);cursor:pointer;padding:4px;border-radius:6px;transition:all .15s;line-height:1}.modal-close:hover{background:var(--surface2);color:var(--text)}
 .modal-body{padding:18px}.modal-footer{padding:14px 18px;border-top:1px solid var(--border2);display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap}
-.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}.col-span-2{grid-column:span 2}
 .field label{display:block;font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:7px}
 .field input,.field select,.field textarea{width:100%;background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:10px 12px;border-radius:10px;font-size:13px;font-family:'DM Sans',sans-serif;outline:none;transition:border-color .2s,box-shadow .2s;-webkit-appearance:none}
 .field input:focus,.field select:focus,.field textarea:focus{border-color:var(--green);box-shadow:0 0 0 3px rgba(46,204,113,.08)}
 .field input::placeholder{color:var(--text3)}.field select option{background:var(--surface2)}
 .field input[readonly]{color:var(--green);font-weight:600;cursor:default}
+.form-divider{height:1px;background:var(--border);margin:16px 0}
+.section-label{font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px;display:flex;align-items:center;gap:7px}
+.section-label svg{width:13px;height:13px;color:var(--green)}
+
 /* COMPROBANTE */
 .comp-modal{max-width:420px}
 .comprobante-wrap{padding:8px}
-#comprobante-visual{
-  background:#fff;color:#1a1a1a;
-  border-radius:12px;overflow:hidden;
-  font-family:'DM Sans',sans-serif;
-}
-.comp-header{
-  background:linear-gradient(135deg,#0d3322,#1a5c3a);
-  padding:24px;text-align:center;
-}
-.comp-logo{
-  width:52px;height:52px;border-radius:14px;
-  background:rgba(46,204,113,.2);border:2px solid rgba(46,204,113,.4);
-  display:flex;align-items:center;justify-content:center;
-  font-size:18px;font-weight:700;color:#2ecc71;
-  margin:0 auto 12px;font-family:'DM Mono',monospace;
-}
+#comprobante-visual{background:#fff;color:#1a1a1a;border-radius:12px;overflow:hidden;font-family:'DM Sans',sans-serif;}
+.comp-header{background:linear-gradient(135deg,#0d3322,#1a5c3a);padding:24px;text-align:center;}
+.comp-logo{width:52px;height:52px;border-radius:14px;background:rgba(46,204,113,.2);border:2px solid rgba(46,204,113,.4);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;color:#2ecc71;margin:0 auto 12px;font-family:'DM Mono',monospace;}
 .comp-org{font-size:13px;font-weight:700;color:#fff;margin-bottom:3px}
 .comp-sub{font-size:10px;color:rgba(255,255,255,.6);text-transform:uppercase;letter-spacing:.1em}
-.comp-badge{
-  display:inline-block;margin-top:12px;
-  background:rgba(46,204,113,.2);border:1px solid rgba(46,204,113,.4);
-  color:#2ecc71;font-size:11px;font-weight:600;
-  padding:4px 14px;border-radius:20px;letter-spacing:.06em;text-transform:uppercase;
-}
+.comp-badge{display:inline-block;margin-top:12px;background:rgba(46,204,113,.2);border:1px solid rgba(46,204,113,.4);color:#2ecc71;font-size:11px;font-weight:600;padding:4px 14px;border-radius:20px;letter-spacing:.06em;text-transform:uppercase;}
 .comp-body{padding:20px}
 .comp-monto-wrap{text-align:center;padding:16px 0;border-bottom:1px solid #e8ecf0;margin-bottom:16px}
 .comp-monto-label{font-size:11px;color:#888;text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px}
@@ -116,7 +144,6 @@ tbody tr:hover td{background:rgba(255,255,255,.02)}
 .comp-footer{background:#f8f9fa;padding:14px 20px;text-align:center;border-top:1px solid #e8ecf0}
 .comp-footer-txt{font-size:11px;color:#999;line-height:1.6}
 .comp-num{font-size:10px;color:#bbb;font-family:'DM Mono',monospace;margin-top:4px}
-/* ACCIONES COMPROBANTE */
 .comp-actions{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:12px}
 .comp-action-btn{display:flex;flex-direction:column;align-items:center;gap:5px;padding:10px 6px;border-radius:10px;cursor:pointer;border:1px solid var(--border);background:var(--surface2);color:var(--text2);font-size:11px;font-weight:500;transition:all .15s;font-family:'DM Sans',sans-serif}
 .comp-action-btn:hover{background:var(--surface3);color:var(--text)}
@@ -135,7 +162,7 @@ tbody tr:hover td{background:rgba(255,255,255,.02)}
 @keyframes spin{to{transform:rotate(360deg)}}
 .loading-text{font-size:13px;color:var(--text2)}
 .empty-cell{text-align:center;padding:40px;color:var(--text3);font-size:13px}
-@media(max-width:768px){.stats-row{grid-template-columns:1fr 1fr}.form-grid{grid-template-columns:1fr}.col-span-2{grid-column:span 1}.comp-actions{grid-template-columns:1fr 1fr 1fr}}
+@media(max-width:768px){.stats-row{grid-template-columns:1fr 1fr}}
 @media(max-width:480px){.stats-row{grid-template-columns:1fr 1fr}}
 </style>
 </head>
@@ -224,61 +251,126 @@ tbody tr:hover td{background:rgba(255,255,255,.02)}
   </div>
 </div>
 
-<!-- MODAL REGISTRAR COBRO -->
+<!-- ═══════════════════════════════════════════════════════════
+     MODAL REGISTRAR COBRO — Rediseñado
+═══════════════════════════════════════════════════════════ -->
 <div class="modal-overlay" id="modal-pago">
-  <div class="modal">
+  <div class="modal" style="max-width:580px">
     <div class="modal-header">
-      <div class="modal-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 1 0 0 7h5a3.5 3.5 0 1 1 0 7H6"/></svg>Registrar cobro</div>
-      <button class="modal-close" onclick="cerrarModalPago()"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+      <div class="modal-title">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 1 0 0 7h5a3.5 3.5 0 1 1 0 7H6"/></svg>
+        Registrar cobro
+      </div>
+      <button class="modal-close" onclick="cerrarModalPago()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
     </div>
     <div class="modal-body">
-      <div class="form-grid">
-        <div class="field col-span-2">
-          <label>Cliente *</label>
-          <select id="p-cliente" onchange="cargarCreditosCliente(this.value)"><option value="">— Seleccionar cliente —</option></select>
+
+      <!-- PASO 1: CLIENTE -->
+      <div class="section-label">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+        Cliente con crédito activo
+      </div>
+      <div class="field" style="margin-bottom:16px">
+        <select id="p-cliente" onchange="alSeleccionarCliente(this.value)">
+          <option value="">— Seleccionar cliente —</option>
+        </select>
+      </div>
+
+      <!-- PASO 2: INFO CRÉDITO + TIPO PAGO (aparece tras seleccionar cliente) -->
+      <div id="seccion-credito" style="display:none">
+        <div class="form-divider"></div>
+
+        <!-- Info cuota -->
+        <div class="section-label">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+          Detalle del crédito
         </div>
-        <div class="field col-span-2">
-          <label>Crédito *</label>
-          <select id="p-credito" onchange="llenarDatosCredito(this.value)"><option value="">— Seleccionar crédito —</option></select>
+        <div class="cuota-info-box" id="cuota-info-box">
+          <div class="cuota-info-row"><span class="cuota-info-label">Crédito</span><span class="cuota-info-val" id="ci-codigo">—</span></div>
+          <div class="cuota-info-row"><span class="cuota-info-label">Saldo pendiente</span><span class="cuota-info-val orange" id="ci-saldo">$0.00</span></div>
+          <div class="cuota-info-row"><span class="cuota-info-label">Cuota mensual</span><span class="cuota-info-val green" id="ci-cuota">$0.00</span></div>
+          <div class="cuota-info-row"><span class="cuota-info-label">Capital de cuota</span><span class="cuota-info-val" id="ci-cap">$0.00</span></div>
+          <div class="cuota-info-row"><span class="cuota-info-label">Interés de cuota</span><span class="cuota-info-val" id="ci-int">$0.00</span></div>
         </div>
-        <div class="field">
-          <label>Capital a cobrar ($) *</label>
-          <input type="number" id="p-capital" placeholder="0.00" step="0.01" min="0" oninput="calcTotal()">
+
+        <!-- Tipo de pago -->
+        <div class="section-label" style="margin-bottom:10px">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          ¿Cómo desea pagar?
         </div>
-        <div class="field">
-          <label>Interés a cobrar ($) *</label>
-          <input type="number" id="p-interes" placeholder="0.00" step="0.01" min="0" oninput="calcTotal()">
+        <div class="tipo-pago-wrap">
+          <button class="tipo-pago-btn" id="btn-cuota-completa" onclick="seleccionarTipoPago('completa')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+            Pagar cuota completa
+          </button>
+          <button class="tipo-pago-btn" id="btn-abono" onclick="seleccionarTipoPago('abono')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Hacer abono
+          </button>
         </div>
-        <div class="field col-span-2">
-          <label>Total a cobrar ($)</label>
-          <input type="number" id="p-total" readonly placeholder="0.00">
+
+        <!-- Monto abono (solo si abono) -->
+        <div id="abono-wrap" style="display:none;margin-top:12px">
+          <div class="field">
+            <label>Monto del abono ($) *</label>
+            <input type="number" id="p-abono" placeholder="0.00" step="0.01" min="0.01" oninput="calcAbono()">
+          </div>
+          <div class="cuota-info-box" id="abono-desglose" style="margin-top:10px;display:none">
+            <div class="cuota-info-row"><span class="cuota-info-label">Capital del abono</span><span class="cuota-info-val green" id="ab-cap">$0.00</span></div>
+            <div class="cuota-info-row"><span class="cuota-info-label">Interés del abono</span><span class="cuota-info-val orange" id="ab-int">$0.00</span></div>
+          </div>
         </div>
-        <div class="field">
-          <label>Fecha de pago *</label>
-          <input type="date" id="p-fecha">
+      </div>
+
+      <!-- PASO 3: FORMAS DE PAGO (aparece tras seleccionar tipo) -->
+      <div id="seccion-formas-pago" style="display:none">
+        <div class="form-divider"></div>
+        <div class="section-label">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M12 12h.01"/></svg>
+          Forma de pago
         </div>
-        <div class="field">
-          <label>Método de pago</label>
-          <select id="p-metodo">
-            <option value="efectivo">Efectivo</option>
-            <option value="transferencia">Transferencia bancaria</option>
-            <option value="cheque">Cheque</option>
-            <option value="otro">Otro</option>
-          </select>
+
+        <div id="formas-pago-lista"></div>
+        <button class="btn-add-forma" onclick="agregarFormaPago()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Añadir otra forma de pago
+        </button>
+
+        <!-- Resumen -->
+        <div class="resumen-pago-box" id="resumen-pago-box" style="margin-top:14px">
+          <div class="resumen-row"><span class="resumen-label">Total a cobrar</span><span class="resumen-val" id="res-total-cobrar">$0.00</span></div>
+          <div class="resumen-row"><span class="resumen-label">Total ingresado</span><span class="resumen-val" id="res-total-ingresado">$0.00</span></div>
+          <div class="resumen-row total"><span>Diferencia</span><span id="res-diferencia">$0.00</span></div>
         </div>
-        <div class="field col-span-2">
-          <label>N° de comprobante / referencia</label>
-          <input type="text" id="p-comp" placeholder="Número de comprobante o referencia (opcional)">
+        <div class="diferencia-warn" id="diferencia-warn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          <span id="diferencia-warn-txt">El monto ingresado no coincide con el total a cobrar.</span>
         </div>
-        <div class="field col-span-2">
+
+        <!-- Fecha y datos extra -->
+        <div class="form-divider"></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+          <div class="field">
+            <label>Fecha de pago *</label>
+            <input type="date" id="p-fecha">
+          </div>
+          <div class="field">
+            <label>N° comprobante / referencia</label>
+            <input type="text" id="p-comp" placeholder="Opcional">
+          </div>
+        </div>
+        <div class="field" style="margin-top:14px">
           <label>Observaciones</label>
           <input type="text" id="p-obs" placeholder="Notas adicionales...">
         </div>
       </div>
+
     </div>
     <div class="modal-footer">
       <button class="btn btn-outline" onclick="cerrarModalPago()">Cancelar</button>
-      <button class="btn btn-green" onclick="guardarPago()">
+      <button class="btn btn-green" id="btn-registrar-pago" style="display:none" onclick="guardarPago()">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
         Registrar y ver comprobante
       </button>
@@ -297,7 +389,6 @@ tbody tr:hover td{background:rgba(255,255,255,.02)}
       <button class="modal-close" onclick="cerrarComprobante()"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
     </div>
     <div class="modal-body" style="padding:12px">
-      <!-- COMPROBANTE VISUAL -->
       <div class="comprobante-wrap">
         <div id="comprobante-visual">
           <div class="comp-header">
@@ -317,7 +408,7 @@ tbody tr:hover td{background:rgba(255,255,255,.02)}
             <div class="comp-row"><span class="comp-row-label">Interés</span><span class="comp-row-val" id="cv-interes">$0.00</span></div>
             <div class="comp-row"><span class="comp-row-label">Saldo restante</span><span class="comp-row-val" id="cv-saldo">$0.00</span></div>
             <div class="comp-row"><span class="comp-row-label">Fecha de pago</span><span class="comp-row-val" id="cv-fecha">—</span></div>
-            <div class="comp-row"><span class="comp-row-label">Método de pago</span><span class="comp-row-val" id="cv-metodo">—</span></div>
+            <div class="comp-row"><span class="comp-row-label">Forma de pago</span><span class="comp-row-val" id="cv-metodo">—</span></div>
             <div class="comp-row" id="cv-comp-row" style="display:none"><span class="comp-row-label">Comprobante</span><span class="comp-row-val" id="cv-comp">—</span></div>
             <div class="comp-row"><span class="comp-row-label">Atendido por</span><span class="comp-row-val" id="cv-usuario">—</span></div>
           </div>
@@ -327,7 +418,6 @@ tbody tr:hover td{background:rgba(255,255,255,.02)}
           </div>
         </div>
       </div>
-      <!-- BOTONES ACCIONES -->
       <div class="comp-actions">
         <button class="comp-action-btn green" onclick="descargarImagen()">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
@@ -353,18 +443,19 @@ tbody tr:hover td{background:rgba(255,255,255,.02)}
     <div class="confirm-body">
       <div class="confirm-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></div>
       <div class="confirm-title">¿Eliminar este cobro?</div>
-      <div class="confirm-msg" id="confirm-msg">Esta acción no se puede deshacer.</div>
+      <div class="confirm-msg" id="confirm-msg">El saldo del crédito será revertido automáticamente.</div>
     </div>
     <div class="modal-footer">
       <button class="btn btn-outline" onclick="cerrarConfirm()">Cancelar</button>
-      <button class="btn btn-red" id="btn-confirmar-eliminar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>Sí, eliminar</button>
+      <button class="btn btn-red" id="btn-confirmar-eliminar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+        Sí, eliminar y revertir
+      </button>
     </div>
   </div>
 </div>
 
-<!-- html2canvas para exportar imagen -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-<!-- jsPDF para exportar PDF -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 <script>
@@ -375,9 +466,14 @@ let todosPagos    = [];
 let todosClientes = [];
 let todosCreditos = [];
 let pagoAEliminar = null;
-let pagoActual    = null; // para comprobante
+let pagoActual    = null;
 
-// ── INIT ────────────────────────────────────────────────────
+// Estado del modal de pago
+let creditoSeleccionado = null;
+let tipoPagoActual      = null; // 'completa' | 'abono'
+let formasPagoCount     = 0;
+
+// ── INIT ──────────────────────────────────────────────────────
 (async function init(){
   document.getElementById('p-fecha').value = EC.hoy();
   const hoy = EC.hoy();
@@ -386,16 +482,12 @@ let pagoActual    = null; // para comprobante
   await Promise.all([cargarClientes(), cargarCreditos(), cargarPagos()]);
 })();
 
-// ── CARGAR DATOS ─────────────────────────────────────────────
+// ── CARGAR DATOS ──────────────────────────────────────────────
 async function cargarClientes(){
   try{
     const r=await fetch(`${EC.api}?accion=leer&tab=clientes`);
     const j=await r.json();
-    if(j.ok){
-      todosClientes=(j.data||[]).filter(c=>c.Activo==='true'||c.Activo===true);
-      const opts='<option value="">— Seleccionar cliente —</option>'+todosClientes.map(c=>`<option value="${c.ID}">${c.Nombres} ${c.Apellidos} — ${c.Cedula}</option>`).join('');
-      document.getElementById('p-cliente').innerHTML=opts;
-    }
+    if(j.ok) todosClientes=(j.data||[]).filter(c=>c.Activo==='true'||c.Activo===true);
   }catch(e){}
 }
 
@@ -421,19 +513,19 @@ async function cargarPagos(){
   EC.hideLoading();
 }
 
-// ── STATS ────────────────────────────────────────────────────
+// ── STATS ─────────────────────────────────────────────────────
 function calcularStats(pagos){
   const hoy=EC.hoy(), mes=hoy.substr(0,7);
   const hoyP=pagos.filter(p=>p.Fecha===hoy);
   const mesP=pagos.filter(p=>(p.Fecha||'').startsWith(mes));
   const tot=arr=>arr.reduce((a,p)=>a+(parseFloat(p.Capital||0)+parseFloat(p.Interes||0)),0);
   document.getElementById('stat-hoy-total').textContent=EC.fmt(tot(hoyP));
-  document.getElementById('stat-hoy-ef').textContent=EC.fmt(tot(hoyP.filter(p=>p.Metodo==='efectivo')));
-  document.getElementById('stat-hoy-tr').textContent=EC.fmt(tot(hoyP.filter(p=>p.Metodo==='transferencia')));
+  document.getElementById('stat-hoy-ef').textContent=EC.fmt(tot(hoyP.filter(p=>(p.Metodo||'').includes('efectivo'))));
+  document.getElementById('stat-hoy-tr').textContent=EC.fmt(tot(hoyP.filter(p=>(p.Metodo||'').includes('transferencia'))));
   document.getElementById('stat-mes').textContent=EC.fmt(tot(mesP));
 }
 
-// ── RENDER TABLA ─────────────────────────────────────────────
+// ── RENDER TABLA ──────────────────────────────────────────────
 function renderPagos(lista){
   if(!lista.length){
     document.getElementById('tbody-pagos').innerHTML='<tr><td colspan="9" class="empty-cell">No hay cobros en el período seleccionado</td></tr>';
@@ -442,7 +534,8 @@ function renderPagos(lista){
   const sorted=[...lista].sort((a,b)=>b.Fecha?.localeCompare(a.Fecha||'')||0);
   document.getElementById('tbody-pagos').innerHTML=sorted.map(p=>{
     const tot=parseFloat(p.Capital||0)+parseFloat(p.Interes||0);
-    const metBadge=p.Metodo==='efectivo'?'b-green':p.Metodo==='transferencia'?'b-blue':'b-gray';
+    const metodo=p.Metodo||'—';
+    const metBadge=metodo.includes('efectivo')&&metodo.includes('transferencia')?'b-orange':metodo.includes('efectivo')?'b-green':metodo.includes('transferencia')?'b-blue':'b-gray';
     return `<tr>
       <td class="mono">${p.Fecha||'—'}</td>
       <td><strong>${p.ClienteNombre||'—'}</strong></td>
@@ -450,7 +543,7 @@ function renderPagos(lista){
       <td class="mono">${EC.fmt(p.Capital||0)}</td>
       <td class="mono" style="color:var(--orange)">${EC.fmt(p.Interes||0)}</td>
       <td class="mono" style="color:var(--green);font-weight:600">${EC.fmt(tot)}</td>
-      <td><span class="badge ${metBadge}">${p.Metodo||'—'}</span></td>
+      <td><span class="badge ${metBadge}" style="max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${metodo}">${metodo}</span></td>
       <td class="mono" style="color:var(--text3)">${p.NumComprobante||'—'}</td>
       <td>
         <div class="td-actions">
@@ -469,84 +562,292 @@ function renderPagos(lista){
   EC.aplicarPermisos();
 }
 
-// ── FILTRAR POR FECHA ────────────────────────────────────────
+// ── FILTRAR ───────────────────────────────────────────────────
 function filtrarPorFecha(){
   const desde=document.getElementById('filtro-desde').value;
   const hasta=document.getElementById('filtro-hasta').value;
-  const filtrado=todosPagos.filter(p=>(!desde||p.Fecha>=desde)&&(!hasta||p.Fecha<=hasta));
-  renderPagos(filtrado);
+  renderPagos(todosPagos.filter(p=>(!desde||p.Fecha>=desde)&&(!hasta||p.Fecha<=hasta)));
 }
 
-// ── MODAL PAGO ───────────────────────────────────────────────
+// ══════════════════════════════════════════════════════════════
+//  MODAL PAGO — Lógica nueva
+// ══════════════════════════════════════════════════════════════
 function abrirModalPago(){
-  ['p-capital','p-interes','p-total','p-comp','p-obs'].forEach(id=>document.getElementById(id).value='');
-  document.getElementById('p-cliente').value='';
-  document.getElementById('p-credito').innerHTML='<option value="">— Seleccionar crédito —</option>';
-  document.getElementById('p-fecha').value=EC.hoy();
-  document.getElementById('p-metodo').value='efectivo';
+  // Reset estado
+  creditoSeleccionado = null;
+  tipoPagoActual      = null;
+  formasPagoCount     = 0;
+
+  document.getElementById('seccion-credito').style.display      = 'none';
+  document.getElementById('seccion-formas-pago').style.display  = 'none';
+  document.getElementById('btn-registrar-pago').style.display   = 'none';
+  document.getElementById('abono-wrap').style.display           = 'none';
+  document.getElementById('abono-desglose').style.display       = 'none';
+  document.getElementById('formas-pago-lista').innerHTML        = '';
+  document.getElementById('p-fecha').value = EC.hoy();
+  document.getElementById('p-comp').value  = '';
+  document.getElementById('p-obs').value   = '';
+  document.getElementById('p-abono') && (document.getElementById('p-abono').value = '');
+
+  // Limpiar selección tipo pago
+  document.getElementById('btn-cuota-completa').className = 'tipo-pago-btn';
+  document.getElementById('btn-abono').className          = 'tipo-pago-btn';
+
+  // Poblar selector de clientes — SOLO con crédito activo
+  const clientesConCredito = todosClientes.filter(c =>
+    todosCreditos.some(cr => cr.ClienteID === c.ID && cr.Estado === 'activo')
+  );
+  const sel = document.getElementById('p-cliente');
+  sel.innerHTML = '<option value="">— Seleccionar cliente —</option>' +
+    clientesConCredito.map(c =>
+      `<option value="${c.ID}">${c.Nombres} ${c.Apellidos} — ${c.Cedula}</option>`
+    ).join('');
+  sel.value = '';
+
   document.getElementById('modal-pago').classList.add('open');
 }
+
 function cerrarModalPago(){ document.getElementById('modal-pago').classList.remove('open'); }
 
-function cargarCreditosCliente(clienteId){
-  const sel=document.getElementById('p-credito');
-  sel.innerHTML='<option value="">— Seleccionar crédito —</option>';
-  if(!clienteId) return;
-  const creds=todosCreditos.filter(c=>c.ClienteID===clienteId&&c.Estado!=='cancelado');
-  creds.forEach(c=>{
-    const opt=document.createElement('option');
-    opt.value=c.ID;
-    opt.textContent=`${c.Codigo} — Saldo: ${EC.fmt(c.Saldo||0)}`;
-    opt.dataset.saldo=c.Saldo||0;
-    opt.dataset.codigo=c.Codigo||'';
-    sel.appendChild(opt);
+// Al seleccionar cliente → buscar su crédito activo y mostrar info
+function alSeleccionarCliente(clienteId){
+  const seccion = document.getElementById('seccion-credito');
+  const secFormas = document.getElementById('seccion-formas-pago');
+  seccion.style.display = 'none';
+  secFormas.style.display = 'none';
+  document.getElementById('btn-registrar-pago').style.display = 'none';
+  tipoPagoActual = null;
+  document.getElementById('btn-cuota-completa').className = 'tipo-pago-btn';
+  document.getElementById('btn-abono').className = 'tipo-pago-btn';
+  document.getElementById('formas-pago-lista').innerHTML = '';
+  formasPagoCount = 0;
+
+  if(!clienteId){ creditoSeleccionado = null; return; }
+
+  // Buscar crédito activo del cliente
+  const credito = todosCreditos.find(cr => cr.ClienteID === clienteId && cr.Estado === 'activo');
+  if(!credito){ EC.toast('Este cliente no tiene crédito activo','error'); creditoSeleccionado=null; return; }
+
+  creditoSeleccionado = credito;
+
+  // Calcular cuota mensual: si tiene campo Cuota se usa, sino capital/plazo + interés
+  const saldo    = parseFloat(credito.Saldo||0);
+  const plazo    = parseInt(credito.Plazo||1);
+  const tasa     = parseFloat(credito.TasaInteres||0); // % mensual
+  const monto    = parseFloat(credito.Monto||saldo);
+
+  // Cuota fija: si existe en el registro, usarla; si no, calcular
+  let cuotaTotal, cuotaCapital, cuotaInteres;
+  if(credito.Cuota && parseFloat(credito.Cuota)>0){
+    cuotaTotal   = parseFloat(credito.Cuota);
+    cuotaInteres = parseFloat((saldo * tasa / 100).toFixed(2));
+    cuotaCapital = parseFloat((cuotaTotal - cuotaInteres).toFixed(2));
+    if(cuotaCapital < 0) cuotaCapital = 0;
+  } else {
+    // Cuota = capital/plazo + interés sobre saldo
+    cuotaCapital = parseFloat((monto / plazo).toFixed(2));
+    cuotaInteres = parseFloat((saldo * tasa / 100).toFixed(2));
+    cuotaTotal   = parseFloat((cuotaCapital + cuotaInteres).toFixed(2));
+  }
+
+  // Si el saldo es menor que la cuota de capital → es la última cuota
+  if(saldo < cuotaCapital){
+    cuotaCapital = saldo;
+    cuotaTotal   = parseFloat((cuotaCapital + cuotaInteres).toFixed(2));
+  }
+
+  // Guardar en el objeto para usar al pagar
+  creditoSeleccionado._cuotaCapital = cuotaCapital;
+  creditoSeleccionado._cuotaInteres = cuotaInteres;
+  creditoSeleccionado._cuotaTotal   = cuotaTotal;
+
+  // Rellenar info box
+  document.getElementById('ci-codigo').textContent = credito.Codigo||'—';
+  document.getElementById('ci-saldo').textContent  = EC.fmt(saldo);
+  document.getElementById('ci-cuota').textContent  = EC.fmt(cuotaTotal);
+  document.getElementById('ci-cap').textContent    = EC.fmt(cuotaCapital);
+  document.getElementById('ci-int').textContent    = EC.fmt(cuotaInteres);
+
+  seccion.style.display = 'block';
+}
+
+function seleccionarTipoPago(tipo){
+  tipoPagoActual = tipo;
+  document.getElementById('btn-cuota-completa').className = 'tipo-pago-btn'+(tipo==='completa'?' selected':'');
+  document.getElementById('btn-abono').className          = 'tipo-pago-btn'+(tipo==='abono'?' selected-abono':'');
+  document.getElementById('abono-wrap').style.display     = tipo==='abono' ? 'block' : 'none';
+  document.getElementById('abono-desglose').style.display = 'none';
+
+  if(tipo==='completa'){
+    // Mostrar sección formas de pago con la cuota completa ya configurada
+    mostrarSeccionFormasPago(
+      creditoSeleccionado._cuotaCapital,
+      creditoSeleccionado._cuotaInteres,
+      creditoSeleccionado._cuotaTotal
+    );
+  } else {
+    // Esperar a que el usuario ingrese el monto del abono
+    document.getElementById('seccion-formas-pago').style.display = 'none';
+    document.getElementById('btn-registrar-pago').style.display  = 'none';
+  }
+}
+
+function calcAbono(){
+  const monto = parseFloat(document.getElementById('p-abono').value)||0;
+  if(!monto || !creditoSeleccionado){ return; }
+  const saldo   = parseFloat(creditoSeleccionado.Saldo||0);
+  const tasa    = parseFloat(creditoSeleccionado.TasaInteres||0);
+  // Proporcional: primero interés del saldo, luego el resto a capital
+  const interes = parseFloat((saldo * tasa / 100).toFixed(2));
+  const capAbono = monto > interes
+    ? parseFloat((monto - interes).toFixed(2))
+    : 0;
+  const intAbono = monto > interes
+    ? interes
+    : monto;
+
+  document.getElementById('ab-cap').textContent = EC.fmt(capAbono);
+  document.getElementById('ab-int').textContent = EC.fmt(intAbono);
+  document.getElementById('abono-desglose').style.display = 'block';
+
+  mostrarSeccionFormasPago(capAbono, intAbono, monto);
+}
+
+function mostrarSeccionFormasPago(capital, interes, total){
+  // Guardar en estado temporal
+  creditoSeleccionado._pagoCapital = capital;
+  creditoSeleccionado._pagoInteres = interes;
+  creditoSeleccionado._pagoTotal   = total;
+
+  document.getElementById('formas-pago-lista').innerHTML = '';
+  formasPagoCount = 0;
+  document.getElementById('seccion-formas-pago').style.display = 'block';
+  document.getElementById('btn-registrar-pago').style.display  = 'inline-flex';
+
+  // Añadir primera forma de pago automáticamente
+  agregarFormaPago(total);
+  actualizarResumen();
+}
+
+function agregarFormaPago(montoDefault=0){
+  formasPagoCount++;
+  const id = formasPagoCount;
+  const lista = document.getElementById('formas-pago-lista');
+  const div = document.createElement('div');
+  div.className = 'forma-pago-item';
+  div.id = `forma-${id}`;
+  div.innerHTML = `
+    ${id>1?`<button class="btn-remove-forma" onclick="removerFormaPago(${id})" title="Quitar">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>`:''}
+    <div class="forma-pago-header">
+      <select id="forma-metodo-${id}" onchange="actualizarResumen()">
+        <option value="efectivo">💵 Efectivo</option>
+        <option value="transferencia">🏦 Transferencia bancaria</option>
+        <option value="cheque">📄 Cheque</option>
+        <option value="otro">Otro</option>
+      </select>
+    </div>
+    <div class="forma-pago-monto-wrap">
+      <label>Monto ($)</label>
+      <input type="number" id="forma-monto-${id}" placeholder="0.00" step="0.01" min="0"
+        value="${montoDefault>0?montoDefault.toFixed(2):''}" oninput="actualizarResumen()">
+    </div>
+  `;
+  lista.appendChild(div);
+  actualizarResumen();
+}
+
+function removerFormaPago(id){
+  const el = document.getElementById(`forma-${id}`);
+  if(el) el.remove();
+  actualizarResumen();
+}
+
+function actualizarResumen(){
+  if(!creditoSeleccionado) return;
+  const totalCobrar = creditoSeleccionado._pagoTotal||0;
+  let totalIngresado = 0;
+  // Sumar todos los montos
+  document.querySelectorAll('[id^="forma-monto-"]').forEach(inp=>{
+    totalIngresado += parseFloat(inp.value)||0;
   });
+  totalIngresado = parseFloat(totalIngresado.toFixed(2));
+  const diff = parseFloat((totalIngresado - totalCobrar).toFixed(2));
+
+  document.getElementById('res-total-cobrar').textContent   = EC.fmt(totalCobrar);
+  document.getElementById('res-total-ingresado').textContent = EC.fmt(totalIngresado);
+  const diffEl = document.getElementById('res-diferencia');
+  const warnEl = document.getElementById('diferencia-warn');
+  diffEl.textContent = EC.fmt(Math.abs(diff));
+  diffEl.style.color = diff===0 ? 'var(--green)' : diff>0 ? 'var(--blue)' : 'var(--red)';
+
+  if(diff===0){
+    warnEl.style.display='none';
+  } else if(diff>0){
+    warnEl.style.display='flex';
+    document.getElementById('diferencia-warn-txt').textContent=`Hay un excedente de ${EC.fmt(diff)} sobre el total a cobrar.`;
+  } else {
+    warnEl.style.display='flex';
+    document.getElementById('diferencia-warn-txt').textContent=`Faltan ${EC.fmt(Math.abs(diff))} para completar el cobro.`;
+  }
 }
 
-function llenarDatosCredito(cid){
-  const cr=todosCreditos.find(c=>c.ID===cid);
-  if(!cr) return;
-  // Sugerir valores de la próxima cuota (si aplica)
-}
-
-function calcTotal(){
-  const cap=parseFloat(document.getElementById('p-capital').value)||0;
-  const int=parseFloat(document.getElementById('p-interes').value)||0;
-  document.getElementById('p-total').value=(cap+int).toFixed(2);
-}
-
-// ── GUARDAR PAGO ─────────────────────────────────────────────
+// ── GUARDAR PAGO ──────────────────────────────────────────────
 async function guardarPago(){
-  const clienteId=document.getElementById('p-cliente').value;
-  const creditoId=document.getElementById('p-credito').value;
-  const capital  =parseFloat(document.getElementById('p-capital').value)||0;
-  const interes  =parseFloat(document.getElementById('p-interes').value)||0;
-  const fecha    =document.getElementById('p-fecha').value||EC.hoy();
-  const metodo   =document.getElementById('p-metodo').value;
-  if(!clienteId||!creditoId){ EC.toast('Selecciona cliente y crédito','error'); return; }
-  if(!capital&&!interes){ EC.toast('Ingresa el monto a cobrar','error'); return; }
+  if(!creditoSeleccionado){ EC.toast('Selecciona un cliente','error'); return; }
+  if(!tipoPagoActual){ EC.toast('Selecciona el tipo de pago','error'); return; }
 
-  const cliente=todosClientes.find(c=>c.ID===clienteId)||{};
-  const credito=todosCreditos.find(c=>c.ID===creditoId)||{};
-  const total=capital+interes;
-  const nuevoSaldo=Math.max(0,parseFloat(credito.Saldo||0)-capital);
-  const numComp=document.getElementById('p-comp').value.trim();
-  const numPago='P-'+Date.now().toString().slice(-6);
+  const capital  = creditoSeleccionado._pagoCapital||0;
+  const interes  = creditoSeleccionado._pagoInteres||0;
+  const total    = creditoSeleccionado._pagoTotal||0;
 
-  const datos={
-    CreditoID     :creditoId,
-    CreditoCodigo :credito.Codigo||'',
-    ClienteID     :clienteId,
-    ClienteNombre :(cliente.Nombres||'')+' '+(cliente.Apellidos||''),
-    Fecha         :fecha,
-    Capital       :capital,
-    Interes       :interes,
-    Total         :total,
-    Metodo        :metodo,
-    NumComprobante:numComp||numPago,
-    Observaciones :document.getElementById('p-obs').value.trim(),
-    NumPago       :numPago,
-    RegistradoPor :EC.usuario.nombre,
+  if(!total){ EC.toast('Ingresa el monto a cobrar','error'); return; }
+
+  // Validar formas de pago
+  const formas = [];
+  const items  = document.querySelectorAll('[id^="forma-monto-"]');
+  let sumaFormas = 0;
+  items.forEach(inp=>{
+    const idx = inp.id.replace('forma-monto-','');
+    const m   = parseFloat(inp.value)||0;
+    const met = document.getElementById(`forma-metodo-${idx}`)?.value||'efectivo';
+    if(m>0) formas.push({metodo:met, monto:m});
+    sumaFormas += m;
+  });
+  if(!formas.length){ EC.toast('Ingresa al menos una forma de pago','error'); return; }
+  const diff = Math.abs(parseFloat((sumaFormas - total).toFixed(2)));
+  if(diff > 0.01){ EC.toast(`El monto ingresado (${EC.fmt(sumaFormas)}) no coincide con el total (${EC.fmt(total)})`,'error'); return; }
+
+  const clienteId = document.getElementById('p-cliente').value;
+  const cliente   = todosClientes.find(c=>c.ID===clienteId)||{};
+  const credito   = creditoSeleccionado;
+  const fecha     = document.getElementById('p-fecha').value||EC.hoy();
+  const numComp   = document.getElementById('p-comp').value.trim();
+  const numPago   = 'P-'+Date.now().toString().slice(-6);
+  const nuevoSaldo = Math.max(0, parseFloat(credito.Saldo||0) - capital);
+
+  // Descripción del método (puede ser mixto)
+  const metodosDesc = formas.map(f=>`${f.metodo}:${EC.fmt(f.monto)}`).join(' + ');
+  const metodoPrincipal = formas.length===1 ? formas[0].metodo : 'mixto';
+
+  const datos = {
+    CreditoID     : credito.ID,
+    CreditoCodigo : credito.Codigo||'',
+    ClienteID     : clienteId,
+    ClienteNombre : (cliente.Nombres||'')+' '+(cliente.Apellidos||''),
+    Fecha         : fecha,
+    Capital       : capital,
+    Interes       : interes,
+    Total         : total,
+    TipoPago      : tipoPagoActual,
+    Metodo        : metodosDesc,
+    MetodoPrincipal: metodoPrincipal,
+    FormasPago    : JSON.stringify(formas),
+    NumComprobante: numComp||numPago,
+    Observaciones : document.getElementById('p-obs').value.trim(),
+    NumPago       : numPago,
+    RegistradoPor : EC.usuario.nombre,
   };
 
   EC.showLoading('Registrando cobro...');
@@ -555,12 +856,15 @@ async function guardarPago(){
     const j=await r.json();
     if(j.ok){
       // Actualizar saldo del crédito
-      await fetch(EC.api,{method:'POST',body:JSON.stringify({accion:'actualizar',tab:'creditos',id:creditoId,datos:{Saldo:nuevoSaldo,Estado:nuevoSaldo<=0?'cancelado':'activo'}})});
+      await fetch(EC.api,{method:'POST',body:JSON.stringify({
+        accion:'actualizar',tab:'creditos',id:credito.ID,
+        datos:{Saldo:nuevoSaldo, Estado:nuevoSaldo<=0?'cancelado':'activo'}
+      })});
       cerrarModalPago();
       await cargarCreditos();
       await cargarPagos();
       // Mostrar comprobante
-      pagoActual={...datos,ID:j.data?.ID||numPago,SaldoRestante:nuevoSaldo};
+      pagoActual={...datos, ID:j.data?.ID||numPago, SaldoRestante:nuevoSaldo};
       mostrarComprobante(pagoActual);
       EC.toast('Cobro registrado exitosamente');
     } else EC.toast('Error al registrar cobro','error');
@@ -568,9 +872,8 @@ async function guardarPago(){
   EC.hideLoading();
 }
 
-// ── COMPROBANTE ──────────────────────────────────────────────
+// ── COMPROBANTE ───────────────────────────────────────────────
 function mostrarComprobante(p){
-  const metLabels={efectivo:'Efectivo',transferencia:'Transferencia bancaria',cheque:'Cheque',otro:'Otro'};
   document.getElementById('cv-total').textContent   = EC.fmt(p.Total||0);
   document.getElementById('cv-cliente').textContent = p.ClienteNombre||'—';
   document.getElementById('cv-credito').textContent = p.CreditoCodigo||'—';
@@ -578,9 +881,9 @@ function mostrarComprobante(p){
   document.getElementById('cv-interes').textContent = EC.fmt(p.Interes||0);
   document.getElementById('cv-saldo').textContent   = EC.fmt(p.SaldoRestante||0);
   document.getElementById('cv-fecha').textContent   = p.Fecha||EC.hoy();
-  document.getElementById('cv-metodo').textContent  = metLabels[p.Metodo]||p.Metodo||'—';
+  document.getElementById('cv-metodo').textContent  = p.Metodo||p.MetodoPrincipal||'—';
   document.getElementById('cv-usuario').textContent = p.RegistradoPor||EC.usuario.nombre||'—';
-  document.getElementById('cv-num').textContent     = 'N° '+( p.NumComprobante||p.NumPago||'—');
+  document.getElementById('cv-num').textContent     = 'N° '+(p.NumComprobante||p.NumPago||'—');
   const compRow=document.getElementById('cv-comp-row');
   if(p.NumComprobante){ document.getElementById('cv-comp').textContent=p.NumComprobante; compRow.style.display=''; }
   else compRow.style.display='none';
@@ -591,12 +894,12 @@ function verComprobante(id){
   const p=todosPagos.find(x=>x.ID===id);
   if(!p) return;
   const cr=todosCreditos.find(c=>c.ID===p.CreditoID)||{};
-  mostrarComprobante({...p,SaldoRestante:cr.Saldo||0,RegistradoPor:p.RegistradoPor||'—'});
+  mostrarComprobante({...p, SaldoRestante:cr.Saldo||0, RegistradoPor:p.RegistradoPor||'—'});
 }
 
 function cerrarComprobante(){ document.getElementById('modal-comprobante').classList.remove('open'); }
 
-// ── DESCARGAR IMAGEN ─────────────────────────────────────────
+// ── DESCARGAR IMAGEN ──────────────────────────────────────────
 async function descargarImagen(){
   const el=document.getElementById('comprobante-visual');
   EC.showLoading('Generando imagen...');
@@ -611,7 +914,7 @@ async function descargarImagen(){
   EC.hideLoading();
 }
 
-// ── DESCARGAR PDF ────────────────────────────────────────────
+// ── DESCARGAR PDF ─────────────────────────────────────────────
 async function descargarPDF(){
   const el=document.getElementById('comprobante-visual');
   EC.showLoading('Generando PDF...');
@@ -629,7 +932,7 @@ async function descargarPDF(){
   EC.hideLoading();
 }
 
-// ── COMPARTIR WHATSAPP ────────────────────────────────────────
+// ── WHATSAPP ──────────────────────────────────────────────────
 async function compartirWhatsApp(){
   const cliente = document.getElementById('cv-cliente').textContent;
   const total   = document.getElementById('cv-total').textContent;
@@ -638,9 +941,7 @@ async function compartirWhatsApp(){
   const saldo   = document.getElementById('cv-saldo').textContent;
   const num     = document.getElementById('cv-num').textContent;
   const metodo  = document.getElementById('cv-metodo').textContent;
-
-  const texto = `✅ *COMPROBANTE DE PAGO*\n`+
-    `_Caja de Ahorro y Crédito Éxito Compartido_\n\n`+
+  const texto = `✅ *COMPROBANTE DE PAGO*\n_Caja de Ahorro y Crédito Éxito Compartido_\n\n`+
     `💰 *Total cobrado:* ${total}\n`+
     `👤 *Cliente:* ${cliente}\n`+
     `📋 *Crédito:* ${credito}\n`+
@@ -649,51 +950,69 @@ async function compartirWhatsApp(){
     `💳 *Saldo restante:* ${saldo}\n`+
     `📅 *Fecha:* ${fecha}\n`+
     `🏦 *Método:* ${metodo}\n`+
-    `${num}\n\n`+
-    `_Gracias por su pago puntual_ 🙏`;
-
-  // Primero intentar compartir la imagen
+    `${num}\n\n_Gracias por su pago puntual_ 🙏`;
   try{
     const el=document.getElementById('comprobante-visual');
     const canvas=await html2canvas(el,{scale:2,backgroundColor:'#ffffff',logging:false});
     canvas.toBlob(async blob=>{
-      if(navigator.share && navigator.canShare && navigator.canShare({files:[new File([blob],'comprobante.png',{type:'image/png'})]})){
-        await navigator.share({
-          title:'Comprobante de pago',
-          text:texto,
-          files:[new File([blob],'comprobante.png',{type:'image/png'})]
-        });
+      if(navigator.share&&navigator.canShare&&navigator.canShare({files:[new File([blob],'comprobante.png',{type:'image/png'})]})){
+        await navigator.share({title:'Comprobante de pago',text:texto,files:[new File([blob],'comprobante.png',{type:'image/png'})]});
       } else {
-        // Fallback: abrir WhatsApp con texto
-        const url=`https://wa.me/?text=${encodeURIComponent(texto)}`;
-        window.open(url,'_blank');
+        window.open(`https://wa.me/?text=${encodeURIComponent(texto)}`,'_blank');
       }
     },'image/png');
   }catch(e){
-    // Fallback: WhatsApp con texto
-    const url=`https://wa.me/?text=${encodeURIComponent(texto)}`;
-    window.open(url,'_blank');
+    window.open(`https://wa.me/?text=${encodeURIComponent(texto)}`,'_blank');
   }
 }
 
-// ── ELIMINAR ─────────────────────────────────────────────────
+// ── ELIMINAR — con reversión de saldo ────────────────────────
 function confirmarEliminar(id){
   if(!EC.esAdmin){ EC.toast('Solo el administrador puede eliminar cobros','error'); return; }
-  pagoAEliminar=id;
-  document.getElementById('confirm-msg').textContent='¿Seguro que deseas eliminar este cobro? El saldo del crédito no se revertirá automáticamente.';
+  const pago = todosPagos.find(p=>p.ID===id);
+  if(!pago){ EC.toast('Cobro no encontrado','error'); return; }
+  pagoAEliminar = id;
+  const cap = parseFloat(pago.Capital||0);
+  const int = parseFloat(pago.Interes||0);
+  document.getElementById('confirm-msg').textContent =
+    `Se eliminará el cobro de ${EC.fmt(cap+int)} del crédito ${pago.CreditoCodigo||'—'} (${pago.ClienteNombre||'—'}). `+
+    `El saldo del crédito será aumentado en ${EC.fmt(cap)} (capital cobrado).`;
   document.getElementById('modal-confirmar').classList.add('open');
-  document.getElementById('btn-confirmar-eliminar').onclick=ejecutarEliminar;
+  document.getElementById('btn-confirmar-eliminar').onclick = ejecutarEliminar;
 }
+
 function cerrarConfirm(){ document.getElementById('modal-confirmar').classList.remove('open'); pagoAEliminar=null; }
+
 async function ejecutarEliminar(){
   if(!pagoAEliminar) return;
-  EC.showLoading('Eliminando cobro...');
+  EC.showLoading('Eliminando cobro y revirtiendo saldo...');
   cerrarConfirm();
+
+  // Obtener datos del pago a eliminar para revertir saldo
+  const pago    = todosPagos.find(p=>p.ID===pagoAEliminar);
+  const capital = parseFloat(pago?.Capital||0);
+
   try{
+    // 1. Marcar pago como eliminado
     const r=await fetch(EC.api,{method:'POST',body:JSON.stringify({accion:'actualizar',tab:'pagos',id:pagoAEliminar,datos:{Eliminado:true}})});
     const j=await r.json();
-    if(j.ok){ await cargarPagos(); EC.toast('Cobro eliminado'); }
-    else EC.toast('Error al eliminar','error');
+    if(j.ok){
+      // 2. Revertir saldo del crédito sumando el capital que se había cobrado
+      if(pago && pago.CreditoID && capital>0){
+        const credito = todosCreditos.find(c=>c.ID===pago.CreditoID);
+        if(credito){
+          const saldoAnterior = parseFloat(credito.Saldo||0);
+          const saldoRevertido = parseFloat((saldoAnterior + capital).toFixed(2));
+          await fetch(EC.api,{method:'POST',body:JSON.stringify({
+            accion:'actualizar',tab:'creditos',id:pago.CreditoID,
+            datos:{Saldo:saldoRevertido, Estado:'activo'}
+          })});
+        }
+      }
+      await cargarCreditos();
+      await cargarPagos();
+      EC.toast('Cobro eliminado y saldo revertido correctamente');
+    } else EC.toast('Error al eliminar','error');
   }catch(e){ EC.toast('Error de conexión','error'); }
   EC.hideLoading();
 }
