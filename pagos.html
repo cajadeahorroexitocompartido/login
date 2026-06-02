@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cobros y Pagos — Éxito Compartido</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#080c10;--surface:#0e1318;--surface2:#141b22;--surface3:#1a2330;--border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.04);--green:#2ecc71;--green2:#27ae60;--green-glow:rgba(46,204,113,0.12);--orange:#f39c12;--red:#e74c3c;--blue:#3498db;--purple:#9b59b6;--yellow:#f1c40f;--text:#f0f4f8;--text2:#8896a4;--text3:#4a5568;--radius:12px}
+html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);font-size:14px;overflow-x:hidden}
+.bg-grid{position:fixed;inset:0;z-index:0;background-image:linear-gradient(rgba(255,255,255,.012) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.012) 1px,transparent 1px);background-size:40px 40px;pointer-events:none}
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:100;backdrop-filter:blur(2px)}.overlay.open{display:block}
+.sidebar{position:fixed;top:0;left:0;bottom:0;width:260px;background:var(--surface);border-right:1px solid var(--border);z-index:200;transform:translateX(-100%);transition:transform .3s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column;overflow-y:auto}.sidebar.open{transform:translateX(0)}
+.sidebar-header{padding:20px 20px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.sidebar-logo{display:flex;align-items:center;gap:12px}
+.sidebar-logo-icon{width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,var(--green),var(--green2));display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#fff;font-family:'DM Mono',monospace;box-shadow:0 4px 12px rgba(46,204,113,0.25);flex-shrink:0}
+.sidebar-logo-text{font-size:12px;font-weight:600;line-height:1.3}.sidebar-logo-sub{font-size:10px;color:var(--text3);margin-top:1px}
+.sidebar-close{background:none;border:none;color:var(--text3);cursor:pointer;padding:6px;border-radius:8px;transition:all .15s;line-height:1}.sidebar-close:hover{background:var(--surface2);color:var(--text)}
+.sidebar-nav{padding:12px 10px;flex:1}
+.nav-group-label{font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.1em;padding:10px 10px 6px}
+.nav-item{display:flex;align-items:center;gap:11px;padding:10px 12px;border-radius:10px;cursor:pointer;color:var(--text2);font-size:13px;margin-bottom:2px;transition:all .15s;text-decoration:none;position:relative}
+.nav-item:hover{background:var(--surface2);color:var(--text)}.nav-item.active{background:var(--green-glow);color:var(--green);font-weight:500}
+.nav-item.active::before{content:'';position:absolute;left:0;top:20%;bottom:20%;width:3px;border-radius:0 3px 3px 0;background:var(--green)}
+.nav-item svg{width:17px;height:17px;flex-shrink:0;opacity:.7}.nav-item.active svg,.nav-item:hover svg{opacity:1}
+.nav-badge{margin-left:auto;font-size:10px;font-weight:700;padding:2px 7px;border-radius:8px;background:var(--red);color:#fff}
+.sidebar-footer{padding:14px;border-top:1px solid var(--border)}
+.user-card{display:flex;align-items:center;gap:10px;padding:10px;border-radius:10px;background:var(--surface2);margin-bottom:10px}
+.user-avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--green),var(--green2));display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;flex-shrink:0}
+.user-name{font-size:12px;font-weight:600}.user-role{font-size:10px;color:var(--text3);margin-top:1px}
+.btn-logout{width:100%;padding:9px;background:rgba(231,76,60,.08);border:1px solid rgba(231,76,60,.15);color:var(--red);border-radius:10px;font-size:12px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;display:flex;align-items:center;justify-content:center;gap:7px;transition:all .15s}.btn-logout:hover{background:rgba(231,76,60,.15)}
+.topbar{position:sticky;top:0;z-index:50;padding:12px 20px;background:rgba(8,12,16,.9);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:14px}
+.btn-hamburger{background:none;border:none;color:var(--text2);cursor:pointer;padding:7px;border-radius:9px;transition:all .15s;line-height:1;display:flex;align-items:center;justify-content:center}.btn-hamburger:hover{background:var(--surface2);color:var(--text)}
+.topbar-title{font-size:15px;font-weight:600}.topbar-sub{font-size:11px;color:var(--text3);margin-top:1px}
+.main{position:relative;z-index:1;min-height:100vh;display:flex;flex-direction:column}
+.content{padding:20px;flex:1}
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
+.stat-box{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;display:flex;align-items:center;gap:12px}
+.stat-icon{width:38px;height:38px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.stat-val{font-size:20px;font-weight:700;font-family:'DM Mono',monospace}
+.stat-label{font-size:11px;color:var(--text3);margin-top:2px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:16px}
+.card-header{padding:14px 16px;border-bottom:1px solid var(--border2);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
+.card-title{font-size:13px;font-weight:600;display:flex;align-items:center;gap:8px}
+.card-title svg{width:15px;height:15px;color:var(--green)}
+.card-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.tbl-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;min-width:700px}
+thead th{font-size:10px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.07em;padding:10px 14px;text-align:left;border-bottom:1px solid var(--border2);white-space:nowrap}
+tbody td{padding:11px 14px;font-size:13px;border-bottom:1px solid var(--border2);vertical-align:middle}
+tbody tr:last-child td{border-bottom:none}
+tbody tr:hover td{background:rgba(255,255,255,.02)}
+.mono{font-family:'DM Mono',monospace;font-size:12px}
+.td-actions{display:flex;gap:6px;align-items:center}
+.badge{display:inline-flex;align-items:center;padding:3px 9px;border-radius:6px;font-size:11px;font-weight:500}
+.b-green{background:rgba(46,204,113,.12);color:var(--green)}.b-orange{background:rgba(243,156,18,.12);color:var(--orange)}.b-red{background:rgba(231,76,60,.12);color:var(--red)}.b-blue{background:rgba(52,152,219,.12);color:var(--blue)}.b-gray{background:rgba(255,255,255,.06);color:var(--text3)}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:9px;font-size:13px;font-weight:500;cursor:pointer;border:none;font-family:'DM Sans',sans-serif;transition:all .15s;white-space:nowrap}
+.btn svg{width:15px;height:15px}
+.btn-green{background:linear-gradient(135deg,var(--green),var(--green2));color:#fff;box-shadow:0 2px 10px rgba(46,204,113,.2)}.btn-green:hover{box-shadow:0 4px 16px rgba(46,204,113,.3);transform:translateY(-1px)}
+.btn-outline{background:transparent;color:var(--text2);border:1px solid var(--border)}.btn-outline:hover{background:var(--surface2);color:var(--text)}
+.btn-whatsapp{background:#25D366;color:#fff}.btn-whatsapp:hover{background:#1da851}
+.btn-red{background:rgba(231,76,60,.1);color:var(--red);border:1px solid rgba(231,76,60,.2)}.btn-red:hover{background:rgba(231,76,60,.2)}
+.btn-sm{padding:6px 12px;font-size:12px}.btn-xs{padding:5px 9px;font-size:11px}
+/* MODAL */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:300;align-items:flex-end;justify-content:center;backdrop-filter:blur(4px)}.modal-overlay.open{display:flex}
+@media(min-width:600px){.modal-overlay{align-items:center}}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:16px 16px 0 0;width:100%;max-width:560px;max-height:92vh;overflow-y:auto;animation:slideUp .25s ease}
+@keyframes slideUp{from{transform:translateY(30px);opacity:0}to{transform:translateY(0);opacity:1}}
+@media(min-width:600px){.modal{border-radius:16px}}
+.modal-header{padding:16px 18px;border-bottom:1px solid var(--border2);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:var(--surface);z-index:10}
+.modal-title{font-size:14px;font-weight:600;display:flex;align-items:center;gap:8px}
+.modal-title svg{width:16px;height:16px;color:var(--green)}
+.modal-close{background:none;border:none;color:var(--text3);cursor:pointer;padding:4px;border-radius:6px;transition:all .15s;line-height:1}.modal-close:hover{background:var(--surface2);color:var(--text)}
+.modal-body{padding:18px}.modal-footer{padding:14px 18px;border-top:1px solid var(--border2);display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}.col-span-2{grid-column:span 2}
+.field label{display:block;font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:7px}
+.field input,.field select,.field textarea{width:100%;background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:10px 12px;border-radius:10px;font-size:13px;font-family:'DM Sans',sans-serif;outline:none;transition:border-color .2s,box-shadow .2s;-webkit-appearance:none}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--green);box-shadow:0 0 0 3px rgba(46,204,113,.08)}
+.field input::placeholder{color:var(--text3)}.field select option{background:var(--surface2)}
+.field input[readonly]{color:var(--green);font-weight:600;cursor:default}
+/* COMPROBANTE */
+.comp-modal{max-width:420px}
+.comprobante-wrap{padding:8px}
+#comprobante-visual{
+  background:#fff;color:#1a1a1a;
+  border-radius:12px;overflow:hidden;
+  font-family:'DM Sans',sans-serif;
+}
+.comp-header{
+  background:linear-gradient(135deg,#0d3322,#1a5c3a);
+  padding:24px;text-align:center;
+}
+.comp-logo{
+  width:52px;height:52px;border-radius:14px;
+  background:rgba(46,204,113,.2);border:2px solid rgba(46,204,113,.4);
+  display:flex;align-items:center;justify-content:center;
+  font-size:18px;font-weight:700;color:#2ecc71;
+  margin:0 auto 12px;font-family:'DM Mono',monospace;
+}
+.comp-org{font-size:13px;font-weight:700;color:#fff;margin-bottom:3px}
+.comp-sub{font-size:10px;color:rgba(255,255,255,.6);text-transform:uppercase;letter-spacing:.1em}
+.comp-badge{
+  display:inline-block;margin-top:12px;
+  background:rgba(46,204,113,.2);border:1px solid rgba(46,204,113,.4);
+  color:#2ecc71;font-size:11px;font-weight:600;
+  padding:4px 14px;border-radius:20px;letter-spacing:.06em;text-transform:uppercase;
+}
+.comp-body{padding:20px}
+.comp-monto-wrap{text-align:center;padding:16px 0;border-bottom:1px solid #e8ecf0;margin-bottom:16px}
+.comp-monto-label{font-size:11px;color:#888;text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px}
+.comp-monto{font-size:36px;font-weight:700;color:#1a5c3a;font-family:'DM Mono',monospace;line-height:1}
+.comp-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #f0f0f0;font-size:13px}
+.comp-row:last-child{border-bottom:none}
+.comp-row-label{color:#666;font-weight:500}
+.comp-row-val{font-weight:600;color:#1a1a1a;font-family:'DM Mono',monospace;font-size:12px}
+.comp-footer{background:#f8f9fa;padding:14px 20px;text-align:center;border-top:1px solid #e8ecf0}
+.comp-footer-txt{font-size:11px;color:#999;line-height:1.6}
+.comp-num{font-size:10px;color:#bbb;font-family:'DM Mono',monospace;margin-top:4px}
+/* ACCIONES COMPROBANTE */
+.comp-actions{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:12px}
+.comp-action-btn{display:flex;flex-direction:column;align-items:center;gap:5px;padding:10px 6px;border-radius:10px;cursor:pointer;border:1px solid var(--border);background:var(--surface2);color:var(--text2);font-size:11px;font-weight:500;transition:all .15s;font-family:'DM Sans',sans-serif}
+.comp-action-btn:hover{background:var(--surface3);color:var(--text)}
+.comp-action-btn svg{width:20px;height:20px}
+.comp-action-btn.green{background:rgba(46,204,113,.1);border-color:rgba(46,204,113,.2);color:var(--green)}
+.comp-action-btn.green:hover{background:rgba(46,204,113,.2)}
+.comp-action-btn.whatsapp{background:rgba(37,211,102,.1);border-color:rgba(37,211,102,.2);color:#25D366}
+.comp-action-btn.whatsapp:hover{background:rgba(37,211,102,.2)}
+/* CONFIRM */
+.confirm-body{padding:24px 18px;text-align:center}
+.confirm-icon{width:56px;height:56px;border-radius:50%;background:rgba(231,76,60,.1);border:2px solid rgba(231,76,60,.2);display:flex;align-items:center;justify-content:center;margin:0 auto 16px}
+.confirm-title{font-size:16px;font-weight:700;margin-bottom:8px}.confirm-msg{font-size:13px;color:var(--text2);line-height:1.6}
+/* LOADING */
+.loading-overlay{display:none;position:fixed;inset:0;background:rgba(8,12,16,.85);z-index:400;align-items:center;justify-content:center;flex-direction:column;gap:14px;backdrop-filter:blur(4px)}.loading-overlay.show{display:flex}
+.loading-spinner{width:36px;height:36px;border:3px solid rgba(46,204,113,.2);border-top-color:var(--green);border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-text{font-size:13px;color:var(--text2)}
+.empty-cell{text-align:center;padding:40px;color:var(--text3);font-size:13px}
+@media(max-width:768px){.stats-row{grid-template-columns:1fr 1fr}.form-grid{grid-template-columns:1fr}.col-span-2{grid-column:span 1}.comp-actions{grid-template-columns:1fr 1fr 1fr}}
+@media(max-width:480px){.stats-row{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+<script src="auth.js"></script>
+<div class="bg-grid"></div>
+<div class="loading-overlay" id="loading-overlay"><div class="loading-spinner"></div><div class="loading-text" id="loading-text">Cargando...</div></div>
+<div class="overlay" id="overlay" onclick="EC.closeSidebar()"></div>
+
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <div class="sidebar-logo"><div class="sidebar-logo-icon">EC</div><div><div class="sidebar-logo-text">Éxito Compartido</div><div class="sidebar-logo-sub">Caja de Ahorro y Crédito</div></div></div>
+    <button class="sidebar-close" onclick="EC.closeSidebar()"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-group-label">Principal</div>
+    <a href="dashboard.html" class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>Dashboard</a>
+    <a href="clientes.html" class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>Clientes</a>
+    <a href="creditos.html" class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>Créditos</a>
+    <a href="pagos.html" class="nav-item active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 1 0 0 7h5a3.5 3.5 0 1 1 0 7H6"/></svg>Cobros / Pagos</a>
+    <div class="nav-group-label">Administración</div>
+    <a href="socios.html" class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 7H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>Socios &amp; Capital</a>
+    <a href="contabilidad.html" class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>Contabilidad</a>
+    <a href="reportes.html" class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>Reportes</a>
+    <div class="nav-group-label" id="nav-admin-group">Sistema</div>
+    <a href="usuarios.html" class="nav-item" id="nav-usuarios"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>Usuarios &amp; Accesos</a>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="user-card"><div class="user-avatar" id="sb-avatar">AD</div><div><div class="user-name" id="sb-name">—</div><div class="user-role" id="sb-role"></div></div></div>
+    <button class="btn-logout" onclick="EC.cerrarSesion()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>Cerrar sesión</button>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="topbar">
+    <button class="btn-hamburger" onclick="EC.openSidebar()"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
+    <div style="flex:1"><div class="topbar-title">Cobros y Pagos</div><div class="topbar-sub">Registro de cobros y comprobantes</div></div>
+    <button class="btn btn-green btn-sm" onclick="abrirModalPago()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Registrar cobro
+    </button>
+  </div>
+
+  <div class="content">
+    <!-- STATS -->
+    <div class="stats-row">
+      <div class="stat-box">
+        <div class="stat-icon" style="background:rgba(46,204,113,.12)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 1 0 0 7h5a3.5 3.5 0 1 1 0 7H6"/></svg></div>
+        <div><div class="stat-val" style="color:var(--green)" id="stat-hoy-total">$0.00</div><div class="stat-label">Total cobrado hoy</div></div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-icon" style="background:rgba(46,204,113,.12)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M12 12h.01"/></svg></div>
+        <div><div class="stat-val" style="color:var(--green)" id="stat-hoy-ef">$0.00</div><div class="stat-label">Efectivo hoy</div></div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-icon" style="background:rgba(52,152,219,.12)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg></div>
+        <div><div class="stat-val" style="color:var(--blue)" id="stat-hoy-tr">$0.00</div><div class="stat-label">Transferencia hoy</div></div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-icon" style="background:rgba(243,156,18,.12)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--orange)" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/></svg></div>
+        <div><div class="stat-val" style="color:var(--orange)" id="stat-mes">$0.00</div><div class="stat-label">Cobros este mes</div></div>
+      </div>
+    </div>
+
+    <!-- FILTROS + TABLA -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Historial de cobros</div>
+        <div class="card-actions">
+          <input type="date" id="filtro-desde" style="background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:7px 10px;border-radius:9px;font-size:12px;outline:none;font-family:'DM Sans',sans-serif">
+          <span style="color:var(--text3);font-size:12px">al</span>
+          <input type="date" id="filtro-hasta" style="background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:7px 10px;border-radius:9px;font-size:12px;outline:none;font-family:'DM Sans',sans-serif">
+          <button class="btn btn-outline btn-sm" onclick="filtrarPorFecha()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>Filtrar
+          </button>
+        </div>
+      </div>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>Fecha</th><th>Cliente</th><th>Crédito</th><th>Capital</th><th>Interés</th><th>Total cobrado</th><th>Método</th><th>Comprobante</th><th>Acciones</th></tr></thead>
+          <tbody id="tbody-pagos"><tr><td colspan="9" class="empty-cell">Cargando cobros...</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL REGISTRAR COBRO -->
+<div class="modal-overlay" id="modal-pago">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 1 0 0 7h5a3.5 3.5 0 1 1 0 7H6"/></svg>Registrar cobro</div>
+      <button class="modal-close" onclick="cerrarModalPago()"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="field col-span-2">
+          <label>Cliente *</label>
+          <select id="p-cliente" onchange="cargarCreditosCliente(this.value)"><option value="">— Seleccionar cliente —</option></select>
+        </div>
+        <div class="field col-span-2">
+          <label>Crédito *</label>
+          <select id="p-credito" onchange="llenarDatosCredito(this.value)"><option value="">— Seleccionar crédito —</option></select>
+        </div>
+        <div class="field">
+          <label>Capital a cobrar ($) *</label>
+          <input type="number" id="p-capital" placeholder="0.00" step="0.01" min="0" oninput="calcTotal()">
+        </div>
+        <div class="field">
+          <label>Interés a cobrar ($) *</label>
+          <input type="number" id="p-interes" placeholder="0.00" step="0.01" min="0" oninput="calcTotal()">
+        </div>
+        <div class="field col-span-2">
+          <label>Total a cobrar ($)</label>
+          <input type="number" id="p-total" readonly placeholder="0.00">
+        </div>
+        <div class="field">
+          <label>Fecha de pago *</label>
+          <input type="date" id="p-fecha">
+        </div>
+        <div class="field">
+          <label>Método de pago</label>
+          <select id="p-metodo">
+            <option value="efectivo">Efectivo</option>
+            <option value="transferencia">Transferencia bancaria</option>
+            <option value="cheque">Cheque</option>
+            <option value="otro">Otro</option>
+          </select>
+        </div>
+        <div class="field col-span-2">
+          <label>N° de comprobante / referencia</label>
+          <input type="text" id="p-comp" placeholder="Número de comprobante o referencia (opcional)">
+        </div>
+        <div class="field col-span-2">
+          <label>Observaciones</label>
+          <input type="text" id="p-obs" placeholder="Notas adicionales...">
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="cerrarModalPago()">Cancelar</button>
+      <button class="btn btn-green" onclick="guardarPago()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+        Registrar y ver comprobante
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL COMPROBANTE -->
+<div class="modal-overlay" id="modal-comprobante">
+  <div class="modal comp-modal">
+    <div class="modal-header">
+      <div class="modal-title">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+        Comprobante de pago
+      </div>
+      <button class="modal-close" onclick="cerrarComprobante()"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div class="modal-body" style="padding:12px">
+      <!-- COMPROBANTE VISUAL -->
+      <div class="comprobante-wrap">
+        <div id="comprobante-visual">
+          <div class="comp-header">
+            <div class="comp-logo">EC</div>
+            <div class="comp-org">Caja de Ahorro y Crédito</div>
+            <div class="comp-sub">Éxito Compartido</div>
+            <div class="comp-badge">✓ Pago confirmado</div>
+          </div>
+          <div class="comp-body">
+            <div class="comp-monto-wrap">
+              <div class="comp-monto-label">Monto cobrado</div>
+              <div class="comp-monto" id="cv-total">$0.00</div>
+            </div>
+            <div class="comp-row"><span class="comp-row-label">Cliente</span><span class="comp-row-val" id="cv-cliente">—</span></div>
+            <div class="comp-row"><span class="comp-row-label">Crédito</span><span class="comp-row-val" id="cv-credito">—</span></div>
+            <div class="comp-row"><span class="comp-row-label">Capital</span><span class="comp-row-val" id="cv-capital">$0.00</span></div>
+            <div class="comp-row"><span class="comp-row-label">Interés</span><span class="comp-row-val" id="cv-interes">$0.00</span></div>
+            <div class="comp-row"><span class="comp-row-label">Saldo restante</span><span class="comp-row-val" id="cv-saldo">$0.00</span></div>
+            <div class="comp-row"><span class="comp-row-label">Fecha de pago</span><span class="comp-row-val" id="cv-fecha">—</span></div>
+            <div class="comp-row"><span class="comp-row-label">Método de pago</span><span class="comp-row-val" id="cv-metodo">—</span></div>
+            <div class="comp-row" id="cv-comp-row" style="display:none"><span class="comp-row-label">Comprobante</span><span class="comp-row-val" id="cv-comp">—</span></div>
+            <div class="comp-row"><span class="comp-row-label">Atendido por</span><span class="comp-row-val" id="cv-usuario">—</span></div>
+          </div>
+          <div class="comp-footer">
+            <div class="comp-footer-txt">Gracias por su pago puntual.<br>Este documento es constancia de su pago.</div>
+            <div class="comp-num" id="cv-num">— — —</div>
+          </div>
+        </div>
+      </div>
+      <!-- BOTONES ACCIONES -->
+      <div class="comp-actions">
+        <button class="comp-action-btn green" onclick="descargarImagen()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+          Descargar imagen
+        </button>
+        <button class="comp-action-btn" onclick="descargarPDF()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          Descargar PDF
+        </button>
+        <button class="comp-action-btn whatsapp" onclick="compartirWhatsApp()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+          WhatsApp
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL CONFIRMAR ELIMINAR -->
+<div class="modal-overlay" id="modal-confirmar">
+  <div class="modal" style="max-width:400px">
+    <div class="modal-header"><div class="modal-title">Confirmar eliminación</div><button class="modal-close" onclick="cerrarConfirm()"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>
+    <div class="confirm-body">
+      <div class="confirm-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></div>
+      <div class="confirm-title">¿Eliminar este cobro?</div>
+      <div class="confirm-msg" id="confirm-msg">Esta acción no se puede deshacer.</div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="cerrarConfirm()">Cancelar</button>
+      <button class="btn btn-red" id="btn-confirmar-eliminar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>Sí, eliminar</button>
+    </div>
+  </div>
+</div>
+
+<!-- html2canvas para exportar imagen -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<!-- jsPDF para exportar PDF -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+<script>
+EC.initSidebar();
+EC.aplicarPermisos();
+
+let todosPagos    = [];
+let todosClientes = [];
+let todosCreditos = [];
+let pagoAEliminar = null;
+let pagoActual    = null; // para comprobante
+
+// ── INIT ────────────────────────────────────────────────────
+(async function init(){
+  document.getElementById('p-fecha').value = EC.hoy();
+  const hoy = EC.hoy();
+  document.getElementById('filtro-desde').value = hoy.substr(0,8)+'01';
+  document.getElementById('filtro-hasta').value = hoy;
+  await Promise.all([cargarClientes(), cargarCreditos(), cargarPagos()]);
+})();
+
+// ── CARGAR DATOS ─────────────────────────────────────────────
+async function cargarClientes(){
+  try{
+    const r=await fetch(`${EC.api}?accion=leer&tab=clientes`);
+    const j=await r.json();
+    if(j.ok){
+      todosClientes=(j.data||[]).filter(c=>c.Activo==='true'||c.Activo===true);
+      const opts='<option value="">— Seleccionar cliente —</option>'+todosClientes.map(c=>`<option value="${c.ID}">${c.Nombres} ${c.Apellidos} — ${c.Cedula}</option>`).join('');
+      document.getElementById('p-cliente').innerHTML=opts;
+    }
+  }catch(e){}
+}
+
+async function cargarCreditos(){
+  try{
+    const r=await fetch(`${EC.api}?accion=leer&tab=creditos`);
+    const j=await r.json();
+    if(j.ok) todosCreditos=j.data||[];
+  }catch(e){}
+}
+
+async function cargarPagos(){
+  EC.showLoading('Cargando cobros...');
+  try{
+    const r=await fetch(`${EC.api}?accion=leer&tab=pagos`);
+    const j=await r.json();
+    if(j.ok){
+      todosPagos=j.data||[];
+      calcularStats(todosPagos);
+      renderPagos(todosPagos);
+    }
+  }catch(e){ EC.toast('Error cargando cobros','error'); }
+  EC.hideLoading();
+}
+
+// ── STATS ────────────────────────────────────────────────────
+function calcularStats(pagos){
+  const hoy=EC.hoy(), mes=hoy.substr(0,7);
+  const hoyP=pagos.filter(p=>p.Fecha===hoy);
+  const mesP=pagos.filter(p=>(p.Fecha||'').startsWith(mes));
+  const tot=arr=>arr.reduce((a,p)=>a+(parseFloat(p.Capital||0)+parseFloat(p.Interes||0)),0);
+  document.getElementById('stat-hoy-total').textContent=EC.fmt(tot(hoyP));
+  document.getElementById('stat-hoy-ef').textContent=EC.fmt(tot(hoyP.filter(p=>p.Metodo==='efectivo')));
+  document.getElementById('stat-hoy-tr').textContent=EC.fmt(tot(hoyP.filter(p=>p.Metodo==='transferencia')));
+  document.getElementById('stat-mes').textContent=EC.fmt(tot(mesP));
+}
+
+// ── RENDER TABLA ─────────────────────────────────────────────
+function renderPagos(lista){
+  if(!lista.length){
+    document.getElementById('tbody-pagos').innerHTML='<tr><td colspan="9" class="empty-cell">No hay cobros en el período seleccionado</td></tr>';
+    return;
+  }
+  const sorted=[...lista].sort((a,b)=>b.Fecha?.localeCompare(a.Fecha||'')||0);
+  document.getElementById('tbody-pagos').innerHTML=sorted.map(p=>{
+    const tot=parseFloat(p.Capital||0)+parseFloat(p.Interes||0);
+    const metBadge=p.Metodo==='efectivo'?'b-green':p.Metodo==='transferencia'?'b-blue':'b-gray';
+    return `<tr>
+      <td class="mono">${p.Fecha||'—'}</td>
+      <td><strong>${p.ClienteNombre||'—'}</strong></td>
+      <td class="mono" style="color:var(--green)">${p.CreditoCodigo||'—'}</td>
+      <td class="mono">${EC.fmt(p.Capital||0)}</td>
+      <td class="mono" style="color:var(--orange)">${EC.fmt(p.Interes||0)}</td>
+      <td class="mono" style="color:var(--green);font-weight:600">${EC.fmt(tot)}</td>
+      <td><span class="badge ${metBadge}">${p.Metodo||'—'}</span></td>
+      <td class="mono" style="color:var(--text3)">${p.NumComprobante||'—'}</td>
+      <td>
+        <div class="td-actions">
+          <button class="btn btn-outline btn-xs" onclick="verComprobante('${p.ID}')">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            Comprobante
+          </button>
+          <button class="btn btn-red btn-xs solo-admin" onclick="confirmarEliminar('${p.ID}')">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+            Eliminar
+          </button>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+  EC.aplicarPermisos();
+}
+
+// ── FILTRAR POR FECHA ────────────────────────────────────────
+function filtrarPorFecha(){
+  const desde=document.getElementById('filtro-desde').value;
+  const hasta=document.getElementById('filtro-hasta').value;
+  const filtrado=todosPagos.filter(p=>(!desde||p.Fecha>=desde)&&(!hasta||p.Fecha<=hasta));
+  renderPagos(filtrado);
+}
+
+// ── MODAL PAGO ───────────────────────────────────────────────
+function abrirModalPago(){
+  ['p-capital','p-interes','p-total','p-comp','p-obs'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('p-cliente').value='';
+  document.getElementById('p-credito').innerHTML='<option value="">— Seleccionar crédito —</option>';
+  document.getElementById('p-fecha').value=EC.hoy();
+  document.getElementById('p-metodo').value='efectivo';
+  document.getElementById('modal-pago').classList.add('open');
+}
+function cerrarModalPago(){ document.getElementById('modal-pago').classList.remove('open'); }
+
+function cargarCreditosCliente(clienteId){
+  const sel=document.getElementById('p-credito');
+  sel.innerHTML='<option value="">— Seleccionar crédito —</option>';
+  if(!clienteId) return;
+  const creds=todosCreditos.filter(c=>c.ClienteID===clienteId&&c.Estado!=='cancelado');
+  creds.forEach(c=>{
+    const opt=document.createElement('option');
+    opt.value=c.ID;
+    opt.textContent=`${c.Codigo} — Saldo: ${EC.fmt(c.Saldo||0)}`;
+    opt.dataset.saldo=c.Saldo||0;
+    opt.dataset.codigo=c.Codigo||'';
+    sel.appendChild(opt);
+  });
+}
+
+function llenarDatosCredito(cid){
+  const cr=todosCreditos.find(c=>c.ID===cid);
+  if(!cr) return;
+  // Sugerir valores de la próxima cuota (si aplica)
+}
+
+function calcTotal(){
+  const cap=parseFloat(document.getElementById('p-capital').value)||0;
+  const int=parseFloat(document.getElementById('p-interes').value)||0;
+  document.getElementById('p-total').value=(cap+int).toFixed(2);
+}
+
+// ── GUARDAR PAGO ─────────────────────────────────────────────
+async function guardarPago(){
+  const clienteId=document.getElementById('p-cliente').value;
+  const creditoId=document.getElementById('p-credito').value;
+  const capital  =parseFloat(document.getElementById('p-capital').value)||0;
+  const interes  =parseFloat(document.getElementById('p-interes').value)||0;
+  const fecha    =document.getElementById('p-fecha').value||EC.hoy();
+  const metodo   =document.getElementById('p-metodo').value;
+  if(!clienteId||!creditoId){ EC.toast('Selecciona cliente y crédito','error'); return; }
+  if(!capital&&!interes){ EC.toast('Ingresa el monto a cobrar','error'); return; }
+
+  const cliente=todosClientes.find(c=>c.ID===clienteId)||{};
+  const credito=todosCreditos.find(c=>c.ID===creditoId)||{};
+  const total=capital+interes;
+  const nuevoSaldo=Math.max(0,parseFloat(credito.Saldo||0)-capital);
+  const numComp=document.getElementById('p-comp').value.trim();
+  const numPago='P-'+Date.now().toString().slice(-6);
+
+  const datos={
+    CreditoID     :creditoId,
+    CreditoCodigo :credito.Codigo||'',
+    ClienteID     :clienteId,
+    ClienteNombre :(cliente.Nombres||'')+' '+(cliente.Apellidos||''),
+    Fecha         :fecha,
+    Capital       :capital,
+    Interes       :interes,
+    Total         :total,
+    Metodo        :metodo,
+    NumComprobante:numComp||numPago,
+    Observaciones :document.getElementById('p-obs').value.trim(),
+    NumPago       :numPago,
+    RegistradoPor :EC.usuario.nombre,
+  };
+
+  EC.showLoading('Registrando cobro...');
+  try{
+    const r=await fetch(EC.api,{method:'POST',body:JSON.stringify({accion:'agregar',tab:'pagos',datos})});
+    const j=await r.json();
+    if(j.ok){
+      // Actualizar saldo del crédito
+      await fetch(EC.api,{method:'POST',body:JSON.stringify({accion:'actualizar',tab:'creditos',id:creditoId,datos:{Saldo:nuevoSaldo,Estado:nuevoSaldo<=0?'cancelado':'activo'}})});
+      cerrarModalPago();
+      await cargarCreditos();
+      await cargarPagos();
+      // Mostrar comprobante
+      pagoActual={...datos,ID:j.data?.ID||numPago,SaldoRestante:nuevoSaldo};
+      mostrarComprobante(pagoActual);
+      EC.toast('Cobro registrado exitosamente');
+    } else EC.toast('Error al registrar cobro','error');
+  }catch(e){ EC.toast('Error de conexión: '+e.message,'error'); }
+  EC.hideLoading();
+}
+
+// ── COMPROBANTE ──────────────────────────────────────────────
+function mostrarComprobante(p){
+  const metLabels={efectivo:'Efectivo',transferencia:'Transferencia bancaria',cheque:'Cheque',otro:'Otro'};
+  document.getElementById('cv-total').textContent   = EC.fmt(p.Total||0);
+  document.getElementById('cv-cliente').textContent = p.ClienteNombre||'—';
+  document.getElementById('cv-credito').textContent = p.CreditoCodigo||'—';
+  document.getElementById('cv-capital').textContent = EC.fmt(p.Capital||0);
+  document.getElementById('cv-interes').textContent = EC.fmt(p.Interes||0);
+  document.getElementById('cv-saldo').textContent   = EC.fmt(p.SaldoRestante||0);
+  document.getElementById('cv-fecha').textContent   = p.Fecha||EC.hoy();
+  document.getElementById('cv-metodo').textContent  = metLabels[p.Metodo]||p.Metodo||'—';
+  document.getElementById('cv-usuario').textContent = p.RegistradoPor||EC.usuario.nombre||'—';
+  document.getElementById('cv-num').textContent     = 'N° '+( p.NumComprobante||p.NumPago||'—');
+  const compRow=document.getElementById('cv-comp-row');
+  if(p.NumComprobante){ document.getElementById('cv-comp').textContent=p.NumComprobante; compRow.style.display=''; }
+  else compRow.style.display='none';
+  document.getElementById('modal-comprobante').classList.add('open');
+}
+
+function verComprobante(id){
+  const p=todosPagos.find(x=>x.ID===id);
+  if(!p) return;
+  const cr=todosCreditos.find(c=>c.ID===p.CreditoID)||{};
+  mostrarComprobante({...p,SaldoRestante:cr.Saldo||0,RegistradoPor:p.RegistradoPor||'—'});
+}
+
+function cerrarComprobante(){ document.getElementById('modal-comprobante').classList.remove('open'); }
+
+// ── DESCARGAR IMAGEN ─────────────────────────────────────────
+async function descargarImagen(){
+  const el=document.getElementById('comprobante-visual');
+  EC.showLoading('Generando imagen...');
+  try{
+    const canvas=await html2canvas(el,{scale:2,backgroundColor:'#ffffff',logging:false});
+    const link=document.createElement('a');
+    link.download=`comprobante-${document.getElementById('cv-num').textContent.replace('N° ','')}.png`;
+    link.href=canvas.toDataURL('image/png');
+    link.click();
+    EC.toast('Imagen descargada exitosamente');
+  }catch(e){ EC.toast('Error generando imagen: '+e.message,'error'); }
+  EC.hideLoading();
+}
+
+// ── DESCARGAR PDF ────────────────────────────────────────────
+async function descargarPDF(){
+  const el=document.getElementById('comprobante-visual');
+  EC.showLoading('Generando PDF...');
+  try{
+    const canvas=await html2canvas(el,{scale:2,backgroundColor:'#ffffff',logging:false});
+    const imgData=canvas.toDataURL('image/png');
+    const {jsPDF}=window.jspdf;
+    const pdf=new jsPDF({orientation:'portrait',unit:'mm',format:'a6'});
+    const pdfW=pdf.internal.pageSize.getWidth();
+    const pdfH=(canvas.height*pdfW)/canvas.width;
+    pdf.addImage(imgData,'PNG',0,0,pdfW,pdfH);
+    pdf.save(`comprobante-${document.getElementById('cv-num').textContent.replace('N° ','')}.pdf`);
+    EC.toast('PDF descargado exitosamente');
+  }catch(e){ EC.toast('Error generando PDF: '+e.message,'error'); }
+  EC.hideLoading();
+}
+
+// ── COMPARTIR WHATSAPP ────────────────────────────────────────
+async function compartirWhatsApp(){
+  const cliente = document.getElementById('cv-cliente').textContent;
+  const total   = document.getElementById('cv-total').textContent;
+  const fecha   = document.getElementById('cv-fecha').textContent;
+  const credito = document.getElementById('cv-credito').textContent;
+  const saldo   = document.getElementById('cv-saldo').textContent;
+  const num     = document.getElementById('cv-num').textContent;
+  const metodo  = document.getElementById('cv-metodo').textContent;
+
+  const texto = `✅ *COMPROBANTE DE PAGO*\n`+
+    `_Caja de Ahorro y Crédito Éxito Compartido_\n\n`+
+    `💰 *Total cobrado:* ${total}\n`+
+    `👤 *Cliente:* ${cliente}\n`+
+    `📋 *Crédito:* ${credito}\n`+
+    `💵 *Capital:* ${document.getElementById('cv-capital').textContent}\n`+
+    `📈 *Interés:* ${document.getElementById('cv-interes').textContent}\n`+
+    `💳 *Saldo restante:* ${saldo}\n`+
+    `📅 *Fecha:* ${fecha}\n`+
+    `🏦 *Método:* ${metodo}\n`+
+    `${num}\n\n`+
+    `_Gracias por su pago puntual_ 🙏`;
+
+  // Primero intentar compartir la imagen
+  try{
+    const el=document.getElementById('comprobante-visual');
+    const canvas=await html2canvas(el,{scale:2,backgroundColor:'#ffffff',logging:false});
+    canvas.toBlob(async blob=>{
+      if(navigator.share && navigator.canShare && navigator.canShare({files:[new File([blob],'comprobante.png',{type:'image/png'})]})){
+        await navigator.share({
+          title:'Comprobante de pago',
+          text:texto,
+          files:[new File([blob],'comprobante.png',{type:'image/png'})]
+        });
+      } else {
+        // Fallback: abrir WhatsApp con texto
+        const url=`https://wa.me/?text=${encodeURIComponent(texto)}`;
+        window.open(url,'_blank');
+      }
+    },'image/png');
+  }catch(e){
+    // Fallback: WhatsApp con texto
+    const url=`https://wa.me/?text=${encodeURIComponent(texto)}`;
+    window.open(url,'_blank');
+  }
+}
+
+// ── ELIMINAR ─────────────────────────────────────────────────
+function confirmarEliminar(id){
+  if(!EC.esAdmin){ EC.toast('Solo el administrador puede eliminar cobros','error'); return; }
+  pagoAEliminar=id;
+  document.getElementById('confirm-msg').textContent='¿Seguro que deseas eliminar este cobro? El saldo del crédito no se revertirá automáticamente.';
+  document.getElementById('modal-confirmar').classList.add('open');
+  document.getElementById('btn-confirmar-eliminar').onclick=ejecutarEliminar;
+}
+function cerrarConfirm(){ document.getElementById('modal-confirmar').classList.remove('open'); pagoAEliminar=null; }
+async function ejecutarEliminar(){
+  if(!pagoAEliminar) return;
+  EC.showLoading('Eliminando cobro...');
+  cerrarConfirm();
+  try{
+    const r=await fetch(EC.api,{method:'POST',body:JSON.stringify({accion:'actualizar',tab:'pagos',id:pagoAEliminar,datos:{Eliminado:true}})});
+    const j=await r.json();
+    if(j.ok){ await cargarPagos(); EC.toast('Cobro eliminado'); }
+    else EC.toast('Error al eliminar','error');
+  }catch(e){ EC.toast('Error de conexión','error'); }
+  EC.hideLoading();
+}
+
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){ cerrarModalPago(); cerrarComprobante(); cerrarConfirm(); EC.closeSidebar(); }
+});
+document.querySelectorAll('.modal-overlay').forEach(m=>{
+  m.addEventListener('click',e=>{ if(e.target===m){ cerrarModalPago(); cerrarComprobante(); cerrarConfirm(); } });
+});
+</script>
+</body>
+</html>
