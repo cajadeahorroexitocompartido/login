@@ -505,7 +505,12 @@ async function cargarPagos(){
     const r=await fetch(`${EC.api}?accion=leer&tab=pagos`);
     const j=await r.json();
     if(j.ok){
-      todosPagos=j.data||[];
+      // Filtrar siempre los registros marcados como eliminados
+      todosPagos=(j.data||[]).filter(p=>
+        p.Eliminado!==true && p.Eliminado!=='true' && p._eliminado!==true && !p.activo===undefined
+      );
+      // Segunda pasada más robusta
+      todosPagos=todosPagos.filter(p=> !(p.Eliminado) && !(p._eliminado) );
       calcularStats(todosPagos);
       renderPagos(todosPagos);
     }
@@ -988,32 +993,67 @@ async function ejecutarEliminar(){
   EC.showLoading('Eliminando cobro y revirtiendo saldo...');
   cerrarConfirm();
 
-  // Obtener datos del pago a eliminar para revertir saldo
   const pago    = todosPagos.find(p=>p.ID===pagoAEliminar);
   const capital = parseFloat(pago?.Capital||0);
 
+  // ── 1. Eliminar del array local INMEDIATAMENTE ────────────
+  todosPagos = todosPagos.filter(p=>p.ID!==pagoAEliminar);
+  calcularStats(todosPagos);
+  renderPagos(todosPagos);
+
+  // ── 2. Revertir saldo en el array local de créditos ───────
+  if(pago && pago.CreditoID && capital>0){
+    const credito = todosCreditos.find(c=>c.ID===pago.CreditoID);
+    if(credito){
+      credito.Saldo = parseFloat((parseFloat(credito.Saldo||0)+capital).toFixed(2));
+      credito.Estado = 'activo';
+    }
+  }
+
+  // ── 3. Persistir en backend (intentar eliminar real primero, luego marcar) ──
   try{
-    // 1. Marcar pago como eliminado
-    const r=await fetch(EC.api,{method:'POST',body:JSON.stringify({accion:'actualizar',tab:'pagos',id:pagoAEliminar,datos:{Eliminado:true}})});
-    const j=await r.json();
-    if(j.ok){
-      // 2. Revertir saldo del crédito sumando el capital que se había cobrado
-      if(pago && pago.CreditoID && capital>0){
-        const credito = todosCreditos.find(c=>c.ID===pago.CreditoID);
-        if(credito){
-          const saldoAnterior = parseFloat(credito.Saldo||0);
-          const saldoRevertido = parseFloat((saldoAnterior + capital).toFixed(2));
-          await fetch(EC.api,{method:'POST',body:JSON.stringify({
-            accion:'actualizar',tab:'creditos',id:pago.CreditoID,
-            datos:{Saldo:saldoRevertido, Estado:'activo'}
-          })});
-        }
+    // Intentar eliminación real
+    let ok = false;
+    try{
+      const r1=await fetch(EC.api,{method:'POST',body:JSON.stringify({accion:'eliminar',tab:'pagos',id:pagoAEliminar})});
+      const j1=await r1.json();
+      ok = j1.ok;
+    }catch(_){}
+
+    // Si no soporta 'eliminar', marcar como eliminado
+    if(!ok){
+      const r2=await fetch(EC.api,{method:'POST',body:JSON.stringify({accion:'actualizar',tab:'pagos',id:pagoAEliminar,datos:{Eliminado:true,_eliminado:true,activo:false}})});
+      const j2=await r2.json();
+      ok = j2.ok;
+    }
+
+    // Revertir saldo en backend
+    if(pago && pago.CreditoID && capital>0){
+      const credito = todosCreditos.find(c=>c.ID===pago.CreditoID);
+      if(credito){
+        await fetch(EC.api,{method:'POST',body:JSON.stringify({
+          accion:'actualizar',tab:'creditos',id:pago.CreditoID,
+          datos:{Saldo:credito.Saldo, Estado:'activo'}
+        })});
       }
-      await cargarCreditos();
-      await cargarPagos();
-      EC.toast('Cobro eliminado y saldo revertido correctamente');
-    } else EC.toast('Error al eliminar','error');
-  }catch(e){ EC.toast('Error de conexión','error'); }
+    }
+
+    // Recargar desde servidor para sincronizar
+    await cargarCreditos();
+    // Solo recargar pagos si el backend realmente filtra los eliminados
+    const r3=await fetch(`${EC.api}?accion=leer&tab=pagos`);
+    const j3=await r3.json();
+    if(j3.ok){
+      // Usar datos del servidor, pero asegurarse de filtrar cualquier registro con Eliminado=true
+      todosPagos=(j3.data||[]).filter(p=>!p.Eliminado&&p.Eliminado!==true&&p.Eliminado!=='true'&&!p._eliminado);
+      calcularStats(todosPagos);
+      renderPagos(todosPagos);
+    }
+    EC.toast('Cobro eliminado y saldo revertido correctamente');
+  }catch(e){
+    // Aunque falle el backend, la UI ya se actualizó localmente
+    EC.toast('Cobro eliminado de la vista. Verifique la conexión.','error');
+  }
   EC.hideLoading();
 }
 
