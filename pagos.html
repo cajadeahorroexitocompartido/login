@@ -175,7 +175,7 @@ tbody tr:hover td{background:rgba(255,255,255,.02)}
   Descripción: Cobros y pagos — Registro de cobros con múltiples formas de pago, comprobante descargable (PNG/PDF) y envío por WhatsApp.
   ------------------------------------------------------------
   🔗 ENLACE APP SCRIPT (BASE DE DATOS):
-     https://script.google.com/macros/s/AKfycbwvC9zB3BI_XlHhFCGRaAD3A7zWVpZZQRN9CL0Er3gMoARgcFotSB6QBLjEHjCjVlv_/exec
+     https://script.google.com/macros/s/AKfycbxLsaiL7CJBCC7frd8FuTeCLHRC1qZFKgu1HN6fy6-gJmtDOg9v9YzPHAQ1mfpOS_Ka/exec
   ------------------------------------------------------------
   ⚠️  Si necesitas cambiar la URL de la base de datos,
       busca la línea anterior y reemplaza la URL.
@@ -1022,7 +1022,7 @@ function cerrarConfirm(){
 async function ejecutarEliminar(){
   if(!pagoAEliminar) return;
 
-  // Guardar referencia antes de cerrar (cerrarConfirm pone pagoAEliminar=null)
+  // Guardar datos antes de limpiar la referencia
   const idAEliminar = pagoAEliminar;
   const pago        = todosPagos.find(p=>p.ID===idAEliminar);
   const capital     = parseFloat(pago?.Capital||0);
@@ -1035,34 +1035,50 @@ async function ejecutarEliminar(){
   EC.showLoading('Eliminando cobro y revirtiendo saldo...');
 
   try{
-    // ── PASO 1: Eliminar el pago del Sheet ──────────────────
-    // Usamos GET con parámetros para garantizar que Apps Script lo reciba
-    const urlEliminar = `${EC.api}?accion=eliminar&tab=pagos&id=${encodeURIComponent(idAEliminar)}&capital=${capital}&creditoId=${encodeURIComponent(creditoId)}`;
-    const r1 = await fetch(urlEliminar);
+    // ── PASO 1: Marcar pago como ELIMINADO en el Sheet ──────
+    // Google Apps Script no permite borrar filas por GET.
+    // Marcamos Eliminado=SI y el backend lo filtra en todas las lecturas.
+    const r1 = await fetch(EC.api, {
+      method : 'POST',
+      headers: {'Content-Type':'text/plain'},
+      body   : JSON.stringify({
+        accion : 'actualizar',
+        tab    : 'pagos',
+        id     : idAEliminar,
+        datos  : { Eliminado: 'SI' }
+      })
+    });
     const j1 = await r1.json();
-    console.log('Respuesta eliminar:', j1);
+    console.log('Marcar eliminado:', j1);
 
-    // ── PASO 2: Revertir saldo del crédito en el Sheet ──────
-    // Lo hace el Apps Script automáticamente, pero lo reforzamos aquí
+    // ── PASO 2: Revertir saldo del crédito ──────────────────
     if(creditoId && capital > 0){
       const credito = todosCreditos.find(c=>c.ID===creditoId);
       if(credito){
         const nuevoSaldo = parseFloat((parseFloat(credito.Saldo||0) + capital).toFixed(2));
-        await fetch(EC.api, {
-          method:'POST',
-          body: JSON.stringify({
-            accion: 'actualizar',
-            tab   : 'creditos',
-            id    : creditoId,
-            datos : { Saldo: nuevoSaldo, Estado: 'activo' }
+        const r2 = await fetch(EC.api, {
+          method : 'POST',
+          headers: {'Content-Type':'text/plain'},
+          body   : JSON.stringify({
+            accion : 'actualizar',
+            tab    : 'creditos',
+            id     : creditoId,
+            datos  : { Saldo: nuevoSaldo, Estado: 'activo' }
           })
         });
+        const j2 = await r2.json();
+        console.log('Revertir saldo:', j2);
       }
     }
 
-    // ── PASO 3: Recargar todo desde el servidor ─────────────
-    await cargarCreditos();
-    await cargarPagos();
+    // ── PASO 3: Actualizar UI inmediatamente ─────────────────
+    // Quitar de la lista local sin esperar al servidor
+    todosPagos = todosPagos.filter(p => p.ID !== idAEliminar);
+    calcularStats(todosPagos);
+    renderPagos(todosPagos);
+
+    // ── PASO 4: Recargar desde servidor para sincronizar ─────
+    await Promise.all([cargarCreditos(), cargarPagos()]);
 
     EC.toast('Cobro eliminado y saldo revertido correctamente');
 
