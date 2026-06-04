@@ -518,12 +518,11 @@ async function cargarPagos(){
     const r=await fetch(`${EC.api}?accion=leer&tab=pagos`);
     const j=await r.json();
     if(j.ok){
-      // Filtrar siempre los registros marcados como eliminados
-      todosPagos=(j.data||[]).filter(p=>
-        p.Eliminado!==true && p.Eliminado!=='true' && p._eliminado!==true && !p.activo===undefined
-      );
-      // Segunda pasada más robusta
-      todosPagos=todosPagos.filter(p=> !(p.Eliminado) && !(p._eliminado) );
+      // Filtrar solo registros marcados como eliminados (el Apps Script ya filtra, esto es por si acaso)
+      todosPagos=(j.data||[]).filter(p=>{
+        const elim = p.Eliminado;
+        return elim !== true && elim !== 'true' && elim !== 'TRUE' && elim !== 1 && elim !== '1';
+      });
       calcularStats(todosPagos);
       renderPagos(todosPagos);
     }
