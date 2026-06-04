@@ -518,11 +518,8 @@ async function cargarPagos(){
     const r=await fetch(`${EC.api}?accion=leer&tab=pagos`);
     const j=await r.json();
     if(j.ok){
-      // Filtrar solo registros marcados como eliminados (el Apps Script ya filtra, esto es por si acaso)
-      todosPagos=(j.data||[]).filter(p=>{
-        const elim = p.Eliminado;
-        return elim !== true && elim !== 'true' && elim !== 'TRUE' && elim !== 1 && elim !== '1';
-      });
+      // El Apps Script ya filtra los eliminados del lado del servidor
+      todosPagos = j.data || [];
       calcularStats(todosPagos);
       renderPagos(todosPagos);
     }
@@ -1017,74 +1014,68 @@ function confirmarEliminar(id){
   document.getElementById('btn-confirmar-eliminar').onclick = ejecutarEliminar;
 }
 
-function cerrarConfirm(){ document.getElementById('modal-confirmar').classList.remove('open'); pagoAEliminar=null; }
+function cerrarConfirm(){
+  document.getElementById('modal-confirmar').classList.remove('open');
+  pagoAEliminar = null;
+}
 
 async function ejecutarEliminar(){
   if(!pagoAEliminar) return;
+
+  // Guardar referencia antes de cerrar (cerrarConfirm pone pagoAEliminar=null)
+  const idAEliminar = pagoAEliminar;
+  const pago        = todosPagos.find(p=>p.ID===idAEliminar);
+  const capital     = parseFloat(pago?.Capital||0);
+  const creditoId   = pago?.CreditoID||'';
+
+  // Cerrar modal
+  document.getElementById('modal-confirmar').classList.remove('open');
+  pagoAEliminar = null;
+
   EC.showLoading('Eliminando cobro y revirtiendo saldo...');
-  cerrarConfirm();
 
-  const pago    = todosPagos.find(p=>p.ID===pagoAEliminar);
-  const capital = parseFloat(pago?.Capital||0);
-
-  // ── 1. Eliminar del array local INMEDIATAMENTE ────────────
-  todosPagos = todosPagos.filter(p=>p.ID!==pagoAEliminar);
-  calcularStats(todosPagos);
-  renderPagos(todosPagos);
-
-  // ── 2. Revertir saldo en el array local de créditos ───────
-  if(pago && pago.CreditoID && capital>0){
-    const credito = todosCreditos.find(c=>c.ID===pago.CreditoID);
-    if(credito){
-      credito.Saldo = parseFloat((parseFloat(credito.Saldo||0)+capital).toFixed(2));
-      credito.Estado = 'activo';
-    }
-  }
-
-  // ── 3. Persistir en backend (intentar eliminar real primero, luego marcar) ──
   try{
-    // Intentar eliminación real
-    let ok = false;
-    try{
-      const r1=await fetch(EC.api,{method:'POST',body:JSON.stringify({accion:'eliminar',tab:'pagos',id:pagoAEliminar,capital:capital,creditoId:pago?.CreditoID||''})});
-      const j1=await r1.json();
-      ok = j1.ok;
-    }catch(_){}
+    // ── PASO 1: Eliminar el pago del Sheet ──────────────────
+    const r1 = await fetch(EC.api, {
+      method:'POST',
+      body: JSON.stringify({
+        accion   : 'eliminar',
+        tab      : 'pagos',
+        id       : idAEliminar,
+        capital  : capital,
+        creditoId: creditoId
+      })
+    });
+    const j1 = await r1.json();
 
-    // Si no soporta 'eliminar', marcar como eliminado
-    if(!ok){
-      const r2=await fetch(EC.api,{method:'POST',body:JSON.stringify({accion:'actualizar',tab:'pagos',id:pagoAEliminar,datos:{Eliminado:true,_eliminado:true,activo:false}})});
-      const j2=await r2.json();
-      ok = j2.ok;
-    }
-
-    // Revertir saldo en backend
-    if(pago && pago.CreditoID && capital>0){
-      const credito = todosCreditos.find(c=>c.ID===pago.CreditoID);
+    // ── PASO 2: Revertir saldo del crédito en el Sheet ──────
+    // Lo hace el Apps Script automáticamente, pero lo reforzamos aquí
+    if(creditoId && capital > 0){
+      const credito = todosCreditos.find(c=>c.ID===creditoId);
       if(credito){
-        await fetch(EC.api,{method:'POST',body:JSON.stringify({
-          accion:'actualizar',tab:'creditos',id:pago.CreditoID,
-          datos:{Saldo:credito.Saldo, Estado:'activo'}
-        })});
+        const nuevoSaldo = parseFloat((parseFloat(credito.Saldo||0) + capital).toFixed(2));
+        await fetch(EC.api, {
+          method:'POST',
+          body: JSON.stringify({
+            accion: 'actualizar',
+            tab   : 'creditos',
+            id    : creditoId,
+            datos : { Saldo: nuevoSaldo, Estado: 'activo' }
+          })
+        });
       }
     }
 
-    // Recargar desde servidor para sincronizar
+    // ── PASO 3: Recargar todo desde el servidor ─────────────
     await cargarCreditos();
-    // Solo recargar pagos si el backend realmente filtra los eliminados
-    const r3=await fetch(`${EC.api}?accion=leer&tab=pagos`);
-    const j3=await r3.json();
-    if(j3.ok){
-      // Usar datos del servidor, pero asegurarse de filtrar cualquier registro con Eliminado=true
-      todosPagos=(j3.data||[]).filter(p=>!p.Eliminado&&p.Eliminado!==true&&p.Eliminado!=='true'&&!p._eliminado);
-      calcularStats(todosPagos);
-      renderPagos(todosPagos);
-    }
+    await cargarPagos();
+
     EC.toast('Cobro eliminado y saldo revertido correctamente');
+
   }catch(e){
-    // Aunque falle el backend, la UI ya se actualizó localmente
-    EC.toast('Cobro eliminado de la vista. Verifique la conexión.','error');
+    EC.toast('Error al eliminar: '+e.message,'error');
   }
+
   EC.hideLoading();
 }
 
