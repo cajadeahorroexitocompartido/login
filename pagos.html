@@ -175,7 +175,7 @@ tbody tr:hover td{background:rgba(255,255,255,.02)}
   Descripción: Cobros y pagos — Registro de cobros con múltiples formas de pago, comprobante descargable (PNG/PDF) y envío por WhatsApp.
   ------------------------------------------------------------
   🔗 ENLACE APP SCRIPT (BASE DE DATOS):
-     https://script.google.com/macros/s/AKfycbzffZlfscfcQ8dr5VTE6v3v7N-zIusxodt863ldHt4CmaTOPbJ1tTwSiyW45BDmirJr/exec
+     https://script.google.com/macros/s/AKfycbwvC9zB3BI_XlHhFCGRaAD3A7zWVpZZQRN9CL0Er3gMoARgcFotSB6QBLjEHjCjVlv_/exec
   ------------------------------------------------------------
   ⚠️  Si necesitas cambiar la URL de la base de datos,
       busca la línea anterior y reemplaza la URL.
@@ -1036,17 +1036,11 @@ async function ejecutarEliminar(){
 
   try{
     // ── PASO 1: Eliminar el pago del Sheet ──────────────────
-    const r1 = await fetch(EC.api, {
-      method:'POST',
-      body: JSON.stringify({
-        accion   : 'eliminar',
-        tab      : 'pagos',
-        id       : idAEliminar,
-        capital  : capital,
-        creditoId: creditoId
-      })
-    });
+    // Usamos GET con parámetros para garantizar que Apps Script lo reciba
+    const urlEliminar = `${EC.api}?accion=eliminar&tab=pagos&id=${encodeURIComponent(idAEliminar)}&capital=${capital}&creditoId=${encodeURIComponent(creditoId)}`;
+    const r1 = await fetch(urlEliminar);
     const j1 = await r1.json();
+    console.log('Respuesta eliminar:', j1);
 
     // ── PASO 2: Revertir saldo del crédito en el Sheet ──────
     // Lo hace el Apps Script automáticamente, pero lo reforzamos aquí
