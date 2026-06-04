@@ -168,6 +168,19 @@ tbody tr:hover td{background:rgba(255,255,255,.02)}
 </head>
 <body>
 <script src="auth.js"></script>
+
+<!-- ============================================================
+  ÉXITO COMPARTIDO — Sistema de Gestión Financiera
+  Archivo: pagos.html
+  Descripción: Cobros y pagos — Registro de cobros con múltiples formas de pago, comprobante descargable (PNG/PDF) y envío por WhatsApp.
+  ------------------------------------------------------------
+  🔗 ENLACE APP SCRIPT (BASE DE DATOS):
+     https://script.google.com/macros/s/AKfycbzffZlfscfcQ8dr5VTE6v3v7N-zIusxodt863ldHt4CmaTOPbJ1tTwSiyW45BDmirJr/exec
+  ------------------------------------------------------------
+  ⚠️  Si necesitas cambiar la URL de la base de datos,
+      busca la línea anterior y reemplaza la URL.
+  ============================================================ -->
+
 <div class="bg-grid"></div>
 <div class="loading-overlay" id="loading-overlay"><div class="loading-spinner"></div><div class="loading-text" id="loading-text">Cargando...</div></div>
 <div class="overlay" id="overlay" onclick="EC.closeSidebar()"></div>
@@ -635,29 +648,45 @@ function alSeleccionarCliente(clienteId){
 
   creditoSeleccionado = credito;
 
-  // Calcular cuota mensual: si tiene campo Cuota se usa, sino capital/plazo + interés
-  const saldo    = parseFloat(credito.Saldo||0);
-  const plazo    = parseInt(credito.Plazo||1);
-  const tasa     = parseFloat(credito.TasaInteres||0); // % mensual
-  const monto    = parseFloat(credito.Monto||saldo);
+  // Calcular cuota según tabla de amortización almacenada en el crédito
+  const saldo      = parseFloat(credito.Saldo||0);
+  const plazo      = parseInt(credito.NumCuotas||1);          // ← correcto
+  const tasa       = parseFloat(credito.TasaMensual||0);      // ← correcto
+  const monto      = parseFloat(credito.MontoOriginal||saldo); // ← correcto
+  const frecuencia = credito.Frecuencia||'mensual';
+  const tabla      = credito.Tabla||'francesa';
 
-  // Cuota fija: si existe en el registro, usarla; si no, calcular
+  // Factor de frecuencia (mensual=1, quincenal=2, semanal=4, diario=30)
+  const _factores  = {mensual:1, quincenal:2, semanal:4, diario:30};
+  const _factor    = _factores[frecuencia]||1;
+  const tasaPer    = tasa / _factor / 100;  // tasa por período
+
+  // Calcular cuota correctamente según tabla de amortización
   let cuotaTotal, cuotaCapital, cuotaInteres;
-  if(credito.Cuota && parseFloat(credito.Cuota)>0){
-    cuotaTotal   = parseFloat(credito.Cuota);
-    cuotaInteres = parseFloat((saldo * tasa / 100).toFixed(2));
-    cuotaCapital = parseFloat((cuotaTotal - cuotaInteres).toFixed(2));
+  if(tabla === 'francesa'){
+    // Cuota fija: misma en todos los períodos
+    const cuotaFija = tasaPer === 0
+      ? monto / plazo
+      : monto * (tasaPer * Math.pow(1+tasaPer, plazo)) / (Math.pow(1+tasaPer, plazo) - 1);
+    cuotaInteres = parseFloat((saldo * tasaPer).toFixed(2));
+    cuotaCapital = parseFloat((cuotaFija - cuotaInteres).toFixed(2));
+    cuotaTotal   = parseFloat(cuotaFija.toFixed(2));
     if(cuotaCapital < 0) cuotaCapital = 0;
-  } else {
-    // Cuota = capital/plazo + interés sobre saldo
+  } else if(tabla === 'alemana'){
+    // Capital fijo, interés sobre saldo
     cuotaCapital = parseFloat((monto / plazo).toFixed(2));
-    cuotaInteres = parseFloat((saldo * tasa / 100).toFixed(2));
+    cuotaInteres = parseFloat((saldo * tasaPer).toFixed(2));
+    cuotaTotal   = parseFloat((cuotaCapital + cuotaInteres).toFixed(2));
+  } else {
+    // Americana: solo interés, capital al vencimiento
+    cuotaInteres = parseFloat((monto * tasaPer).toFixed(2));
+    cuotaCapital = saldo <= cuotaInteres ? saldo : 0;
     cuotaTotal   = parseFloat((cuotaCapital + cuotaInteres).toFixed(2));
   }
 
   // Si el saldo es menor que la cuota de capital → es la última cuota
-  if(saldo < cuotaCapital){
-    cuotaCapital = saldo;
+  if(saldo > 0 && saldo < cuotaCapital){
+    cuotaCapital = parseFloat(saldo.toFixed(2));
     cuotaTotal   = parseFloat((cuotaCapital + cuotaInteres).toFixed(2));
   }
 
@@ -701,7 +730,10 @@ function calcAbono(){
   const monto = parseFloat(document.getElementById('p-abono').value)||0;
   if(!monto || !creditoSeleccionado){ return; }
   const saldo   = parseFloat(creditoSeleccionado.Saldo||0);
-  const tasa    = parseFloat(creditoSeleccionado.TasaInteres||0);
+  const tasa_ab   = parseFloat(creditoSeleccionado.TasaMensual||0);  // ← correcto
+  const frec_ab   = creditoSeleccionado.Frecuencia||'mensual';
+  const fact_ab   = {mensual:1,quincenal:2,semanal:4,diario:30}[frec_ab]||1;
+  const tasa      = tasa_ab / fact_ab / 100;  // tasa por período
   // Proporcional: primero interés del saldo, luego el resto a capital
   const interes = parseFloat((saldo * tasa / 100).toFixed(2));
   const capAbono = monto > interes
@@ -1015,7 +1047,7 @@ async function ejecutarEliminar(){
     // Intentar eliminación real
     let ok = false;
     try{
-      const r1=await fetch(EC.api,{method:'POST',body:JSON.stringify({accion:'eliminar',tab:'pagos',id:pagoAEliminar})});
+      const r1=await fetch(EC.api,{method:'POST',body:JSON.stringify({accion:'eliminar',tab:'pagos',id:pagoAEliminar,capital:capital,creditoId:pago?.CreditoID||''})});
       const j1=await r1.json();
       ok = j1.ok;
     }catch(_){}

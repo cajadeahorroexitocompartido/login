@@ -1,4 +1,15 @@
 // ============================================================
+//  ÉXITO COMPARTIDO — Sistema de Gestión Financiera
+//  Archivo: auth.js
+//  Descripción: Seguridad compartida — Se incluye en TODAS las páginas. Verifica sesión activa, maneja permisos por rol y expone funciones globales (EC.*).
+//  ----------------------------------------------------------
+//  🔗 ENLACE APP SCRIPT (BASE DE DATOS):
+//     https://script.google.com/macros/s/AKfycbzffZlfscfcQ8dr5VTE6v3v7N-zIusxodt863ldHt4CmaTOPbJ1tTwSiyW45BDmirJr/exec
+//  ----------------------------------------------------------
+//  ⚠️  Si necesitas cambiar la URL de la base de datos,
+//      busca la constante API_URL y reemplaza el valor.
+// ============================================================
+// ============================================================
 // auth.js — Seguridad compartida para todas las páginas
 // Todas las páginas del sistema deben incluir este script
 // PRIMERO antes de cualquier otro código
