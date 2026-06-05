@@ -518,8 +518,11 @@ async function cargarPagos(){
     const r=await fetch(`${EC.api}?accion=leer&tab=pagos`);
     const j=await r.json();
     if(j.ok){
-      // El Apps Script ya filtra los eliminados del lado del servidor
-      todosPagos = j.data || [];
+      // Filtrar en el navegador: solo mostrar pagos con Estado != eliminado
+      todosPagos = (j.data || []).filter(p => {
+        const est = String(p.Estado||'activo').toLowerCase().trim();
+        return est !== 'eliminado';
+      });
       calcularStats(todosPagos);
       renderPagos(todosPagos);
     }
@@ -881,6 +884,7 @@ async function guardarPago(){
     Observaciones : document.getElementById('p-obs').value.trim(),
     NumPago       : numPago,
     RegistradoPor : EC.usuario.nombre,
+    Estado        : 'activo',
   };
 
   EC.showLoading('Registrando cobro...');
@@ -1045,7 +1049,7 @@ async function ejecutarEliminar(){
         accion : 'actualizar',
         tab    : 'pagos',
         id     : idAEliminar,
-        datos  : { Eliminado: 'SI' }
+        datos  : { Estado: 'eliminado' }
       })
     });
     const j1 = await r1.json();
@@ -1076,13 +1080,10 @@ async function ejecutarEliminar(){
     calcularStats(todosPagos);
     renderPagos(todosPagos);
 
-    // ── PASO 4: Recargar créditos (para mostrar saldo revertido) ──
+    // ── PASO 4: Recargar créditos para mostrar saldo revertido ────
     await cargarCreditos();
 
-    // ── PASO 5: Recargar pagos con espera para que el Sheet actualice ──
-    // Esperamos 2 segundos antes de recargar para que Google Sheets
-    // termine de procesar la actualización
-    await new Promise(resolve => setTimeout(resolve, 2000));
+    // ── PASO 5: Recargar pagos (el filtro de Estado hace el trabajo) ──
     await cargarPagos();
 
     EC.toast('Cobro eliminado y saldo revertido correctamente');
