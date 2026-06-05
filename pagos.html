@@ -731,7 +731,7 @@ function calcAbono(){
   const fact_ab   = {mensual:1,quincenal:2,semanal:4,diario:30}[frec_ab]||1;
   const tasa      = tasa_ab / fact_ab / 100;  // tasa por período
   // Proporcional: primero interés del saldo, luego el resto a capital
-  const interes = parseFloat((saldo * tasa / 100).toFixed(2));
+  const interes = parseFloat((saldo * tasa).toFixed(2));  // tasa ya está en decimal
   const capAbono = monto > interes
     ? parseFloat((monto - interes).toFixed(2))
     : 0;
@@ -1071,14 +1071,19 @@ async function ejecutarEliminar(){
       }
     }
 
-    // ── PASO 3: Actualizar UI inmediatamente ─────────────────
-    // Quitar de la lista local sin esperar al servidor
+    // ── PASO 3: Quitar de lista local INMEDIATAMENTE ──────────
     todosPagos = todosPagos.filter(p => p.ID !== idAEliminar);
     calcularStats(todosPagos);
     renderPagos(todosPagos);
 
-    // ── PASO 4: Recargar desde servidor para sincronizar ─────
-    await Promise.all([cargarCreditos(), cargarPagos()]);
+    // ── PASO 4: Recargar créditos (para mostrar saldo revertido) ──
+    await cargarCreditos();
+
+    // ── PASO 5: Recargar pagos con espera para que el Sheet actualice ──
+    // Esperamos 2 segundos antes de recargar para que Google Sheets
+    // termine de procesar la actualización
+    await new Promise(resolve => setTimeout(resolve, 2000));
+    await cargarPagos();
 
     EC.toast('Cobro eliminado y saldo revertido correctamente');
 
