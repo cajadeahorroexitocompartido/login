@@ -215,10 +215,22 @@ document.getElementById('fecha-hoy').textContent = new Date().toLocaleDateString
 async function cargarDashboard(){
   EC.showLoading('Cargando dashboard...');
   try{
-    const r = await fetch(`${EC.api}?accion=dashboard`);
-    const j = await r.json();
-    if(j.ok && j.data){
-      const d = j.data;
+    // Cargar dashboard y pagos del mes en paralelo
+    const mes = EC.hoy().substr(0,7);
+    const [rDash, rPagosMes] = await Promise.all([
+      fetch(`${EC.api}?accion=dashboard`),
+      fetch(`${EC.api}?accion=leer&tab=pagos`)
+    ]);
+    const jDash = await rDash.json();
+    const jPagos = await rPagosMes.json();
+
+    // Todos los pagos del mes filtrados por eliminados localmente
+    const todosPagosMes = PagosEliminados.filtrar(jPagos.data||[])
+      .filter(p=>String(p.Fecha||'').startsWith(mes));
+    const totalMes = todosPagosMes.reduce((a,p)=>a+(+p.Capital||0)+(+p.Interes||0),0);
+
+    if(jDash.ok && jDash.data){
+      const d = jDash.data;
       // Recalcular cobros hoy excluyendo eliminados
       const _pagosHoy = PagosEliminados.filtrar(d.ultPagos||[]).filter(p=>p.Fecha===EC.hoy());
       const _cobrosHoy = _pagosHoy.reduce((a,p)=>a+(+p.Capital||0)+(+p.Interes||0),0);
@@ -233,7 +245,8 @@ async function cargarDashboard(){
       document.getElementById('kpi-mora-val').textContent   = EC.fmt(d.moraMonto||0)+' en riesgo';
       document.getElementById('kpi-capital').textContent    = EC.fmt(d.capitalSocial||0);
       document.getElementById('kpi-socios-n').textContent   = (d.totalSocios||0)+' socios activos';
-      document.getElementById('kpi-mes').textContent        = EC.fmt(d.pagosMesTotal||0);
+      // Usar el total del mes calculado localmente (ya excluye eliminados)
+      document.getElementById('kpi-mes').textContent        = EC.fmt(totalMes);
       document.getElementById('badge-mora').textContent     = d.enMora||0;
 
       const pagos = PagosEliminados.filtrar(d.ultPagos||[]).slice(0,6);
