@@ -91,6 +91,7 @@ tbody tr:hover td{background:rgba(255,255,255,.02)}
 
 <!-- AUTH: se verifica ANTES de mostrar nada -->
 <script src="auth.js"></script>
+<script src="pagos_eliminados.js"></script>
 
 <!-- ============================================================
   ÉXITO COMPARTIDO — Sistema de Gestión Financiera
@@ -218,9 +219,13 @@ async function cargarDashboard(){
     const j = await r.json();
     if(j.ok && j.data){
       const d = j.data;
-      document.getElementById('kpi-cobros-hoy').textContent = EC.fmt(d.cobrosHoy);
-      document.getElementById('kpi-cobros-n').textContent   = (d.ultPagos||[]).filter(p=>p.Fecha===EC.hoy()).length+' pagos hoy';
-      document.getElementById('kpi-trans-hoy').textContent  = EC.fmt(d.transHoy||0);
+      // Recalcular cobros hoy excluyendo eliminados
+      const _pagosHoy = PagosEliminados.filtrar(d.ultPagos||[]).filter(p=>p.Fecha===EC.hoy());
+      const _cobrosHoy = _pagosHoy.reduce((a,p)=>a+(+p.Capital||0)+(+p.Interes||0),0);
+      const _transHoy  = _pagosHoy.filter(p=>(p.Metodo||'').includes('transferencia')).reduce((a,p)=>a+(+p.Capital||0)+(+p.Interes||0),0);
+      document.getElementById('kpi-cobros-hoy').textContent = EC.fmt(_cobrosHoy);
+      document.getElementById('kpi-cobros-n').textContent   = _pagosHoy.length+' pagos hoy';
+      document.getElementById('kpi-trans-hoy').textContent  = EC.fmt(_transHoy);
       document.getElementById('kpi-trans-n').textContent    = (d.ultPagos||[]).filter(p=>p.Metodo==='transferencia'&&p.Fecha===EC.hoy()).length+' operaciones';
       document.getElementById('kpi-creditos').textContent   = d.creditosActivos||0;
       document.getElementById('kpi-cartera').textContent    = 'Cartera: '+EC.fmt(d.carteraTotal||0);
@@ -231,7 +236,7 @@ async function cargarDashboard(){
       document.getElementById('kpi-mes').textContent        = EC.fmt(d.pagosMesTotal||0);
       document.getElementById('badge-mora').textContent     = d.enMora||0;
 
-      const pagos = (d.ultPagos||[]).slice(0,6);
+      const pagos = PagosEliminados.filtrar(d.ultPagos||[]).slice(0,6);
       document.getElementById('tbody-recientes').innerHTML = pagos.length
         ? pagos.map(p=>`<tr><td>${p.ClienteNombre||'—'}</td><td class="mono">${EC.fmt((+p.Capital||0)+(+p.Interes||0))}</td><td><span class="badge ${p.Metodo==='efectivo'?'b-green':'b-blue'}">${p.Metodo||'—'}</span></td><td class="mono">${p.Fecha||'—'}</td></tr>`).join('')
         : '<tr><td colspan="4" class="empty-cell">Sin cobros registrados hoy</td></tr>';

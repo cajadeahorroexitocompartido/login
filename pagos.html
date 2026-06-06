@@ -168,6 +168,7 @@ tbody tr:hover td{background:rgba(255,255,255,.02)}
 </head>
 <body>
 <script src="auth.js"></script>
+<script src="pagos_eliminados.js"></script>
 
 <!-- ============================================================
   ÉXITO COMPARTIDO — Sistema de Gestión Financiera
@@ -518,11 +519,8 @@ async function cargarPagos(){
     const r=await fetch(`${EC.api}?accion=leer&tab=pagos`);
     const j=await r.json();
     if(j.ok){
-      // Filtrar en el navegador: solo mostrar pagos con Estado != eliminado
-      todosPagos = (j.data || []).filter(p => {
-        const est = String(p.Estado||'activo').toLowerCase().trim();
-        return est !== 'eliminado';
-      });
+      // Filtrar pagos eliminados localmente (lista negra en localStorage)
+      todosPagos = PagosEliminados.filtrar(j.data || []);
       calcularStats(todosPagos);
       renderPagos(todosPagos);
     }
@@ -1036,6 +1034,9 @@ async function ejecutarEliminar(){
   document.getElementById('modal-confirmar').classList.remove('open');
   pagoAEliminar = null;
 
+  // Agregar a lista negra local INMEDIATAMENTE
+  PagosEliminados.agregar(idAEliminar);
+
   EC.showLoading('Eliminando cobro y revirtiendo saldo...');
 
   try{
@@ -1075,8 +1076,8 @@ async function ejecutarEliminar(){
       }
     }
 
-    // ── PASO 3: Quitar de lista local INMEDIATAMENTE ──────────
-    todosPagos = todosPagos.filter(p => p.ID !== idAEliminar);
+    // ── PASO 3: Quitar de UI inmediatamente (ya está en lista negra) ──
+    todosPagos = PagosEliminados.filtrar(todosPagos);
     calcularStats(todosPagos);
     renderPagos(todosPagos);
 
