@@ -304,6 +304,8 @@ tbody tr:hover td{background:rgba(255,255,255,.02)}
         <div class="field"><label>Frecuencia</label><select id="n-frec" onchange="calcNuevo()"><option value="mensual">Mensual</option><option value="quincenal">Quincenal</option><option value="semanal">Semanal</option><option value="diario">Diario</option></select></div>
         <div class="field"><label>Tabla amortización</label><select id="n-tabla" onchange="calcNuevo()"><option value="francesa">Francesa (cuota fija)</option><option value="alemana">Alemana (capital fijo)</option><option value="americana">Americana</option></select></div>
         <div class="field"><label>Fecha de inicio</label><input type="date" id="n-fecha"></div>
+        <div class="field"><label>Tasa de mora (% diario)</label><input type="number" id="n-mora" placeholder="0.00 (opcional)" step="0.01" min="0" title="% diario sobre el monto de la cuota vencida"></div>
+        <div class="field col-2"><label>Observaciones</label><input type="text" id="n-obs" placeholder="Notas del crédito (opcional)"></div>
       </div>
       <div class="resumen-grid">
         <div class="res-box hl"><div class="res-label">Cuota a pagar</div><div class="res-val" style="color:var(--green)" id="rn-cuota">$0.00</div></div>
@@ -919,6 +921,8 @@ async function guardarCredito(){
     Frecuencia    :document.getElementById('n-frec').value,
     Tabla         :document.getElementById('n-tabla').value,
     FechaInicio   :document.getElementById('n-fecha').value||EC.hoy(),
+    TasaMora      :parseFloat(document.getElementById('n-mora')?.value||0)||0,
+    Observaciones :document.getElementById('n-obs')?.value?.trim()||'',
     Estado        :'activo',
   };
   EC.showLoading('Registrando crédito...');

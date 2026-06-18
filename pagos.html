@@ -176,7 +176,7 @@ tbody tr:hover td{background:rgba(255,255,255,.02)}
   Descripción: Cobros y pagos — Registro de cobros con múltiples formas de pago, comprobante descargable (PNG/PDF) y envío por WhatsApp.
   ------------------------------------------------------------
   🔗 ENLACE APP SCRIPT (BASE DE DATOS):
-     https://script.google.com/macros/s/AKfycbxLsaiL7CJBCC7frd8FuTeCLHRC1qZFKgu1HN6fy6-gJmtDOg9v9YzPHAQ1mfpOS_Ka/exec
+     https://script.google.com/macros/s/AKfycbxK0c4knfEeo9RQ0fXKBQqbDQXdX9DnFIGdOVfvlrw8cDqKFwfvOz4DrZNh-ZHVvc1Y/exec
   ------------------------------------------------------------
   ⚠️  Si necesitas cambiar la URL de la base de datos,
       busca la línea anterior y reemplaza la URL.
@@ -303,10 +303,14 @@ tbody tr:hover td{background:rgba(255,255,255,.02)}
         </div>
         <div class="cuota-info-box" id="cuota-info-box">
           <div class="cuota-info-row"><span class="cuota-info-label">Crédito</span><span class="cuota-info-val" id="ci-codigo">—</span></div>
+          <div class="cuota-info-row"><span class="cuota-info-label">Fecha de esta cuota</span><span class="cuota-info-val green" id="ci-fecha-cuota">—</span></div>
+          <div class="cuota-info-row"><span class="cuota-info-label">N° de cuota</span><span class="cuota-info-val" id="ci-num-cuota">—</span></div>
           <div class="cuota-info-row"><span class="cuota-info-label">Saldo pendiente</span><span class="cuota-info-val orange" id="ci-saldo">$0.00</span></div>
-          <div class="cuota-info-row"><span class="cuota-info-label">Cuota mensual</span><span class="cuota-info-val green" id="ci-cuota">$0.00</span></div>
+          <div class="cuota-info-row"><span class="cuota-info-label">Cuota a pagar</span><span class="cuota-info-val green" id="ci-cuota">$0.00</span></div>
           <div class="cuota-info-row"><span class="cuota-info-label">Capital de cuota</span><span class="cuota-info-val" id="ci-cap">$0.00</span></div>
           <div class="cuota-info-row"><span class="cuota-info-label">Interés de cuota</span><span class="cuota-info-val" id="ci-int">$0.00</span></div>
+          <div class="cuota-info-row" id="ci-mora-row" style="display:none"><span class="cuota-info-label" style="color:var(--red)">⚠ Interés de mora</span><span class="cuota-info-val" style="color:var(--red)" id="ci-mora">$0.00</span></div>
+          <div class="cuota-info-row" id="ci-dias-mora-row" style="display:none"><span class="cuota-info-label" style="color:var(--red)">Días en mora</span><span class="cuota-info-val" style="color:var(--red)" id="ci-dias-mora">0 días</span></div>
         </div>
 
         <!-- Tipo de pago -->
@@ -323,6 +327,19 @@ tbody tr:hover td{background:rgba(255,255,255,.02)}
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
             Hacer abono
           </button>
+          <button class="tipo-pago-btn" id="btn-precancelar" onclick="seleccionarTipoPago('precancelar')" style="border-color:rgba(231,76,60,.3)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+            Precancelar crédito
+          </button>
+        </div>
+        <!-- Info precancelación -->
+        <div id="precancelar-info" style="display:none;margin-top:12px">
+          <div class="cuota-info-box" style="border-color:rgba(231,76,60,.3);background:rgba(231,76,60,.04)">
+            <div class="cuota-info-row"><span class="cuota-info-label">Saldo de capital</span><span class="cuota-info-val green" id="pre-cap">$0.00</span></div>
+            <div class="cuota-info-row"><span class="cuota-info-label">Interés pendiente (sin cuotas futuras)</span><span class="cuota-info-val" id="pre-int">$0.00</span></div>
+            <div class="cuota-info-row" style="border-top:1px solid rgba(231,76,60,.2);margin-top:4px;padding-top:8px"><span class="cuota-info-label" style="font-weight:700;color:var(--red)">TOTAL A PRECANCELAR</span><span class="cuota-info-val" style="color:var(--red);font-size:16px" id="pre-total">$0.00</span></div>
+            <div style="font-size:11px;color:var(--text3);margin-top:8px;line-height:1.5">ⓘ Al precancelar solo se cobra el capital pendiente más el interés del período actual. Los intereses futuros se eliminan.</div>
+          </div>
         </div>
 
         <!-- Monto abono (solo si abono) -->
@@ -687,17 +704,66 @@ function alSeleccionarCliente(clienteId){
     cuotaTotal   = parseFloat((cuotaCapital + cuotaInteres).toFixed(2));
   }
 
+  // Calcular número de cuota actual
+  const pagosDelCredito = todosPagos.filter(p=>(p.CreditoID||'')===credito.ID);
+  const numCuotaActual  = pagosDelCredito.length + 1;
+
+  // Calcular fecha de esta cuota usando la tabla de amortización
+  const factores2 = {mensual:1,quincenal:2,semanal:4,diario:30};
+  function addPer(d,t,n){
+    const dt=new Date(d+'T12:00:00');
+    if(t==='mensual') dt.setMonth(dt.getMonth()+n);
+    else if(t==='quincenal') dt.setDate(dt.getDate()+n*15);
+    else if(t==='semanal') dt.setDate(dt.getDate()+n*7);
+    else dt.setDate(dt.getDate()+n);
+    return dt.toISOString().split('T')[0];
+  }
+  const fechaInicio   = credito.FechaInicio||EC.hoy();
+  const fechaCuotaActual = addPer(fechaInicio, frecuencia, numCuotaActual);
+
+  // Calcular mora si la fecha de la cuota ya pasó
+  const hoyStr = EC.hoy();
+  let mora = 0, diasMora = 0;
+  if(fechaCuotaActual < hoyStr){
+    const fechaVence = new Date(fechaCuotaActual+'T12:00:00');
+    const hoyDate   = new Date(hoyStr+'T12:00:00');
+    diasMora = Math.floor((hoyDate - fechaVence) / (1000*60*60*24));
+    // % diario sobre el monto de la cuota vencida
+    const tasaMoraDiaria = parseFloat(credito.TasaMora||0) / 100;
+    mora = tasaMoraDiaria > 0
+      ? parseFloat((cuotaTotal * tasaMoraDiaria * diasMora).toFixed(2))
+      : 0;
+  }
+
   // Guardar en el objeto para usar al pagar
   creditoSeleccionado._cuotaCapital = cuotaCapital;
   creditoSeleccionado._cuotaInteres = cuotaInteres;
   creditoSeleccionado._cuotaTotal   = cuotaTotal;
+  creditoSeleccionado._tasaPer      = tasaPer;
+  creditoSeleccionado._mora         = mora;
+  creditoSeleccionado._diasMora     = diasMora;
+  creditoSeleccionado._fechaCuota   = fechaCuotaActual;
+  creditoSeleccionado._numCuota     = numCuotaActual;
 
   // Rellenar info box
-  document.getElementById('ci-codigo').textContent = credito.Codigo||'—';
-  document.getElementById('ci-saldo').textContent  = EC.fmt(saldo);
-  document.getElementById('ci-cuota').textContent  = EC.fmt(cuotaTotal);
-  document.getElementById('ci-cap').textContent    = EC.fmt(cuotaCapital);
-  document.getElementById('ci-int').textContent    = EC.fmt(cuotaInteres);
+  document.getElementById('ci-codigo').textContent     = credito.Codigo||'—';
+  document.getElementById('ci-fecha-cuota').textContent= fechaCuotaActual;
+  document.getElementById('ci-num-cuota').textContent  = 'Cuota #'+numCuotaActual+' de '+(credito.NumCuotas||'?');
+  document.getElementById('ci-saldo').textContent      = EC.fmt(saldo);
+  document.getElementById('ci-cuota').textContent      = EC.fmt(cuotaTotal + mora);
+  document.getElementById('ci-cap').textContent        = EC.fmt(cuotaCapital);
+  document.getElementById('ci-int').textContent        = EC.fmt(cuotaInteres);
+
+  // Mostrar mora si aplica
+  if(mora > 0){
+    document.getElementById('ci-mora-row').style.display      = '';
+    document.getElementById('ci-dias-mora-row').style.display = '';
+    document.getElementById('ci-mora').textContent            = EC.fmt(mora);
+    document.getElementById('ci-dias-mora').textContent       = diasMora+' días';
+  } else {
+    document.getElementById('ci-mora-row').style.display      = 'none';
+    document.getElementById('ci-dias-mora-row').style.display = 'none';
+  }
 
   seccion.style.display = 'block';
 }
@@ -706,18 +772,39 @@ function seleccionarTipoPago(tipo){
   tipoPagoActual = tipo;
   document.getElementById('btn-cuota-completa').className = 'tipo-pago-btn'+(tipo==='completa'?' selected':'');
   document.getElementById('btn-abono').className          = 'tipo-pago-btn'+(tipo==='abono'?' selected-abono':'');
-  document.getElementById('abono-wrap').style.display     = tipo==='abono' ? 'block' : 'none';
-  document.getElementById('abono-desglose').style.display = 'none';
+  document.getElementById('btn-precancelar').className    = 'tipo-pago-btn'+(tipo==='precancelar'?' selected':'');
+  document.getElementById('btn-precancelar').style.borderColor = tipo==='precancelar' ? 'var(--red)' : 'rgba(231,76,60,.3)';
+  document.getElementById('btn-precancelar').style.background  = tipo==='precancelar' ? 'rgba(231,76,60,.1)' : '';
+  document.getElementById('btn-precancelar').style.color       = tipo==='precancelar' ? 'var(--red)' : '';
+  document.getElementById('abono-wrap').style.display       = tipo==='abono'        ? 'block' : 'none';
+  document.getElementById('precancelar-info').style.display  = tipo==='precancelar' ? 'block' : 'none';
+  document.getElementById('abono-desglose').style.display    = 'none';
 
   if(tipo==='completa'){
-    // Mostrar sección formas de pago con la cuota completa ya configurada
-    mostrarSeccionFormasPago(
-      creditoSeleccionado._cuotaCapital,
-      creditoSeleccionado._cuotaInteres,
-      creditoSeleccionado._cuotaTotal
-    );
+    // Cuota normal + mora si aplica
+    const mora = creditoSeleccionado._mora||0;
+    const cap  = creditoSeleccionado._cuotaCapital;
+    const int  = creditoSeleccionado._cuotaInteres + mora;
+    const tot  = creditoSeleccionado._cuotaTotal + mora;
+    mostrarSeccionFormasPago(cap, int, tot);
+  } else if(tipo==='precancelar'){
+    // Solo capital pendiente + interés del período actual
+    const saldo    = parseFloat(creditoSeleccionado.Saldo||0);
+    const tasaPer  = creditoSeleccionado._tasaPer||0;
+    const intActual= parseFloat((saldo * tasaPer).toFixed(2));
+    const total    = parseFloat((saldo + intActual).toFixed(2));
+    creditoSeleccionado._preCapital = saldo;
+    creditoSeleccionado._preInteres = intActual;
+    creditoSeleccionado._preTotal   = total;
+    document.getElementById('pre-cap').textContent   = EC.fmt(saldo);
+    document.getElementById('pre-int').textContent   = EC.fmt(intActual);
+    document.getElementById('pre-total').textContent = EC.fmt(total);
+    mostrarSeccionFormasPago(saldo, intActual, total);
+    // Cambiar texto del botón registrar
+    document.getElementById('btn-registrar-pago').innerHTML =
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15"><circle cx="12" cy="12" r="10"/><polyline points="9 11 12 14 22 4"/></svg> Precancelar y cerrar crédito';
   } else {
-    // Esperar a que el usuario ingrese el monto del abono
+    // Abono: esperar monto del usuario
     document.getElementById('seccion-formas-pago').style.display = 'none';
     document.getElementById('btn-registrar-pago').style.display  = 'none';
   }
@@ -861,28 +948,40 @@ async function guardarPago(){
   const numPago   = 'P-'+Date.now().toString().slice(-6);
   const nuevoSaldo = Math.max(0, parseFloat(credito.Saldo||0) - capital);
 
-  // Descripción del método (puede ser mixto)
-  const metodosDesc = formas.map(f=>`${f.metodo}:${EC.fmt(f.monto)}`).join(' + ');
+  // Descripción del método — guardar correctamente para estadísticas
   const metodoPrincipal = formas.length===1 ? formas[0].metodo : 'mixto';
+  const metodosDesc     = formas.map(f=>`${f.metodo}:${EC.fmt(f.monto)}`).join(' + ');
+
+  // Si es precancelación, usar valores de precancelación
+  let capFinal   = capital;
+  let intFinal   = interes;
+  let totalFinal = total;
+  let estadoCred = nuevoSaldo<=0 ? 'cancelado' : 'activo';
+  if(tipoPagoActual==='precancelar'){
+    capFinal   = creditoSeleccionado._preCapital||capital;
+    intFinal   = creditoSeleccionado._preInteres||interes;
+    totalFinal = creditoSeleccionado._preTotal||total;
+    estadoCred = 'cancelado';
+  }
 
   const datos = {
-    CreditoID     : credito.ID,
-    CreditoCodigo : credito.Codigo||'',
-    ClienteID     : clienteId,
-    ClienteNombre : (cliente.Nombres||'')+' '+(cliente.Apellidos||''),
-    Fecha         : fecha,
-    Capital       : capital,
-    Interes       : interes,
-    Total         : total,
-    TipoPago      : tipoPagoActual,
-    Metodo        : metodosDesc,
+    CreditoID      : credito.ID,
+    CreditoCodigo  : credito.Codigo||'',
+    ClienteID      : clienteId,
+    ClienteNombre  : (cliente.Nombres||'')+' '+(cliente.Apellidos||''),
+    Fecha          : fecha,
+    Capital        : capFinal,
+    Interes        : intFinal,
+    Total          : totalFinal,
+    TipoPago       : tipoPagoActual,
+    Metodo         : metodoPrincipal,  // efectivo, transferencia, mixto — para estadísticas
     MetodoPrincipal: metodoPrincipal,
-    FormasPago    : JSON.stringify(formas),
-    NumComprobante: numComp||numPago,
-    Observaciones : document.getElementById('p-obs').value.trim(),
-    NumPago       : numPago,
-    RegistradoPor : EC.usuario.nombre,
-    Estado        : 'activo',
+    FormasPago     : JSON.stringify(formas),
+    NumComprobante : numComp||numPago,
+    Observaciones  : document.getElementById('p-obs').value.trim(),
+    NumPago        : numPago,
+    RegistradoPor  : EC.usuario.nombre,
+    Estado         : 'activo',
   };
 
   EC.showLoading('Registrando cobro...');
@@ -891,9 +990,11 @@ async function guardarPago(){
     const j=await r.json();
     if(j.ok){
       // Actualizar saldo del crédito
-      await fetch(EC.api,{method:'POST',body:JSON.stringify({
+      // Calcular nuevo saldo según tipo de pago
+      const saldoFinal = tipoPagoActual==='precancelar' ? 0 : Math.max(0, parseFloat(credito.Saldo||0) - capFinal);
+      await fetch(EC.api,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({
         accion:'actualizar',tab:'creditos',id:credito.ID,
-        datos:{Saldo:nuevoSaldo, Estado:nuevoSaldo<=0?'cancelado':'activo'}
+        datos:{Saldo:saldoFinal, Estado:estadoCred}
       })});
       cerrarModalPago();
       await cargarCreditos();
@@ -1043,6 +1144,7 @@ async function ejecutarEliminar(){
     // ── PASO 1: Marcar pago como ELIMINADO en el Sheet ──────
     // Google Apps Script no permite borrar filas por GET.
     // Marcamos Eliminado=SI y el backend lo filtra en todas las lecturas.
+    // Marcar como eliminado en Google Sheets (funciona en TODOS los dispositivos)
     const r1 = await fetch(EC.api, {
       method : 'POST',
       headers: {'Content-Type':'text/plain'},
@@ -1054,7 +1156,7 @@ async function ejecutarEliminar(){
       })
     });
     const j1 = await r1.json();
-    console.log('Marcar eliminado:', j1);
+    console.log('Marcar eliminado en Sheet:', j1);
 
     // ── PASO 2: Revertir saldo del crédito ──────────────────
     if(creditoId && capital > 0){
