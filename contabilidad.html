@@ -124,7 +124,6 @@ tbody tr:hover td{background:rgba(255,255,255,.02)}
 </head>
 <body>
 <script src="auth.js"></script>
-<script src="pagos_eliminados.js"></script>
 
 <!-- ============================================================
   ÉXITO COMPARTIDO — Sistema de Gestión Financiera
@@ -133,7 +132,7 @@ tbody tr:hover td{background:rgba(255,255,255,.02)}
   generados desde cobros y aportes. Plan de cuentas personalizable.
   ------------------------------------------------------------
   🔗 ENLACE APP SCRIPT (BASE DE DATOS):
-     https://script.google.com/macros/s/AKfycbyobO7TqCGv_k2G03aBYWFzviimKUWlknozSn00O7--yNzgFD-gvY-wySvX_ONhG_3G/exec
+     https://script.google.com/macros/s/AKfycby-BrSpUIdQ_v08SYjsg7lFDcMCMxfgbqAjPIlfZZGFRVEoyyTHrRIzJmZFMoUIDAzTFw/exec
   ============================================================ -->
 
 <div class="bg-grid"></div>
@@ -429,7 +428,7 @@ async function cargarAsientos(){
     }
 
     // Asientos de cobros (filtrar eliminados)
-    const pagosActivos = PagosEliminados.filtrar(jPagos.data||[]);
+    const pagosActivos = jPagos.data||[];  // Apps Script ya filtra eliminados
     for(const p of pagosActivos){
       const cap = parseFloat(p.Capital||0);
       const int = parseFloat(p.Interes||0);

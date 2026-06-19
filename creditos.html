@@ -138,11 +138,10 @@ tbody tr:hover td{background:rgba(255,255,255,.02)}
 </head>
 <body>
 <script src="auth.js"></script>
-<script src="pagos_eliminados.js"></script>
 <!-- ============================================================
   ÉXITO COMPARTIDO — Módulo de Créditos
   🔗 ENLACE APP SCRIPT (BASE DE DATOS):
-     https://script.google.com/macros/s/AKfycbyobO7TqCGv_k2G03aBYWFzviimKUWlknozSn00O7--yNzgFD-gvY-wySvX_ONhG_3G/exec
+     https://script.google.com/macros/s/AKfycby-BrSpUIdQ_v08SYjsg7lFDcMCMxfgbqAjPIlfZZGFRVEoyyTHrRIzJmZFMoUIDAzTFw/exec
   ============================================================ -->
 <div class="bg-grid"></div>
 <div class="loading-overlay" id="loading-overlay"><div class="loading-spinner"></div><div class="loading-text" id="loading-text">Cargando...</div></div>
@@ -388,7 +387,7 @@ async function cargarTodo(){
     const jP  = await rP.json();
     todosCreditos = jC.ok  ? jC.data  || [] : [];
     todosClientes = jCl.ok ? jCl.data || [] : [];
-    todosPagos    = jP.ok  ? PagosEliminados.filtrar(jP.data||[]) : [];
+    todosPagos    = jP.ok  ? (jP.data||[]) : [];  // Apps Script ya filtra eliminados
     calcularKPIs();
     renderClientes(todosCreditos);
     renderFinalizados(todosCreditos);

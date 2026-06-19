@@ -168,7 +168,6 @@ tbody tr:hover td{background:rgba(255,255,255,.02)}
 </head>
 <body>
 <script src="auth.js"></script>
-<script src="pagos_eliminados.js"></script>
 
 <!-- ============================================================
   ÉXITO COMPARTIDO — Sistema de Gestión Financiera
@@ -176,7 +175,7 @@ tbody tr:hover td{background:rgba(255,255,255,.02)}
   Descripción: Cobros y pagos — Registro de cobros con múltiples formas de pago, comprobante descargable (PNG/PDF) y envío por WhatsApp.
   ------------------------------------------------------------
   🔗 ENLACE APP SCRIPT (BASE DE DATOS):
-     https://script.google.com/macros/s/AKfycbyobO7TqCGv_k2G03aBYWFzviimKUWlknozSn00O7--yNzgFD-gvY-wySvX_ONhG_3G/exec
+     https://script.google.com/macros/s/AKfycby-BrSpUIdQ_v08SYjsg7lFDcMCMxfgbqAjPIlfZZGFRVEoyyTHrRIzJmZFMoUIDAzTFw/exec
   ------------------------------------------------------------
   ⚠️  Si necesitas cambiar la URL de la base de datos,
       busca la línea anterior y reemplaza la URL.
@@ -437,6 +436,7 @@ tbody tr:hover td{background:rgba(255,255,255,.02)}
             <div class="comp-row"><span class="comp-row-label">Crédito</span><span class="comp-row-val" id="cv-credito">—</span></div>
             <div class="comp-row"><span class="comp-row-label">Capital</span><span class="comp-row-val" id="cv-capital">$0.00</span></div>
             <div class="comp-row"><span class="comp-row-label">Interés</span><span class="comp-row-val" id="cv-interes">$0.00</span></div>
+            <div class="comp-row" id="cv-mora-row" style="display:none"><span class="comp-row-label" style="color:#c0392b">Interés de mora</span><span class="comp-row-val" style="color:#c0392b" id="cv-mora">$0.00</span></div>
             <div class="comp-row"><span class="comp-row-label">Saldo restante</span><span class="comp-row-val" id="cv-saldo">$0.00</span></div>
             <div class="comp-row"><span class="comp-row-label">Fecha de pago</span><span class="comp-row-val" id="cv-fecha">—</span></div>
             <div class="comp-row"><span class="comp-row-label">Forma de pago</span><span class="comp-row-val" id="cv-metodo">—</span></div>
@@ -537,7 +537,7 @@ async function cargarPagos(){
     const j=await r.json();
     if(j.ok){
       // Filtrar pagos eliminados localmente (lista negra en localStorage)
-      todosPagos = PagosEliminados.filtrar(j.data || []);
+      todosPagos = j.data || [];  // Apps Script ya filtra los eliminados (columna Estado)
       calcularStats(todosPagos);
       renderPagos(todosPagos);
     }
@@ -550,10 +550,10 @@ function calcularStats(pagos){
   const hoy=EC.hoy(), mes=hoy.substr(0,7);
   const hoyP=pagos.filter(p=>p.Fecha===hoy);
   const mesP=pagos.filter(p=>(p.Fecha||'').startsWith(mes));
-  const tot=arr=>arr.reduce((a,p)=>a+(parseFloat(p.Capital||0)+parseFloat(p.Interes||0)),0);
+  const tot=arr=>arr.reduce((a,p)=>a+(parseFloat(p.Capital||0)+parseFloat(p.Interes||0)+parseFloat(p.Mora||0)),0);
   document.getElementById('stat-hoy-total').textContent=EC.fmt(tot(hoyP));
-  document.getElementById('stat-hoy-ef').textContent=EC.fmt(tot(hoyP.filter(p=>(p.Metodo||'').includes('efectivo'))));
-  document.getElementById('stat-hoy-tr').textContent=EC.fmt(tot(hoyP.filter(p=>(p.Metodo||'').includes('transferencia'))));
+  document.getElementById('stat-hoy-ef').textContent=EC.fmt(tot(hoyP.filter(p=>(p.Metodo||'').toLowerCase().includes('efectivo'))));
+  document.getElementById('stat-hoy-tr').textContent=EC.fmt(tot(hoyP.filter(p=>(p.Metodo||'').toLowerCase().includes('transferencia'))));
   document.getElementById('stat-mes').textContent=EC.fmt(tot(mesP));
 }
 
@@ -952,14 +952,21 @@ async function guardarPago(){
   const metodoPrincipal = formas.length===1 ? formas[0].metodo : 'mixto';
   const metodosDesc     = formas.map(f=>`${f.metodo}:${EC.fmt(f.monto)}`).join(' + ');
 
+  // Mora aplicada (si la cuota está vencida y el tipo de pago es completa)
+  const moraAplicada = (tipoPagoActual==='completa') ? (creditoSeleccionado._mora||0) : 0;
+  // El interés base sin mora (la mora se guarda aparte)
+  const interesBase = Math.max(0, interes - moraAplicada);
+
   // Si es precancelación, usar valores de precancelación
   let capFinal   = capital;
-  let intFinal   = interes;
+  let intFinal   = interesBase;
+  let moraFinal  = moraAplicada;
   let totalFinal = total;
   let estadoCred = nuevoSaldo<=0 ? 'cancelado' : 'activo';
   if(tipoPagoActual==='precancelar'){
     capFinal   = creditoSeleccionado._preCapital||capital;
     intFinal   = creditoSeleccionado._preInteres||interes;
+    moraFinal  = 0;
     totalFinal = creditoSeleccionado._preTotal||total;
     estadoCred = 'cancelado';
   }
@@ -972,6 +979,7 @@ async function guardarPago(){
     Fecha          : fecha,
     Capital        : capFinal,
     Interes        : intFinal,
+    Mora           : moraFinal,
     Total          : totalFinal,
     TipoPago       : tipoPagoActual,
     Metodo         : metodoPrincipal,  // efectivo, transferencia, mixto — para estadísticas
@@ -1015,6 +1023,13 @@ function mostrarComprobante(p){
   document.getElementById('cv-credito').textContent = p.CreditoCodigo||'—';
   document.getElementById('cv-capital').textContent = EC.fmt(p.Capital||0);
   document.getElementById('cv-interes').textContent = EC.fmt(p.Interes||0);
+  const moraVal = parseFloat(p.Mora||0);
+  if(moraVal > 0){
+    document.getElementById('cv-mora-row').style.display = '';
+    document.getElementById('cv-mora').textContent = EC.fmt(moraVal);
+  } else {
+    document.getElementById('cv-mora-row').style.display = 'none';
+  }
   document.getElementById('cv-saldo').textContent   = EC.fmt(p.SaldoRestante||0);
   document.getElementById('cv-fecha').textContent   = p.Fecha||EC.hoy();
   document.getElementById('cv-metodo').textContent  = p.Metodo||p.MetodoPrincipal||'—';
@@ -1125,9 +1140,6 @@ async function ejecutarEliminar(){
   document.getElementById('modal-confirmar').classList.remove('open');
   pagoAEliminar = null;
 
-  // Agregar a lista negra local INMEDIATAMENTE
-  PagosEliminados.agregar(idAEliminar);
-
   EC.showLoading('Eliminando cobro y revirtiendo saldo...');
 
   try{
@@ -1169,7 +1181,7 @@ async function ejecutarEliminar(){
     }
 
     // ── PASO 3: Quitar de UI inmediatamente (ya está en lista negra) ──
-    todosPagos = PagosEliminados.filtrar(todosPagos);
+    todosPagos = todosPagos.filter(p => p.ID !== idAEliminar);
     calcularStats(todosPagos);
     renderPagos(todosPagos);
 
