@@ -142,7 +142,7 @@ tbody tr:hover td{background:rgba(255,255,255,.02)}
 <!-- ============================================================
   ÉXITO COMPARTIDO — Módulo de Créditos
   🔗 ENLACE APP SCRIPT (BASE DE DATOS):
-     https://script.google.com/macros/s/AKfycbxK0c4knfEeo9RQ0fXKBQqbDQXdX9DnFIGdOVfvlrw8cDqKFwfvOz4DrZNh-ZHVvc1Y/exec
+     https://script.google.com/macros/s/AKfycbyobO7TqCGv_k2G03aBYWFzviimKUWlknozSn00O7--yNzgFD-gvY-wySvX_ONhG_3G/exec
   ============================================================ -->
 <div class="bg-grid"></div>
 <div class="loading-overlay" id="loading-overlay"><div class="loading-spinner"></div><div class="loading-text" id="loading-text">Cargando...</div></div>
@@ -537,23 +537,34 @@ function verDetalle(cr){
   document.getElementById('det-total-int').textContent   = EC.fmt(totalInteres);
   document.getElementById('det-total-deuda').textContent = EC.fmt(totalDeuda);
 
-  // Datos actuales
-  const capPorCobrar = Math.max(0, monto - capPagado);
-  const intPorCobrar = Math.max(0, totalInteres - intPagado);
-  document.getElementById('det-saldo').textContent          = EC.fmt(saldo);
-  document.getElementById('det-cap-pagado').textContent     = EC.fmt(capPagado);
-  document.getElementById('det-int-pagado').textContent     = EC.fmt(intPagado);
+  // Datos actuales — si el crédito está finalizado, todo pendiente queda en cero
+  const creditoFinalizado2 = cr.Estado === 'cancelado';
+  const saldoMostrarDet = creditoFinalizado2 ? 0 : saldo;
+  const capPorCobrar = creditoFinalizado2 ? 0 : Math.max(0, monto - capPagado);
+  const intPorCobrar = creditoFinalizado2 ? 0 : Math.max(0, totalInteres - intPagado);
+  const pctMostrar    = creditoFinalizado2 ? 100 : pct;
+  const cuotasPagadasMostrar = creditoFinalizado2 ? filas.length : cuotasPagadas;
+  const cuotasPendMostrar    = creditoFinalizado2 ? 0 : cuotasPend;
+
+  document.getElementById('det-saldo').textContent          = EC.fmt(saldoMostrarDet);
+  document.getElementById('det-cap-pagado').textContent     = EC.fmt(creditoFinalizado2 ? monto : capPagado);
+  document.getElementById('det-int-pagado').textContent     = EC.fmt(creditoFinalizado2 ? intPagado : intPagado);
   document.getElementById('det-cap-cobrar').textContent     = EC.fmt(capPorCobrar);
   document.getElementById('det-int-cobrar').textContent     = EC.fmt(intPorCobrar);
-  document.getElementById('det-cuotas-pagadas').textContent = cuotasPagadas+' / '+filas.length;
-  document.getElementById('det-cuotas-pend').textContent    = cuotasPend+' cuotas';
-  document.getElementById('det-pct').textContent            = pct+'%';
+  document.getElementById('det-cuotas-pagadas').textContent = cuotasPagadasMostrar+' / '+filas.length;
+  document.getElementById('det-cuotas-pend').textContent    = cuotasPendMostrar+' cuotas';
+  document.getElementById('det-pct').textContent            = pctMostrar+'%';
 
   // Tabla amortización con estados
+  // Si el crédito está cancelado (pagado completo o precancelado),
+  // TODAS las cuotas se muestran como Cancelado y sin saldo pendiente
   const hoy = EC.hoy();
+  const creditoFinalizado = cr.Estado === 'cancelado';
   document.getElementById('tbody-amort-detalle').innerHTML = filas.map((f,i)=>{
-    let estado, cls;
-    if(i < cuotasPagadas){
+    let estado, cls, saldoMostrar = f.saldo;
+    if(creditoFinalizado){
+      estado='Cancelado'; cls='est-cancelado'; saldoMostrar=0;
+    } else if(i < cuotasPagadas){
       estado='Cancelado'; cls='est-cancelado';
     } else if(f.fecha < hoy){
       estado='Vencido'; cls='est-vencido';
@@ -566,7 +577,7 @@ function verDetalle(cr){
       <td class="mono">${EC.fmt(f.cuota)}</td>
       <td class="mono">${EC.fmt(f.cap)}</td>
       <td class="mono" style="color:var(--orange)">${EC.fmt(f.int)}</td>
-      <td class="mono">${EC.fmt(f.saldo)}</td>
+      <td class="mono">${EC.fmt(saldoMostrar)}</td>
       <td><span class="${cls}">${estado}</span></td>
     </tr>`;
   }).join('');

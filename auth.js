@@ -4,7 +4,7 @@
 //  Descripción: Seguridad compartida — Se incluye en TODAS las páginas. Verifica sesión activa, maneja permisos por rol y expone funciones globales (EC.*).
 //  ----------------------------------------------------------
 //  🔗 ENLACE APP SCRIPT (BASE DE DATOS):
-//     https://script.google.com/macros/s/AKfycbwvC9zB3BI_XlHhFCGRaAD3A7zWVpZZQRN9CL0Er3gMoARgcFotSB6QBLjEHjCjVlv_/exec
+//     https://script.google.com/macros/s/AKfycbyobO7TqCGv_k2G03aBYWFzviimKUWlknozSn00O7--yNzgFD-gvY-wySvX_ONhG_3G/exec
 //  ----------------------------------------------------------
 //  ⚠️  Si necesitas cambiar la URL de la base de datos,
 //      busca la constante API_URL y reemplaza el valor.

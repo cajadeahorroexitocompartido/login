@@ -5,7 +5,7 @@
 //  para filtrarlos en todas las páginas sin depender del servidor.
 //  ------------------------------------------------------------
 //  🔗 ENLACE APP SCRIPT (BASE DE DATOS):
-//     https://script.google.com/macros/s/AKfycbxLsaiL7CJBCC7frd8FuTeCLHRC1qZFKgu1HN6fy6-gJmtDOg9v9YzPHAQ1mfpOS_Ka/exec
+//     https://script.google.com/macros/s/AKfycbyobO7TqCGv_k2G03aBYWFzviimKUWlknozSn00O7--yNzgFD-gvY-wySvX_ONhG_3G/exec
 // ============================================================
 
 const PagosEliminados = {

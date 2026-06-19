@@ -176,7 +176,7 @@ tbody tr:hover td{background:rgba(255,255,255,.02)}
   Descripción: Cobros y pagos — Registro de cobros con múltiples formas de pago, comprobante descargable (PNG/PDF) y envío por WhatsApp.
   ------------------------------------------------------------
   🔗 ENLACE APP SCRIPT (BASE DE DATOS):
-     https://script.google.com/macros/s/AKfycbxK0c4knfEeo9RQ0fXKBQqbDQXdX9DnFIGdOVfvlrw8cDqKFwfvOz4DrZNh-ZHVvc1Y/exec
+     https://script.google.com/macros/s/AKfycbyobO7TqCGv_k2G03aBYWFzviimKUWlknozSn00O7--yNzgFD-gvY-wySvX_ONhG_3G/exec
   ------------------------------------------------------------
   ⚠️  Si necesitas cambiar la URL de la base de datos,
       busca la línea anterior y reemplaza la URL.
@@ -986,7 +986,7 @@ async function guardarPago(){
 
   EC.showLoading('Registrando cobro...');
   try{
-    const r=await fetch(EC.api,{method:'POST',body:JSON.stringify({accion:'agregar',tab:'pagos',datos})});
+    const r=await fetch(EC.api,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({accion:'agregar',tab:'pagos',datos})});
     const j=await r.json();
     if(j.ok){
       // Actualizar saldo del crédito
@@ -1070,35 +1070,25 @@ async function descargarPDF(){
 
 // ── WHATSAPP ──────────────────────────────────────────────────
 async function compartirWhatsApp(){
-  const cliente = document.getElementById('cv-cliente').textContent;
-  const total   = document.getElementById('cv-total').textContent;
-  const fecha   = document.getElementById('cv-fecha').textContent;
-  const credito = document.getElementById('cv-credito').textContent;
-  const saldo   = document.getElementById('cv-saldo').textContent;
-  const num     = document.getElementById('cv-num').textContent;
-  const metodo  = document.getElementById('cv-metodo').textContent;
-  const texto = `✅ *COMPROBANTE DE PAGO*\n_Caja de Ahorro y Crédito Éxito Compartido_\n\n`+
-    `💰 *Total cobrado:* ${total}\n`+
-    `👤 *Cliente:* ${cliente}\n`+
-    `📋 *Crédito:* ${credito}\n`+
-    `💵 *Capital:* ${document.getElementById('cv-capital').textContent}\n`+
-    `📈 *Interés:* ${document.getElementById('cv-interes').textContent}\n`+
-    `💳 *Saldo restante:* ${saldo}\n`+
-    `📅 *Fecha:* ${fecha}\n`+
-    `🏦 *Método:* ${metodo}\n`+
-    `${num}\n\n_Gracias por su pago puntual_ 🙏`;
+  // Solo se comparte la IMAGEN del comprobante, sin texto acompañante
   try{
     const el=document.getElementById('comprobante-visual');
     const canvas=await html2canvas(el,{scale:2,backgroundColor:'#ffffff',logging:false});
     canvas.toBlob(async blob=>{
-      if(navigator.share&&navigator.canShare&&navigator.canShare({files:[new File([blob],'comprobante.png',{type:'image/png'})]})){
-        await navigator.share({title:'Comprobante de pago',text:texto,files:[new File([blob],'comprobante.png',{type:'image/png'})]});
+      const file = new File([blob],'comprobante.png',{type:'image/png'});
+      if(navigator.share && navigator.canShare && navigator.canShare({files:[file]})){
+        await navigator.share({files:[file]});
       } else {
-        window.open(`https://wa.me/?text=${encodeURIComponent(texto)}`,'_blank');
+        // Fallback: descargar la imagen para que el usuario la adjunte manualmente
+        const link=document.createElement('a');
+        link.download='comprobante.png';
+        link.href=canvas.toDataURL('image/png');
+        link.click();
+        EC.toast('Imagen descargada. Ábrela en WhatsApp para compartirla.');
       }
     },'image/png');
   }catch(e){
-    window.open(`https://wa.me/?text=${encodeURIComponent(texto)}`,'_blank');
+    EC.toast('Error al compartir: '+e.message,'error');
   }
 }
 
