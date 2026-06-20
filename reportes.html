@@ -262,6 +262,66 @@ tbody tr:hover td{background:rgba(255,255,255,.02)}
 EC.initSidebar();
 EC.aplicarPermisos();
 
+// ── GENERAR AMORTIZACIÓN Y CALCULAR MORA DINÁMICAMENTE ────────
+function generarAmortizacion(monto, tasaMens, plazo, frec, tabla, fechaInicio){
+  const fact = {mensual:1,quincenal:2,semanal:4,diario:30}[frec]||1;
+  const tasa = tasaMens / fact / 100;
+  const filas = [];
+  function addPer(d,t,n){
+    const dt=new Date(d+'T12:00:00');
+    if(t==='mensual') dt.setMonth(dt.getMonth()+n);
+    else if(t==='quincenal') dt.setDate(dt.getDate()+n*15);
+    else if(t==='semanal') dt.setDate(dt.getDate()+n*7);
+    else dt.setDate(dt.getDate()+n);
+    return dt.toISOString().split('T')[0];
+  }
+  if(tabla==='francesa'){
+    const cuota = tasa===0 ? monto/plazo : monto*(tasa*Math.pow(1+tasa,plazo))/(Math.pow(1+tasa,plazo)-1);
+    let s = monto;
+    for(let i=1;i<=plazo;i++){
+      const int=parseFloat((s*tasa).toFixed(2)), cap=parseFloat((cuota-int).toFixed(2));
+      s=parseFloat(Math.max(0,s-cap).toFixed(2));
+      filas.push({n:i,fecha:addPer(fechaInicio,frec,i),cuota:parseFloat(cuota.toFixed(2)),cap,int,saldo:s});
+    }
+  } else if(tabla==='alemana'){
+    const capC=parseFloat((monto/plazo).toFixed(2)); let s=monto;
+    for(let i=1;i<=plazo;i++){
+      const int=parseFloat((s*tasa).toFixed(2)), cuota=parseFloat((capC+int).toFixed(2));
+      s=parseFloat(Math.max(0,s-capC).toFixed(2));
+      filas.push({n:i,fecha:addPer(fechaInicio,frec,i),cuota,cap:capC,int,saldo:s});
+    }
+  } else {
+    for(let i=1;i<=plazo;i++){
+      const int=parseFloat((monto*tasa).toFixed(2)), cap=i===plazo?monto:0;
+      filas.push({n:i,fecha:addPer(fechaInicio,frec,i),cuota:parseFloat((int+cap).toFixed(2)),cap,int,saldo:i===plazo?0:monto});
+    }
+  }
+  return filas;
+}
+
+function estaEnMora(credito, todosPagos){
+  if(credito.Estado === 'cancelado') return false;
+  const pagosCredito = todosPagos.filter(p=>(p.CreditoID||'')===credito.ID);
+  const cuotasPagadas = pagosCredito.length;
+  const numCuotas = parseInt(credito.NumCuotas||0);
+  if(cuotasPagadas >= numCuotas) return false;
+  const filas = generarAmortizacion(parseFloat(credito.MontoOriginal||0), parseFloat(credito.TasaMensual||0), numCuotas, credito.Frecuencia||'mensual', credito.Tabla||'francesa', credito.FechaInicio||EC.hoy());
+  const proximaCuota = filas[cuotasPagadas];
+  if(!proximaCuota) return false;
+  return proximaCuota.fecha < EC.hoy();
+}
+
+function diasEnMora(credito, todosPagos){
+  const pagosCredito = todosPagos.filter(p=>(p.CreditoID||'')===credito.ID);
+  const cuotasPagadas = pagosCredito.length;
+  const filas = generarAmortizacion(parseFloat(credito.MontoOriginal||0), parseFloat(credito.TasaMensual||0), parseInt(credito.NumCuotas||0), credito.Frecuencia||'mensual', credito.Tabla||'francesa', credito.FechaInicio||EC.hoy());
+  const proximaCuota = filas[cuotasPagadas];
+  if(!proximaCuota) return 0;
+  const hoyD = new Date(EC.hoy()+'T12:00:00');
+  const fechaCuota = new Date(proximaCuota.fecha+'T12:00:00');
+  return Math.max(0, Math.floor((hoyD-fechaCuota)/(1000*60*60*24)));
+}
+
 // ── INIT ────────────────────────────────────────────────────
 (function init(){
   const hoy   = EC.hoy();
@@ -288,8 +348,10 @@ async function generarReporte(){
     const jCapital = await rCapital.json();
     const jCreditos= await rCreditos.json();
 
+    const todosPagosCompleto = jPagos.data||[]; // sin filtrar por fecha, para calcular mora de cuotas
+
     // Filtrar pagos eliminados y por período
-    const pagos = (jPagos.data||[])
+    const pagos = todosPagosCompleto
       .filter(p=>p.Fecha>=desde && p.Fecha<=hasta);  // Apps Script ya filtra eliminados
 
     const movs = (jCapital.data||[])
@@ -326,21 +388,19 @@ async function generarReporte(){
     const tot  = cap+int+moraCobrada;
     const otro = Math.max(0, tot - ef - tr); // lo que no fue efectivo ni transferencia (cheque, otro)
 
-    // ── Mora pendiente (cuotas vencidas no pagadas en créditos en mora) ──
-    const moraPendiente = creditos
-      .filter(c=>c.Estado==='en_mora')
-      .reduce((a,c)=>{
-        const tasaMora = parseFloat(c.TasaMora||0)/100;
-        if(!tasaMora) return a;
-        const saldoCred = parseFloat(c.Saldo||0);
-        const tasaPer    = parseFloat(c.TasaMensual||0)/100;
-        const cuotaInt   = parseFloat((saldoCred*tasaPer).toFixed(2));
-        // Estimado simple: días desde fecha de inicio hasta hoy, vencidos
-        const hoyD = new Date();
-        const inicio = new Date((c.FechaInicio||'')+'T12:00:00');
-        const diasTranscurridos = Math.max(0, Math.floor((hoyD-inicio)/(1000*60*60*24)));
-        return a + parseFloat((cuotaInt*tasaMora*diasTranscurridos).toFixed(2));
-      },0);
+    // ── Mora pendiente: calculada dinámicamente sobre créditos realmente vencidos ──
+    const creditosEnMoraReal = creditos.filter(c=>estaEnMora(c, todosPagosCompleto));
+    const moraPendiente = creditosEnMoraReal.reduce((a,c)=>{
+      const tasaMora = parseFloat(c.TasaMora||0)/100;
+      if(!tasaMora) return a;
+      const tasaPer  = parseFloat(c.TasaMensual||0)/parseFloat({mensual:1,quincenal:2,semanal:4,diario:30}[c.Frecuencia||'mensual']||1)/100;
+      const filasCred = generarAmortizacion(parseFloat(c.MontoOriginal||0), parseFloat(c.TasaMensual||0), parseInt(c.NumCuotas||0), c.Frecuencia||'mensual', c.Tabla||'francesa', c.FechaInicio||EC.hoy());
+      const pagosCred = todosPagosCompleto.filter(p=>(p.CreditoID||'')===c.ID);
+      const cuotaVencida = filasCred[pagosCred.length];
+      if(!cuotaVencida) return a;
+      const dias = diasEnMora(c, todosPagosCompleto);
+      return a + parseFloat((cuotaVencida.cuota*tasaMora*dias).toFixed(2));
+    },0);
 
     // ── Capital ─────────────────────────────────────────────
     const aportes = movs.filter(m=>m.Tipo==='aporte').reduce((a,m)=>a+(+m.Monto||0),0);
@@ -350,10 +410,10 @@ async function generarReporte(){
     const allMovs = jCapital.data||[];
     const capTotal= allMovs.reduce((a,m)=>m.Tipo==='aporte'?a+(+m.Monto||0):m.Tipo==='retiro'||m.Tipo==='dividendo'?a-(+m.Monto||0):a,0);
 
-    // ── Cartera ─────────────────────────────────────────────
+    // ── Cartera (mora calculada dinámicamente, no por campo Estado) ──
     const credPer   = creditos.filter(c=>c.FechaInicio>=desde&&c.FechaInicio<=hasta);
     const activos   = creditos.filter(c=>c.Estado!=='cancelado');
-    const mora      = creditos.filter(c=>c.Estado==='en_mora');
+    const mora      = creditosEnMoraReal;
     const cancelados= creditos.filter(c=>c.Estado==='cancelado');
     const saldoTotal= activos.reduce((a,c)=>a+(+c.Saldo||0),0);
     const moraMonto = mora.reduce((a,c)=>a+(+c.Saldo||0),0);

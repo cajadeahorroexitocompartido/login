@@ -396,11 +396,52 @@ async function cargarTodo(){
   EC.hideLoading();
 }
 
+// ── CALCULAR MORA DINÁMICAMENTE ───────────────────────────────
+// Un crédito está en mora si la fecha de su próxima cuota pendiente
+// ya pasó y esa cuota no ha sido pagada. No depende de un campo
+// "Estado" guardado manualmente — se calcula siempre en tiempo real.
+function estaEnMora(credito){
+  if(credito.Estado === 'cancelado') return false;
+  const pagosCredito = todosPagos.filter(p=>(p.CreditoID||p.creditoId||'')===credito.ID);
+  const cuotasPagadas = pagosCredito.length;
+  const numCuotas = parseInt(credito.NumCuotas||0);
+  if(cuotasPagadas >= numCuotas) return false; // ya pagó todo
+  const filas = generarAmortizacion(
+    parseFloat(credito.MontoOriginal||0),
+    parseFloat(credito.TasaMensual||0),
+    numCuotas,
+    credito.Frecuencia||'mensual',
+    credito.Tabla||'francesa',
+    credito.FechaInicio||EC.hoy()
+  );
+  const proximaCuota = filas[cuotasPagadas]; // la siguiente cuota a pagar
+  if(!proximaCuota) return false;
+  return proximaCuota.fecha < EC.hoy();
+}
+
+function diasEnMora(credito){
+  const pagosCredito = todosPagos.filter(p=>(p.CreditoID||p.creditoId||'')===credito.ID);
+  const cuotasPagadas = pagosCredito.length;
+  const filas = generarAmortizacion(
+    parseFloat(credito.MontoOriginal||0),
+    parseFloat(credito.TasaMensual||0),
+    parseInt(credito.NumCuotas||0),
+    credito.Frecuencia||'mensual',
+    credito.Tabla||'francesa',
+    credito.FechaInicio||EC.hoy()
+  );
+  const proximaCuota = filas[cuotasPagadas];
+  if(!proximaCuota) return 0;
+  const hoyD = new Date(EC.hoy()+'T12:00:00');
+  const fechaCuota = new Date(proximaCuota.fecha+'T12:00:00');
+  return Math.max(0, Math.floor((hoyD-fechaCuota)/(1000*60*60*24)));
+}
+
 // ── KPIs ─────────────────────────────────────────────────────
 function calcularKPIs(){
   const activos  = todosCreditos.filter(c=>c.Estado!=='cancelado');
-  const mora     = todosCreditos.filter(c=>c.Estado==='en_mora');
-  const alDia    = activos.filter(c=>c.Estado!=='en_mora');
+  const mora     = activos.filter(c=>estaEnMora(c));
+  const alDia    = activos.filter(c=>!estaEnMora(c));
   const cartera  = activos.reduce((a,c)=>a+(+c.Saldo||0),0);
   const cartMora = mora.reduce((a,c)=>a+(+c.Saldo||0),0);
   const cartDia  = alDia.reduce((a,c)=>a+(+c.Saldo||0),0);
@@ -435,7 +476,7 @@ function renderClientes(creditos, filtro=''){
     const saldo   = item.creditos.reduce((a,c)=>a+(+c.Saldo||0),0);
     const monto   = item.creditos.reduce((a,c)=>a+(+c.MontoOriginal||0),0);
     const pct     = monto>0 ? Math.round((1-(saldo/monto))*100) : 0;
-    const tienenMora = item.creditos.some(c=>c.Estado==='en_mora');
+    const tienenMora = item.creditos.some(c=>estaEnMora(c));
     const ini     = item.nombre.split(' ').map(n=>n[0]).slice(0,2).join('').toUpperCase();
     const numCreds= item.creditos.length;
     return `<div class="cliente-card" onclick="verDetalleCliente('${item.clienteId}')">
@@ -517,8 +558,10 @@ function verDetalle(cr){
   // Llenar encabezado
   document.getElementById('det-cliente').textContent  = cr.ClienteNombre||'—';
   document.getElementById('det-codigo').textContent   = cr.Codigo||cr.codigo||'—';
-  const estadoBadge = {activo:'b-green',al_dia:'b-green',en_mora:'b-red',cancelado:'b-gray'}[cr.Estado]||'b-gray';
-  const estadoLabel = {activo:'Al día',al_dia:'Al día',en_mora:'En mora',cancelado:'Cancelado'}[cr.Estado]||cr.Estado||'—';
+  const enMoraReal   = estaEnMora(cr);
+  const estadoReal   = cr.Estado === 'cancelado' ? 'cancelado' : (enMoraReal ? 'en_mora' : 'activo');
+  const estadoBadge = {activo:'b-green',al_dia:'b-green',en_mora:'b-red',cancelado:'b-gray'}[estadoReal]||'b-gray';
+  const estadoLabel = {activo:'Al día',al_dia:'Al día',en_mora:'En mora ('+diasEnMora(cr)+' días)',cancelado:'Cancelado'}[estadoReal]||estadoReal;
   document.getElementById('det-estado-badge').className = 'badge '+estadoBadge;
   document.getElementById('det-estado-badge').textContent = estadoLabel;
 

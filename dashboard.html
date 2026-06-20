@@ -211,51 +211,124 @@ EC.initSidebar();
 EC.aplicarPermisos();
 document.getElementById('fecha-hoy').textContent = new Date().toLocaleDateString('es-EC',{day:'2-digit',month:'short',year:'numeric'});
 
+// ── GENERAR TABLA DE AMORTIZACIÓN (para calcular mora dinámica) ──
+function generarAmortizacion(monto, tasaMens, plazo, frec, tabla, fechaInicio){
+  const fact = {mensual:1,quincenal:2,semanal:4,diario:30}[frec]||1;
+  const tasa = tasaMens / fact / 100;
+  const filas = [];
+  function addPer(d,t,n){
+    const dt=new Date(d+'T12:00:00');
+    if(t==='mensual') dt.setMonth(dt.getMonth()+n);
+    else if(t==='quincenal') dt.setDate(dt.getDate()+n*15);
+    else if(t==='semanal') dt.setDate(dt.getDate()+n*7);
+    else dt.setDate(dt.getDate()+n);
+    return dt.toISOString().split('T')[0];
+  }
+  if(tabla==='francesa'){
+    const cuota = tasa===0 ? monto/plazo : monto*(tasa*Math.pow(1+tasa,plazo))/(Math.pow(1+tasa,plazo)-1);
+    let s = monto;
+    for(let i=1;i<=plazo;i++){
+      const int=parseFloat((s*tasa).toFixed(2)), cap=parseFloat((cuota-int).toFixed(2));
+      s=parseFloat(Math.max(0,s-cap).toFixed(2));
+      filas.push({n:i,fecha:addPer(fechaInicio,frec,i),cuota:parseFloat(cuota.toFixed(2)),cap,int,saldo:s});
+    }
+  } else if(tabla==='alemana'){
+    const capC=parseFloat((monto/plazo).toFixed(2)); let s=monto;
+    for(let i=1;i<=plazo;i++){
+      const int=parseFloat((s*tasa).toFixed(2)), cuota=parseFloat((capC+int).toFixed(2));
+      s=parseFloat(Math.max(0,s-capC).toFixed(2));
+      filas.push({n:i,fecha:addPer(fechaInicio,frec,i),cuota,cap:capC,int,saldo:s});
+    }
+  } else {
+    for(let i=1;i<=plazo;i++){
+      const int=parseFloat((monto*tasa).toFixed(2)), cap=i===plazo?monto:0;
+      filas.push({n:i,fecha:addPer(fechaInicio,frec,i),cuota:parseFloat((int+cap).toFixed(2)),cap,int,saldo:i===plazo?0:monto});
+    }
+  }
+  return filas;
+}
+
+// Un crédito está en mora si su próxima cuota pendiente ya venció
+function estaEnMora(credito, pagos){
+  if(credito.Estado === 'cancelado') return false;
+  const pagosCredito = pagos.filter(p=>(p.CreditoID||'')===credito.ID);
+  const cuotasPagadas = pagosCredito.length;
+  const numCuotas = parseInt(credito.NumCuotas||0);
+  if(cuotasPagadas >= numCuotas) return false;
+  const filas = generarAmortizacion(parseFloat(credito.MontoOriginal||0), parseFloat(credito.TasaMensual||0), numCuotas, credito.Frecuencia||'mensual', credito.Tabla||'francesa', credito.FechaInicio||EC.hoy());
+  const proximaCuota = filas[cuotasPagadas];
+  if(!proximaCuota) return false;
+  return proximaCuota.fecha < EC.hoy();
+}
+
 async function cargarDashboard(){
   EC.showLoading('Cargando dashboard...');
   try{
-    // Cargar dashboard y pagos del mes en paralelo
     const mes = EC.hoy().substr(0,7);
-    const [rDash, rPagosMes] = await Promise.all([
+    const [rDash, rPagos, rCreditos] = await Promise.all([
       fetch(`${EC.api}?accion=dashboard`),
-      fetch(`${EC.api}?accion=leer&tab=pagos`)
+      fetch(`${EC.api}?accion=leer&tab=pagos`),
+      fetch(`${EC.api}?accion=leer&tab=creditos`),
     ]);
-    const jDash = await rDash.json();
-    const jPagos = await rPagosMes.json();
+    const jDash    = await rDash.json();
+    const jPagos    = await rPagos.json();
+    const jCreditos = await rCreditos.json();
 
-    // Todos los pagos del mes filtrados por eliminados localmente
-    const todosPagosMes = (jPagos.data||[])
-      .filter(p=>String(p.Fecha||'').startsWith(mes));  // Apps Script ya filtra eliminados
-    const totalMes = todosPagosMes.reduce((a,p)=>a+(+p.Capital||0)+(+p.Interes||0),0);
+    const todosPagos    = jPagos.data    || [];
+    const todosCreditos = jCreditos.data || [];
+
+    const todosPagosMes = todosPagos.filter(p=>String(p.Fecha||'').startsWith(mes));
+    const totalMes = todosPagosMes.reduce((a,p)=>a+(+p.Capital||0)+(+p.Interes||0)+(+p.Mora||0),0);
+
+    // ── Calcular mora dinámicamente ──────────────────────────
+    const activos = todosCreditos.filter(c=>c.Estado!=='cancelado');
+    const moraCreditos = activos.filter(c=>estaEnMora(c, todosPagos));
+    const moraMontoCalc = moraCreditos.reduce((a,c)=>a+(+c.Saldo||0),0);
 
     if(jDash.ok && jDash.data){
       const d = jDash.data;
-      // Recalcular cobros hoy excluyendo eliminados
-      const _pagosHoy = (d.ultPagos||[]).filter(p=>p.Fecha===EC.hoy());
-      const _cobrosHoy = _pagosHoy.reduce((a,p)=>a+(+p.Capital||0)+(+p.Interes||0),0);
-      const _transHoy  = _pagosHoy.filter(p=>(p.Metodo||'').includes('transferencia')).reduce((a,p)=>a+(+p.Capital||0)+(+p.Interes||0),0);
+      const _pagosHoy = todosPagos.filter(p=>p.Fecha===EC.hoy());
+      const _cobrosHoy = _pagosHoy.reduce((a,p)=>a+(+p.Capital||0)+(+p.Interes||0)+(+p.Mora||0),0);
+
+      // Desglosar efectivo/transferencia incluyendo pagos mixtos
+      function totPorMetodo(arr, metodoBuscado){
+        let suma = 0;
+        arr.forEach(p=>{
+          const met = String(p.Metodo||'').toLowerCase();
+          if(met === metodoBuscado){
+            suma += (+p.Capital||0)+(+p.Interes||0)+(+p.Mora||0);
+          } else if(met === 'mixto' && p.FormasPago){
+            try{
+              JSON.parse(p.FormasPago).forEach(f=>{
+                if(String(f.metodo||'').toLowerCase()===metodoBuscado) suma += parseFloat(f.monto||0);
+              });
+            }catch(e){}
+          }
+        });
+        return suma;
+      }
+      const _transHoy = totPorMetodo(_pagosHoy,'transferencia');
+
       document.getElementById('kpi-cobros-hoy').textContent = EC.fmt(_cobrosHoy);
       document.getElementById('kpi-cobros-n').textContent   = _pagosHoy.length+' pagos hoy';
       document.getElementById('kpi-trans-hoy').textContent  = EC.fmt(_transHoy);
-      document.getElementById('kpi-trans-n').textContent    = (d.ultPagos||[]).filter(p=>p.Metodo==='transferencia'&&p.Fecha===EC.hoy()).length+' operaciones';
-      document.getElementById('kpi-creditos').textContent   = d.creditosActivos||0;
-      document.getElementById('kpi-cartera').textContent    = 'Cartera: '+EC.fmt(d.carteraTotal||0);
-      document.getElementById('kpi-mora').textContent       = d.enMora||0;
-      document.getElementById('kpi-mora-val').textContent   = EC.fmt(d.moraMonto||0)+' en riesgo';
+      document.getElementById('kpi-trans-n').textContent    = _pagosHoy.filter(p=>String(p.Metodo||'').toLowerCase().includes('transferencia')).length+' operaciones';
+      document.getElementById('kpi-creditos').textContent   = activos.length;
+      document.getElementById('kpi-cartera').textContent    = 'Cartera: '+EC.fmt(activos.reduce((a,c)=>a+(+c.Saldo||0),0));
+      document.getElementById('kpi-mora').textContent       = moraCreditos.length;
+      document.getElementById('kpi-mora-val').textContent   = EC.fmt(moraMontoCalc)+' en riesgo';
       document.getElementById('kpi-capital').textContent    = EC.fmt(d.capitalSocial||0);
       document.getElementById('kpi-socios-n').textContent   = (d.totalSocios||0)+' socios activos';
-      // Usar el total del mes calculado localmente (ya excluye eliminados)
       document.getElementById('kpi-mes').textContent        = EC.fmt(totalMes);
-      document.getElementById('badge-mora').textContent     = d.enMora||0;
+      document.getElementById('badge-mora').textContent     = moraCreditos.length;
 
-      const pagos = (d.ultPagos||[]).slice(0,6);
-      document.getElementById('tbody-recientes').innerHTML = pagos.length
-        ? pagos.map(p=>`<tr><td>${p.ClienteNombre||'—'}</td><td class="mono">${EC.fmt((+p.Capital||0)+(+p.Interes||0))}</td><td><span class="badge ${p.Metodo==='efectivo'?'b-green':'b-blue'}">${p.Metodo||'—'}</span></td><td class="mono">${p.Fecha||'—'}</td></tr>`).join('')
+      const pagosRecientes = [...todosPagos].sort((a,b)=>String(b.Fecha).localeCompare(String(a.Fecha))).slice(0,6);
+      document.getElementById('tbody-recientes').innerHTML = pagosRecientes.length
+        ? pagosRecientes.map(p=>`<tr><td>${p.ClienteNombre||'—'}</td><td class="mono">${EC.fmt((+p.Capital||0)+(+p.Interes||0)+(+p.Mora||0))}</td><td><span class="badge ${String(p.Metodo||'').toLowerCase().includes('efectivo')?'b-green':String(p.Metodo||'').toLowerCase().includes('transferencia')?'b-blue':'b-gray'}">${p.Metodo||'—'}</span></td><td class="mono">${p.Fecha||'—'}</td></tr>`).join('')
         : '<tr><td colspan="4" class="empty-cell">Sin cobros registrados hoy</td></tr>';
 
-      const mora = d.creditosMora||[];
-      document.getElementById('tbody-mora').innerHTML = mora.length
-        ? mora.map(c=>`<tr><td>${c.ClienteNombre||'—'}</td><td class="mono" style="color:var(--red)">${EC.fmt(c.Saldo||0)}</td><td><span class="badge b-red">En mora</span></td></tr>`).join('')
+      document.getElementById('tbody-mora').innerHTML = moraCreditos.length
+        ? moraCreditos.map(c=>`<tr><td>${c.ClienteNombre||'—'}</td><td class="mono" style="color:var(--red)">${EC.fmt(c.Saldo||0)}</td><td><span class="badge b-red">En mora</span></td></tr>`).join('')
         : '<tr><td colspan="3" class="empty-cell">Sin créditos en mora ✓</td></tr>';
     }
   }catch(e){
