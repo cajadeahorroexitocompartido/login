@@ -192,6 +192,7 @@ tbody tr:hover td{background:rgba(255,255,255,.02)}
             <div class="rep-row"><span>Otros métodos</span><span class="rep-val" id="r-otro">$0.00</span></div>
             <div class="rep-row"><span>Capital cobrado</span><span class="rep-val" id="r-cap">$0.00</span></div>
             <div class="rep-row"><span>Intereses cobrados</span><span class="rep-val" style="color:var(--orange)" id="r-int">$0.00</span></div>
+            <div class="rep-row"><span>Interés de mora cobrado</span><span class="rep-val" style="color:var(--red)" id="r-mora-cobrada">$0.00</span></div>
             <div class="rep-row total"><span>TOTAL COBRADO</span><span class="rep-val" id="r-total">$0.00</span></div>
           </div>
         </div>
@@ -232,7 +233,8 @@ tbody tr:hover td{background:rgba(255,255,255,.02)}
             <div class="rep-title">Recuperación</div>
             <div class="rep-row"><span>Capital recuperado</span><span class="rep-val" style="color:var(--green)" id="r-cap-rec">$0.00</span></div>
             <div class="rep-row"><span>Intereses cobrados</span><span class="rep-val" style="color:var(--orange)" id="r-int-rec">$0.00</span></div>
-            <div class="rep-row"><span>Mora pendiente</span><span class="rep-val" style="color:var(--red)" id="r-mora-monto">$0.00</span></div>
+            <div class="rep-row"><span>Saldo de capital en mora</span><span class="rep-val" style="color:var(--red)" id="r-mora-monto">$0.00</span></div>
+            <div class="rep-row"><span>Interés de mora pendiente (estimado)</span><span class="rep-val" style="color:var(--red)" id="r-mora-pendiente">$0.00</span></div>
           </div>
         </div>
       </div>
@@ -297,12 +299,48 @@ async function generarReporte(){
 
     // ── Cobros ─────────────────────────────────────────────
     const metodo = m => String(m.Metodo||m.MetodoPrincipal||'').toLowerCase();
-    const ef  = pagos.filter(p=>metodo(p).includes('efectivo')).reduce((a,p)=>a+(+p.Capital||0)+(+p.Interes||0)+(+p.Mora||0),0);
-    const tr  = pagos.filter(p=>metodo(p).includes('transferencia')).reduce((a,p)=>a+(+p.Capital||0)+(+p.Interes||0)+(+p.Mora||0),0);
-    const otro= pagos.filter(p=>!metodo(p).includes('efectivo')&&!metodo(p).includes('transferencia')).reduce((a,p)=>a+(+p.Capital||0)+(+p.Interes||0)+(+p.Mora||0),0);
-    const cap = pagos.reduce((a,p)=>a+(+p.Capital||0),0);
-    const int = pagos.reduce((a,p)=>a+(+p.Interes||0),0);
-    const tot = cap+int;
+
+    // Sumar por método real, desglosando pagos "mixto" con FormasPago
+    function totPorMetodo(arr, metodoBuscado){
+      let suma = 0;
+      arr.forEach(p=>{
+        const met = metodo(p);
+        if(met === metodoBuscado){
+          suma += (+p.Capital||0)+(+p.Interes||0)+(+p.Mora||0);
+        } else if(met === 'mixto' && p.FormasPago){
+          try{
+            const formas = JSON.parse(p.FormasPago);
+            formas.forEach(f=>{
+              if(String(f.metodo||'').toLowerCase()===metodoBuscado) suma += parseFloat(f.monto||0);
+            });
+          }catch(e){}
+        }
+      });
+      return suma;
+    }
+    const ef   = totPorMetodo(pagos,'efectivo');
+    const tr   = totPorMetodo(pagos,'transferencia');
+    const cap  = pagos.reduce((a,p)=>a+(+p.Capital||0),0);
+    const int  = pagos.reduce((a,p)=>a+(+p.Interes||0),0);
+    const moraCobrada = pagos.reduce((a,p)=>a+(+p.Mora||0),0);
+    const tot  = cap+int+moraCobrada;
+    const otro = Math.max(0, tot - ef - tr); // lo que no fue efectivo ni transferencia (cheque, otro)
+
+    // ── Mora pendiente (cuotas vencidas no pagadas en créditos en mora) ──
+    const moraPendiente = creditos
+      .filter(c=>c.Estado==='en_mora')
+      .reduce((a,c)=>{
+        const tasaMora = parseFloat(c.TasaMora||0)/100;
+        if(!tasaMora) return a;
+        const saldoCred = parseFloat(c.Saldo||0);
+        const tasaPer    = parseFloat(c.TasaMensual||0)/100;
+        const cuotaInt   = parseFloat((saldoCred*tasaPer).toFixed(2));
+        // Estimado simple: días desde fecha de inicio hasta hoy, vencidos
+        const hoyD = new Date();
+        const inicio = new Date((c.FechaInicio||'')+'T12:00:00');
+        const diasTranscurridos = Math.max(0, Math.floor((hoyD-inicio)/(1000*60*60*24)));
+        return a + parseFloat((cuotaInt*tasaMora*diasTranscurridos).toFixed(2));
+      },0);
 
     // ── Capital ─────────────────────────────────────────────
     const aportes = movs.filter(m=>m.Tipo==='aporte').reduce((a,m)=>a+(+m.Monto||0),0);
@@ -331,6 +369,7 @@ async function generarReporte(){
     document.getElementById('r-otro').textContent  = EC.fmt(otro);
     document.getElementById('r-cap').textContent   = EC.fmt(cap);
     document.getElementById('r-int').textContent   = EC.fmt(int);
+    document.getElementById('r-mora-cobrada').textContent = EC.fmt(moraCobrada);
     document.getElementById('r-total').textContent = EC.fmt(tot);
 
     document.getElementById('r-aportes').textContent  = EC.fmt(aportes);
@@ -347,6 +386,7 @@ async function generarReporte(){
     document.getElementById('r-cap-rec').textContent   = EC.fmt(cap);
     document.getElementById('r-int-rec').textContent   = EC.fmt(int);
     document.getElementById('r-mora-monto').textContent= EC.fmt(moraMonto);
+    document.getElementById('r-mora-pendiente').textContent = EC.fmt(moraPendiente);
 
     // Detalle cobros
     const sorted = [...pagos].sort((a,b)=>b.Fecha?.localeCompare(a.Fecha||''));
@@ -423,6 +463,7 @@ async function exportarPDF(){
       body:[
         ['Cobros en efectivo',       document.getElementById('r-ef').textContent],
         ['Cobros por transferencia', document.getElementById('r-tr').textContent],
+        ['Interés de mora cobrado',  document.getElementById('r-mora-cobrada').textContent],
         ['Otros métodos',            document.getElementById('r-otro').textContent],
         ['Capital cobrado',          document.getElementById('r-cap').textContent],
         ['Intereses cobrados',       document.getElementById('r-int').textContent],
@@ -474,6 +515,7 @@ async function exportarPDF(){
         ['Créditos al día',                  document.getElementById('r-al-dia').textContent],
         ['Créditos en mora',                 document.getElementById('r-en-mora').textContent],
         ['Monto en mora',                    document.getElementById('r-mora-monto').textContent],
+        ['Interés de mora pendiente',        document.getElementById('r-mora-pendiente').textContent],
         ['Capital recuperado',               document.getElementById('r-cap-rec').textContent],
         ['Intereses cobrados',               document.getElementById('r-int-rec').textContent],
       ],

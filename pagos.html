@@ -550,10 +550,36 @@ function calcularStats(pagos){
   const hoy=EC.hoy(), mes=hoy.substr(0,7);
   const hoyP=pagos.filter(p=>p.Fecha===hoy);
   const mesP=pagos.filter(p=>(p.Fecha||'').startsWith(mes));
+
+  // Suma total simple (capital + interés + mora)
   const tot=arr=>arr.reduce((a,p)=>a+(parseFloat(p.Capital||0)+parseFloat(p.Interes||0)+parseFloat(p.Mora||0)),0);
+
+  // Suma por método real, desglosando los pagos "mixto" usando FormasPago
+  function totPorMetodo(arr, metodoBuscado){
+    let suma = 0;
+    arr.forEach(p=>{
+      const metodo = String(p.Metodo||'').toLowerCase();
+      if(metodo === metodoBuscado){
+        // Pago simple de un solo método: sumar el total completo
+        suma += parseFloat(p.Capital||0)+parseFloat(p.Interes||0)+parseFloat(p.Mora||0);
+      } else if(metodo === 'mixto' && p.FormasPago){
+        // Pago mixto: desglosar usando FormasPago y sumar solo la parte que corresponde
+        try{
+          const formas = JSON.parse(p.FormasPago);
+          formas.forEach(f=>{
+            if(String(f.metodo||'').toLowerCase() === metodoBuscado){
+              suma += parseFloat(f.monto||0);
+            }
+          });
+        }catch(e){ /* JSON inválido, ignorar */ }
+      }
+    });
+    return suma;
+  }
+
   document.getElementById('stat-hoy-total').textContent=EC.fmt(tot(hoyP));
-  document.getElementById('stat-hoy-ef').textContent=EC.fmt(tot(hoyP.filter(p=>(p.Metodo||'').toLowerCase().includes('efectivo'))));
-  document.getElementById('stat-hoy-tr').textContent=EC.fmt(tot(hoyP.filter(p=>(p.Metodo||'').toLowerCase().includes('transferencia'))));
+  document.getElementById('stat-hoy-ef').textContent=EC.fmt(totPorMetodo(hoyP,'efectivo'));
+  document.getElementById('stat-hoy-tr').textContent=EC.fmt(totPorMetodo(hoyP,'transferencia'));
   document.getElementById('stat-mes').textContent=EC.fmt(tot(mesP));
 }
 
