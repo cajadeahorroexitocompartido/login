@@ -273,6 +273,10 @@ tbody tr:hover td{background:rgba(255,255,255,.02)}
           <div class="info-item"><div class="info-label">% Pagado</div><div class="info-val" style="color:var(--green)" id="det-pct">—</div></div>
           <div class="info-item"><div class="info-label">Cuotas pagadas</div><div class="info-val" id="det-cuotas-pagadas">—</div></div>
           <div class="info-item"><div class="info-label">Cuotas pendientes</div><div class="info-val" style="color:var(--orange)" id="det-cuotas-pend">—</div></div>
+          <div class="info-item" style="border:1px solid rgba(231,76,60,.3);background:rgba(231,76,60,.05)"><div class="info-label">Cuotas en mora</div><div class="info-val" style="color:var(--red)" id="det-cuotas-mora">—</div></div>
+          <div class="info-item" style="border:1px solid rgba(231,76,60,.3);background:rgba(231,76,60,.05)"><div class="info-label">Capital en mora</div><div class="info-val" style="color:var(--red)" id="det-cap-mora">—</div></div>
+          <div class="info-item" style="border:1px solid rgba(231,76,60,.3);background:rgba(231,76,60,.05)"><div class="info-label">Interés de mora acumulado</div><div class="info-val" style="color:var(--red)" id="det-int-mora">—</div></div>
+          <div class="info-item" style="border:1px solid rgba(231,76,60,.4);background:rgba(231,76,60,.08)"><div class="info-label">TOTAL EN MORA (capital+interés mora)</div><div class="info-val" style="color:var(--red);font-size:16px" id="det-total-mora">—</div></div>
         </div>
         <!-- TABLA AMORTIZACIÓN -->
         <div class="section-sep">Tabla de amortización</div>
@@ -596,6 +600,32 @@ function verDetalle(cr){
   document.getElementById('det-cuotas-pagadas').textContent = cuotasPagadasMostrar+' / '+filas.length;
   document.getElementById('det-cuotas-pend').textContent    = cuotasPendMostrar+' cuotas';
   document.getElementById('det-pct').textContent            = pctMostrar+'%';
+
+  // ── CÁLCULO DE MORA: cuotas vencidas no pagadas ────────────
+  // Recorre todas las cuotas pendientes y marca las que ya vencieron
+  const hoyMora = EC.hoy();
+  const tasaMoraDiaria = parseFloat(cr.TasaMora||0)/100;
+  let cuotasEnMora = 0, capitalEnMora = 0, interesMoraAcumulado = 0;
+
+  if(!creditoFinalizado2){
+    for(let i=cuotasPagadas; i<filas.length; i++){
+      const f = filas[i];
+      if(f.fecha < hoyMora){
+        cuotasEnMora++;
+        capitalEnMora += f.cap;
+        if(tasaMoraDiaria > 0){
+          const dias = Math.floor((new Date(hoyMora+'T12:00:00') - new Date(f.fecha+'T12:00:00')) / (1000*60*60*24));
+          interesMoraAcumulado += parseFloat((f.cuota * tasaMoraDiaria * dias).toFixed(2));
+        }
+      }
+    }
+  }
+  const totalEnMora = capitalEnMora + interesMoraAcumulado;
+
+  document.getElementById('det-cuotas-mora').textContent = cuotasEnMora+' cuota'+(cuotasEnMora!==1?'s':'');
+  document.getElementById('det-cap-mora').textContent    = EC.fmt(capitalEnMora);
+  document.getElementById('det-int-mora').textContent    = EC.fmt(interesMoraAcumulado);
+  document.getElementById('det-total-mora').textContent  = EC.fmt(totalEnMora);
 
   // Tabla amortización con estados
   // Si el crédito está cancelado (pagado completo o precancelado),
