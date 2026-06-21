@@ -326,7 +326,7 @@ function renderSocios(lista){
 
 // ── RENDER MOVIMIENTOS ────────────────────────────────────────
 function renderMovimientos(){
-  const ultimos=[...todosMovimientos].sort((a,b)=>(b.Fecha||'').localeCompare(a.Fecha||'')).slice(0,15);
+  const ultimos=[...todosMovimientos].sort((a,b)=>(b.Fecha||'').localeCompare(a.Fecha||'')).slice(0,10);
   if(!ultimos.length){ document.getElementById('lista-movimientos').innerHTML='<div style="text-align:center;padding:30px;color:var(--text3)">Sin movimientos</div>'; return; }
   document.getElementById('lista-movimientos').innerHTML=ultimos.map(m=>{
     const esAporte=m.Tipo==='aporte';
@@ -349,7 +349,14 @@ function renderMovimientos(){
   }).join('');
 }
 
-function filtrarSocios(q){ renderSocios(todosSocios.filter(s=>((s.Nombres||'')+(s.Apellidos||'')).toLowerCase().includes(q.toLowerCase())||(s.Cedula||'').includes(q))); }
+function filtrarSocios(q){
+  const texto = (q||'').toLowerCase().trim();
+  const filtrados = todosSocios.filter(s =>
+    ((s.Nombres||'')+' '+(s.Apellidos||'')).toLowerCase().includes(texto) ||
+    String(s.Cedula||'').includes(texto)
+  );
+  renderSocios(filtrados);
+}
 
 // ── MODAL SOCIO ───────────────────────────────────────────────
 function abrirModalSocio(){
@@ -389,15 +396,15 @@ async function guardarSocio(){
   try{
     let sid=id;
     if(id){
-      await fetch(EC.api,{method:'POST',body:JSON.stringify({accion:'actualizar',tab:'socios',id,datos})});
+      await fetch(EC.api,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({accion:'actualizar',tab:'socios',id,datos})});
     } else {
-      const r=await fetch(EC.api,{method:'POST',body:JSON.stringify({accion:'agregar',tab:'socios',datos})});
+      const r=await fetch(EC.api,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({accion:'agregar',tab:'socios',datos})});
       const j=await r.json();
       if(j.ok) sid=j.data?.ID||j.data?.id;
     }
     const aporte=parseFloat(document.getElementById('s-aporte-inicial').value)||0;
     if(aporte>0 && sid && !id){
-      await fetch(EC.api,{method:'POST',body:JSON.stringify({accion:'agregar',tab:'capital',datos:{SocioID:sid,SocioNombre:n+' '+a,Tipo:'aporte',Monto:aporte,Fecha:EC.hoy(),Descripcion:'Aporte inicial'}})});
+      await fetch(EC.api,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({accion:'agregar',tab:'capital',datos:{SocioID:sid,SocioNombre:n+' '+a,Tipo:'aporte',Monto:aporte,Fecha:EC.hoy(),Descripcion:'Aporte inicial'}})});
     }
     cerrarModalSocio();
     await Promise.all([cargarSocios(),cargarMovimientos()]);
@@ -435,9 +442,14 @@ async function guardarMovimiento(){
   const s=todosSocios.find(x=>x.ID===sid)||{};
   EC.showLoading('Registrando movimiento...');
   try{
-    const r=await fetch(EC.api,{method:'POST',body:JSON.stringify({accion:'agregar',tab:'capital',datos:{SocioID:sid,SocioNombre:(s.Nombres||'')+' '+(s.Apellidos||''),Tipo:tipo,Monto:monto,Fecha:fecha,Descripcion:desc||tipo}})});
+    const r=await fetch(EC.api,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({accion:'agregar',tab:'capital',datos:{SocioID:sid,SocioNombre:(s.Nombres||'')+' '+(s.Apellidos||''),Tipo:tipo,Monto:monto,Fecha:fecha,Descripcion:desc||tipo}})});
     const j=await r.json();
-    if(j.ok){ cerrarModalMov(); await cargarMovimientos(); EC.toast('Movimiento registrado exitosamente'); }
+    if(j.ok){
+      cerrarModalMov();
+      await cargarMovimientos();   // actualiza todosMovimientos + stats + lista de movimientos
+      renderSocios(todosSocios);   // vuelve a dibujar las tarjetas de socios con el capital nuevo
+      EC.toast('Movimiento registrado exitosamente');
+    }
     else EC.toast('Error al registrar','error');
   }catch(e){ EC.toast('Error: '+e.message,'error'); }
   EC.hideLoading();
