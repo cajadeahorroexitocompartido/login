@@ -193,17 +193,13 @@
       <input type="hidden" id="p-cliente" value="">
       <div class="field" style="margin-bottom:10px">
         <div class="search-wrap" style="width:100%">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-          <input type="text" id="p-cliente-buscar" placeholder="Buscar por nombre o cédula..." oninput="filtrarClientesPago(this.value)" style="width:100%;padding-left:32px">
+          <input type="text" id="p-cliente-buscar" placeholder="Buscar por nombre o cédula..." oninput="filtrarClientesPago(this.value)" style="width:100%;padding-left:12px">
         </div>
       </div>
       <div id="p-cliente-seleccionado" style="display:none;margin-bottom:14px">
-        <div class="cuota-info-box" style="display:flex;align-items:center;justify-content:space-between">
-          <div>
-            <div style="font-size:13px;font-weight:bold;color:var(--text)" id="p-cliente-nombre-sel">—</div>
-            <div style="font-size:11px;color:var(--text3)" id="p-cliente-cedula-sel">—</div>
-          </div>
-          <button class="btn btn-outline btn-xs" onclick="cambiarClientePago()">Cambiar</button>
+        <div class="cuota-info-box">
+          <div style="font-size:13px;font-weight:bold;color:var(--text)" id="p-cliente-nombre-sel">—</div>
+          <div style="font-size:11px;color:var(--text3)" id="p-cliente-cedula-sel">—</div>
         </div>
       </div>
       <div id="p-cliente-lista" class="card" style="margin-bottom:14px;max-height:240px;overflow-y:auto">
@@ -216,7 +212,6 @@
 
         <!-- Info cuota -->
         <div class="section-label">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
           Detalle del crédito
         </div>
         <div class="cuota-info-box" id="cuota-info-box">
@@ -227,26 +222,22 @@
           <div class="cuota-info-row"><span class="cuota-info-label">Cuota a pagar</span><span class="cuota-info-val green" id="ci-cuota">$0.00</span></div>
           <div class="cuota-info-row"><span class="cuota-info-label">Capital de cuota</span><span class="cuota-info-val" id="ci-cap">$0.00</span></div>
           <div class="cuota-info-row"><span class="cuota-info-label">Interés de cuota</span><span class="cuota-info-val" id="ci-int">$0.00</span></div>
-          <div class="cuota-info-row" id="ci-mora-row" style="display:none"><span class="cuota-info-label" style="color:var(--red)">⚠ Interés de mora</span><span class="cuota-info-val" style="color:var(--red)" id="ci-mora">$0.00</span></div>
+          <div class="cuota-info-row" id="ci-mora-row" style="display:none"><span class="cuota-info-label" style="color:var(--red)">Interés de mora</span><span class="cuota-info-val" style="color:var(--red)" id="ci-mora">$0.00</span></div>
           <div class="cuota-info-row" id="ci-dias-mora-row" style="display:none"><span class="cuota-info-label" style="color:var(--red)">Días en mora</span><span class="cuota-info-val" style="color:var(--red)" id="ci-dias-mora">0 días</span></div>
         </div>
 
         <!-- Tipo de pago -->
         <div class="section-label" style="margin-bottom:10px">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
           ¿Cómo desea pagar?
         </div>
         <div class="tipo-pago-wrap">
           <button class="tipo-pago-btn" id="btn-cuota-completa" onclick="seleccionarTipoPago('completa')">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
             Pagar cuota completa
           </button>
           <button class="tipo-pago-btn" id="btn-abono" onclick="seleccionarTipoPago('abono')">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
             Hacer abono
           </button>
           <button class="tipo-pago-btn" id="btn-precancelar" onclick="seleccionarTipoPago('precancelar')" style="border-color:rgba(231,76,60,.3)">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
             Precancelar crédito
           </button>
         </div>
@@ -256,7 +247,7 @@
             <div class="cuota-info-row"><span class="cuota-info-label">Saldo de capital</span><span class="cuota-info-val green" id="pre-cap">$0.00</span></div>
             <div class="cuota-info-row"><span class="cuota-info-label">Interés pendiente (sin cuotas futuras)</span><span class="cuota-info-val" id="pre-int">$0.00</span></div>
             <div class="cuota-info-row" style="border-top:1px solid rgba(231,76,60,.2);margin-top:4px;padding-top:8px"><span class="cuota-info-label" style="font-weight:700;color:var(--red)">TOTAL A PRECANCELAR</span><span class="cuota-info-val" style="color:var(--red);font-size:16px" id="pre-total">$0.00</span></div>
-            <div style="font-size:11px;color:var(--text3);margin-top:8px;line-height:1.5">ⓘ Al precancelar solo se cobra el capital pendiente más el interés del período actual. Los intereses futuros se eliminan.</div>
+            <div style="font-size:11px;color:var(--text3);margin-top:8px;line-height:1.5">Al precancelar solo se cobra el capital pendiente más el interés del período actual. Los intereses futuros se eliminan.</div>
           </div>
         </div>
 
@@ -580,7 +571,6 @@ function abrirModalPago(){
   renderListaClientesPago('');
 
   document.getElementById('modal-pago').classList.add('open');
-  setTimeout(()=>document.getElementById('p-cliente-buscar').focus(), 150);
 }
 
 // Lista de clientes con crédito activo, buscable por nombre o cédula
@@ -644,7 +634,6 @@ function cambiarClientePago(){
   document.getElementById('seccion-formas-pago').style.display = 'none';
   document.getElementById('btn-registrar-pago').style.display = 'none';
   renderListaClientesPago('');
-  setTimeout(()=>document.getElementById('p-cliente-buscar').focus(), 100);
 }
 
 function cerrarModalPago(){ document.getElementById('modal-pago').classList.remove('open'); }
