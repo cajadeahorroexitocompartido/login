@@ -4,356 +4,127 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 <title>Éxito Compartido — Acceso</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@500&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 :root{
-  --bg:#080c10;
-  --surface:#0e1318;
-  --surface2:#141b22;
-  --border:rgba(255,255,255,0.08);
-  --green:#2ecc71;
-  --green2:#27ae60;
-  --red:#e74c3c;
-  --text:#f0f4f8;
-  --text2:#8896a4;
-  --text3:#4a5568;
-  --radius:14px;
+  --bg:#f4f6f8;--surface:#ffffff;--surface2:#f8f9fb;
+  --border:#dde2e8;--border2:#eaedf1;
+  --navy:#1a3a5c;--navy-dark:#12283f;--navy-soft:#eaf0f6;
+  --text:#1c2530;--text2:#5b6776;--text3:#8a96a3;
+  --red:#b3261e;--red-soft:#fbe9e7;
+  --radius:8px;
 }
-html,body{
-  min-height:100vh;
-  font-family:'DM Sans',sans-serif;
-  background:var(--bg);
-  color:var(--text);
-  font-size:15px;
-}
-
-/* FONDO */
-.bg-wrap{
-  position:fixed;inset:0;z-index:0;overflow:hidden;
-  background:radial-gradient(ellipse 80% 60% at 50% -10%, rgba(46,204,113,0.07) 0%, transparent 65%);
-}
-.bg-grid{
-  position:absolute;inset:0;
-  background-image:
-    linear-gradient(rgba(255,255,255,.015) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,255,255,.015) 1px, transparent 1px);
-  background-size:44px 44px;
-}
-
-/* LAYOUT */
-.page{
-  position:relative;z-index:1;
-  min-height:100vh;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  padding:24px 16px;
-}
-
-/* CARD */
-.card{
-  width:100%;
-  max-width:420px;
-  background:var(--surface);
-  border:1px solid var(--border);
-  border-radius:24px;
-  overflow:hidden;
-  box-shadow:0 32px 80px rgba(0,0,0,.5), 0 0 0 1px rgba(255,255,255,.03);
-}
-
-/* HEADER DE LA CARD */
-.card-top{
-  padding:36px 32px 28px;
-  text-align:center;
-  border-bottom:1px solid rgba(255,255,255,.05);
-  background:linear-gradient(180deg, rgba(46,204,113,0.04) 0%, transparent 100%);
-}
-.logo{
-  width:70px;height:70px;
-  border-radius:20px;
-  background:linear-gradient(135deg, var(--green) 0%, var(--green2) 100%);
-  display:inline-flex;align-items:center;justify-content:center;
-  font-size:26px;font-weight:700;color:#fff;
-  font-family:'DM Mono',monospace;
-  box-shadow:0 8px 30px rgba(46,204,113,0.35);
-  margin-bottom:18px;
-}
-.org-name{
-  font-size:18px;font-weight:700;
-  color:var(--text);
-  line-height:1.3;
-  margin-bottom:5px;
-}
-.org-name span{color:var(--green)}
-.org-tag{
-  display:inline-block;
-  font-size:11px;font-weight:500;
-  color:var(--text3);
-  text-transform:uppercase;
-  letter-spacing:.1em;
-}
-
-/* FORM */
+html,body{min-height:100vh;font-family:Arial,Helvetica,sans-serif;background:var(--bg);color:var(--text);font-size:14px}
+.page{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px 16px}
+.card{width:100%;max-width:420px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;box-shadow:0 1px 3px rgba(16,24,32,.08)}
+.card-top{padding:36px 32px 26px;text-align:center;background:var(--navy);border-bottom:3px solid var(--navy-dark)}
+.logo{width:60px;height:60px;border-radius:6px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);display:inline-flex;align-items:center;justify-content:center;font-size:20px;font-weight:bold;color:#fff;margin-bottom:16px;letter-spacing:.5px}
+.org-name{font-size:17px;font-weight:bold;color:#fff;line-height:1.35;margin-bottom:4px}
+.org-tag{font-size:11px;font-weight:normal;color:#c4d2e0;text-transform:uppercase;letter-spacing:.08em}
 .card-body{padding:28px 32px 32px}
-.form-title{font-size:15px;font-weight:600;margin-bottom:4px}
-.form-sub{font-size:13px;color:var(--text3);margin-bottom:24px}
-
-.field{margin-bottom:16px}
-.field label{
-  display:block;font-size:11px;font-weight:600;
-  color:var(--text3);text-transform:uppercase;
-  letter-spacing:.07em;margin-bottom:8px;
-}
+.form-title{font-size:15px;font-weight:bold;margin-bottom:3px;color:var(--text)}
+.form-sub{font-size:12px;color:var(--text3);margin-bottom:22px}
+.field{margin-bottom:14px}
+.field label{display:block;font-size:11px;font-weight:bold;color:var(--text2);text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px}
 .input-wrap{position:relative}
-.input-wrap .ico{
-  position:absolute;left:14px;top:50%;
-  transform:translateY(-50%);
-  color:var(--text3);pointer-events:none;
-}
-.input-wrap input{
-  width:100%;
-  background:var(--surface2);
-  border:1.5px solid var(--border);
-  color:var(--text);
-  padding:13px 44px 13px 42px;
-  border-radius:12px;
-  font-size:14px;
-  font-family:'DM Sans',sans-serif;
-  outline:none;
-  -webkit-appearance:none;
-  transition:border-color .2s, box-shadow .2s;
-}
-.input-wrap input:focus{
-  border-color:var(--green);
-  box-shadow:0 0 0 3px rgba(46,204,113,0.1);
-}
+.input-wrap input{width:100%;background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:11px 14px;border-radius:6px;font-size:13px;font-family:Arial,Helvetica,sans-serif;outline:none;-webkit-appearance:none;transition:border-color .15s}
+.input-wrap input:focus{border-color:var(--navy);background:#fff}
 .input-wrap input::placeholder{color:var(--text3)}
-.toggle-pass{
-  position:absolute;right:14px;top:50%;
-  transform:translateY(-50%);
-  background:none;border:none;
-  color:var(--text3);cursor:pointer;
-  padding:4px;line-height:1;
-  transition:color .15s;
-}
+.toggle-pass{position:absolute;right:11px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--text3);cursor:pointer;padding:4px;line-height:1;font-size:11px}
 .toggle-pass:hover{color:var(--text2)}
-
-/* ERROR */
-.error-box{
-  display:none;
-  background:rgba(231,76,60,.08);
-  border:1px solid rgba(231,76,60,.2);
-  border-radius:10px;
-  padding:11px 14px;
-  font-size:13px;color:var(--red);
-  margin-bottom:16px;
-  align-items:center;gap:9px;
-  line-height:1.4;
-}
+.error-box{display:none;background:var(--red-soft);border:1px solid #f0c4c0;border-radius:6px;padding:10px 12px;font-size:12px;color:var(--red);margin-bottom:14px;align-items:center;gap:8px;line-height:1.4}
 .error-box.show{display:flex}
-
-/* BOTÓN */
-.btn-login{
-  width:100%;padding:15px;
-  background:linear-gradient(135deg, var(--green) 0%, var(--green2) 100%);
-  color:#fff;border:none;border-radius:12px;
-  font-size:15px;font-weight:600;
-  font-family:'DM Sans',sans-serif;
-  cursor:pointer;
-  transition:all .2s;
-  margin-top:6px;
-  display:flex;align-items:center;justify-content:center;gap:10px;
-  box-shadow:0 4px 20px rgba(46,204,113,0.3);
-  -webkit-appearance:none;
-}
-.btn-login:hover{
-  transform:translateY(-1px);
-  box-shadow:0 8px 28px rgba(46,204,113,0.4);
-}
-.btn-login:active{transform:translateY(0)}
+.btn-login{width:100%;padding:12px;background:var(--navy);color:#fff;border:none;border-radius:6px;font-size:14px;font-weight:bold;font-family:Arial,Helvetica,sans-serif;cursor:pointer;margin-top:6px;display:flex;align-items:center;justify-content:center;gap:8px;-webkit-appearance:none;transition:background .15s}
+.btn-login:hover{background:var(--navy-dark)}
 .btn-login.loading{opacity:.7;pointer-events:none}
-.spinner{
-  width:18px;height:18px;
-  border:2px solid rgba(255,255,255,.3);
-  border-top-color:#fff;
-  border-radius:50%;
-  animation:spin .7s linear infinite;
-  display:none;
-}
+.spinner{width:14px;height:14px;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;display:none}
 .btn-login.loading .spinner{display:block}
 .btn-login.loading .btn-txt{display:none}
 @keyframes spin{to{transform:rotate(360deg)}}
-
-/* FOOTER */
-.card-footer{
-  padding:14px 32px;
-  border-top:1px solid rgba(255,255,255,.04);
-  text-align:center;
-  font-size:11px;color:var(--text3);
-  line-height:1.7;
-}
-
-/* RESPONSIVE */
-@media(max-width:480px){
-  .card{border-radius:20px}
-  .card-top{padding:28px 24px 22px}
-  .card-body{padding:22px 24px 28px}
-  .card-footer{padding:12px 24px}
-  .logo{width:60px;height:60px;font-size:22px}
-  .org-name{font-size:16px}
-}
+.card-footer{padding:13px 32px;border-top:1px solid var(--border2);text-align:center;font-size:10px;color:var(--text3);line-height:1.6}
+@media(max-width:480px){.card-top{padding:28px 22px 20px}.card-body{padding:22px 22px 26px}.card-footer{padding:11px 22px}}
 </style>
 </head>
 <body>
-
-<div class="bg-wrap"><div class="bg-grid"></div></div>
-
 <div class="page">
   <div class="card">
-
-    <!-- ENCABEZADO -->
     <div class="card-top">
       <div class="logo">EC</div>
-      <div class="org-name">Caja de Ahorro y Crédito<br><span>Éxito Compartido</span></div>
+      <div class="org-name">Caja de Ahorro y Crédito<br>Éxito Compartido</div>
       <div class="org-tag">Sistema de gestión financiera</div>
     </div>
-
-    <!-- FORMULARIO -->
     <div class="card-body">
       <div class="form-title">Iniciar sesión</div>
       <div class="form-sub">Ingresa tus credenciales para continuar</div>
-
       <div class="error-box" id="error-box">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
         <span id="error-msg">Correo o contraseña incorrectos.</span>
       </div>
-
       <div class="field">
         <label>Correo electrónico</label>
-        <div class="input-wrap">
-          <svg class="ico" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><polyline points="2,4 12,13 22,4"/></svg>
-          <input type="email" id="inp-email" placeholder="tucorreo@email.com" autocomplete="email" inputmode="email">
-        </div>
+        <div class="input-wrap"><input type="email" id="inp-email" placeholder="tucorreo@email.com" autocomplete="email" inputmode="email"></div>
       </div>
-
       <div class="field">
         <label>Contraseña</label>
         <div class="input-wrap">
-          <svg class="ico" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
           <input type="password" id="inp-pass" placeholder="••••••••" autocomplete="current-password">
-          <button class="toggle-pass" onclick="togglePass()" type="button">
-            <svg id="ico-show" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-            <svg id="ico-hide" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
-          </button>
+          <button class="toggle-pass" onclick="togglePass()" type="button"><span id="toggle-txt">Ver</span></button>
         </div>
       </div>
-
       <button class="btn-login" id="btn-login" onclick="doLogin()">
         <span class="btn-txt">Ingresar al sistema</span>
         <div class="spinner"></div>
       </button>
     </div>
-
-    <!-- FOOTER -->
-    <div class="card-footer">
-      Caja de Ahorro y Crédito Éxito Compartido &nbsp;·&nbsp; 2026<br>
-      Solo personal autorizado
-    </div>
-
+    <div class="card-footer">Caja de Ahorro y Crédito Éxito Compartido &nbsp;·&nbsp; 2026<br>Solo personal autorizado</div>
   </div>
 </div>
-
 <script>
-// ── CONFIGURACIÓN ────────────────────────────────────────────
-// 🔗 ENLACE APP SCRIPT (BASE DE DATOS):
 const API = 'https://script.google.com/macros/s/AKfycby-BrSpUIdQ_v08SYjsg7lFDcMCMxfgbqAjPIlfZZGFRVEoyyTHrRIzJmZFMoUIDAzTFw/exec';
-
-// ── TOGGLE CONTRASEÑA ────────────────────────────────────────
 function togglePass(){
-  const inp  = document.getElementById('inp-pass');
-  const show = document.getElementById('ico-show');
-  const hide = document.getElementById('ico-hide');
+  const inp = document.getElementById('inp-pass'), txt = document.getElementById('toggle-txt');
   const oculto = inp.type === 'password';
-  inp.type       = oculto ? 'text'  : 'password';
-  show.style.display = oculto ? 'none'  : 'block';
-  hide.style.display = oculto ? 'block' : 'none';
+  inp.type = oculto ? 'text' : 'password';
+  txt.textContent = oculto ? 'Ocultar' : 'Ver';
 }
-
-// ── LOGIN ────────────────────────────────────────────────────
 async function doLogin(){
   const email = document.getElementById('inp-email').value.trim().toLowerCase();
   const pass  = document.getElementById('inp-pass').value;
   const err   = document.getElementById('error-box');
   const btn   = document.getElementById('btn-login');
-
   err.classList.remove('show');
-
   if(!email || !pass){
     document.getElementById('error-msg').textContent = 'Completa el correo y la contraseña.';
-    err.classList.add('show');
-    return;
+    err.classList.add('show'); return;
   }
-
   btn.classList.add('loading');
-
   try{
-    // Buscar usuario en Google Sheets
-    // Intentar login en Apps Script
-    const r = await fetch(API, {
-      method : 'POST',
-      headers: {'Content-Type':'text/plain'},
-      body   : JSON.stringify({ accion:'login', email, pass })
-    });
+    const r = await fetch(API, {method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({accion:'login',email,pass})});
     const j = await r.json();
-
     if(j.ok && j.data && j.data.ok){
       const u = j.data.usuario;
-      // Normalizar campos — el Apps Script puede devolver Nombre o nombre
-      const usuario = {
-        id    : u.id    || u.ID    || u.Id    || '',
-        nombre: u.nombre|| u.Nombre|| u.name  || email,
-        rol   : u.rol   || u.Rol   || u.role  || 'contador',
-        email : u.email || u.Email || email,
-      };
-      // Guardar sesión
-      sessionStorage.setItem('ec_user',    JSON.stringify(usuario));
-      sessionStorage.setItem('ec_rol',     usuario.rol);
-      sessionStorage.setItem('api_url',    API);
-      // Ir al dashboard
+      const usuario = {id:u.id||u.ID||'',nombre:u.nombre||u.Nombre||email,rol:u.rol||u.Rol||'contador',email:u.email||u.Email||email};
+      sessionStorage.setItem('ec_user', JSON.stringify(usuario));
+      sessionStorage.setItem('ec_rol', usuario.rol);
+      sessionStorage.setItem('api_url', API);
       window.location.href = 'dashboard.html';
     } else {
-      // Si falla el login del Apps Script, intentar buscar el usuario directamente
-      // (por si el Apps Script tiene un bug en la acción login)
       try{
         const r2 = await fetch(`${API}?accion=leer&tab=usuarios`);
         const j2 = await r2.json();
         if(j2.ok && j2.data){
-          const usuarios = j2.data;
-          // Buscar usuario por email (insensible a mayúsculas)
-          const u = usuarios.find(x =>
-            String(x.Email||x.email||'').toLowerCase() === email &&
-            (x.Pass||x.pass||x.Contrasena||x.contrasena||'') === pass &&
-            (x.Activo||x.activo) !== false &&
-            String(x.Activo||x.activo||'true').toLowerCase() !== 'false'
-          );
+          const u = j2.data.find(x => String(x.Email||'').toLowerCase()===email && (x.Pass||'')===pass && String(x.Activo||'true').toLowerCase()!=='false');
           if(u){
-            const usuario = {
-              id    : u.ID    || u.Id    || u.id    || '',
-              nombre: u.Nombre|| u.nombre|| u.Name  || email,
-              rol   : u.Rol   || u.rol   || 'contador',
-              email : u.Email || u.email || email,
-            };
-            sessionStorage.setItem('ec_user',  JSON.stringify(usuario));
-            sessionStorage.setItem('ec_rol',   usuario.rol);
-            sessionStorage.setItem('api_url',  API);
+            const usuario = {id:u.ID||'',nombre:u.Nombre||email,rol:u.Rol||'contador',email:u.Email||email};
+            sessionStorage.setItem('ec_user', JSON.stringify(usuario));
+            sessionStorage.setItem('ec_rol', usuario.rol);
+            sessionStorage.setItem('api_url', API);
             window.location.href = 'dashboard.html';
             return;
           }
         }
       }catch(_){}
-      document.getElementById('error-msg').textContent =
-        (j.data && j.data.msg) ? j.data.msg : 'Correo o contraseña incorrectos. Verifica tus datos.';
+      document.getElementById('error-msg').textContent = (j.data && j.data.msg) ? j.data.msg : 'Correo o contraseña incorrectos.';
       err.classList.add('show');
       if(navigator.vibrate) navigator.vibrate([60,40,60]);
       btn.classList.remove('loading');
@@ -364,8 +135,6 @@ async function doLogin(){
     btn.classList.remove('loading');
   }
 }
-
-// Enter para hacer login
 document.addEventListener('keydown', e => { if(e.key === 'Enter') doLogin(); });
 </script>
 </body>

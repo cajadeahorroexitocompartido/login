@@ -2,168 +2,68 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 <title>Cobros y Pagos — Éxito Compartido</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="estilos.css">
 <style>
-*{margin:0;padding:0;box-sizing:border-box}
-:root{--bg:#080c10;--surface:#0e1318;--surface2:#141b22;--surface3:#1a2330;--border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.04);--green:#2ecc71;--green2:#27ae60;--green-glow:rgba(46,204,113,0.12);--orange:#f39c12;--red:#e74c3c;--blue:#3498db;--purple:#9b59b6;--yellow:#f1c40f;--text:#f0f4f8;--text2:#8896a4;--text3:#4a5568;--radius:12px}
-html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);font-size:14px;overflow-x:hidden}
-.bg-grid{position:fixed;inset:0;z-index:0;background-image:linear-gradient(rgba(255,255,255,.012) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.012) 1px,transparent 1px);background-size:40px 40px;pointer-events:none}
-.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:100;backdrop-filter:blur(2px)}.overlay.open{display:block}
-.sidebar{position:fixed;top:0;left:0;bottom:0;width:260px;background:var(--surface);border-right:1px solid var(--border);z-index:200;transform:translateX(-100%);transition:transform .3s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column;overflow-y:auto}.sidebar.open{transform:translateX(0)}
-.sidebar-header{padding:20px 20px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
-.sidebar-logo{display:flex;align-items:center;gap:12px}
-.sidebar-logo-icon{width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,var(--green),var(--green2));display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#fff;font-family:'DM Mono',monospace;box-shadow:0 4px 12px rgba(46,204,113,0.25);flex-shrink:0}
-.sidebar-logo-text{font-size:12px;font-weight:600;line-height:1.3}.sidebar-logo-sub{font-size:10px;color:var(--text3);margin-top:1px}
-.sidebar-close{background:none;border:none;color:var(--text3);cursor:pointer;padding:6px;border-radius:8px;transition:all .15s;line-height:1}.sidebar-close:hover{background:var(--surface2);color:var(--text)}
-.sidebar-nav{padding:12px 10px;flex:1}
-.nav-group-label{font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.1em;padding:10px 10px 6px}
-.nav-item{display:flex;align-items:center;gap:11px;padding:10px 12px;border-radius:10px;cursor:pointer;color:var(--text2);font-size:13px;margin-bottom:2px;transition:all .15s;text-decoration:none;position:relative}
-.nav-item:hover{background:var(--surface2);color:var(--text)}.nav-item.active{background:var(--green-glow);color:var(--green);font-weight:500}
-.nav-item.active::before{content:'';position:absolute;left:0;top:20%;bottom:20%;width:3px;border-radius:0 3px 3px 0;background:var(--green)}
-.nav-item svg{width:17px;height:17px;flex-shrink:0;opacity:.7}.nav-item.active svg,.nav-item:hover svg{opacity:1}
-.nav-badge{margin-left:auto;font-size:10px;font-weight:700;padding:2px 7px;border-radius:8px;background:var(--red);color:#fff}
-.sidebar-footer{padding:14px;border-top:1px solid var(--border)}
-.user-card{display:flex;align-items:center;gap:10px;padding:10px;border-radius:10px;background:var(--surface2);margin-bottom:10px}
-.user-avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--green),var(--green2));display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;flex-shrink:0}
-.user-name{font-size:12px;font-weight:600}.user-role{font-size:10px;color:var(--text3);margin-top:1px}
-.btn-logout{width:100%;padding:9px;background:rgba(231,76,60,.08);border:1px solid rgba(231,76,60,.15);color:var(--red);border-radius:10px;font-size:12px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;display:flex;align-items:center;justify-content:center;gap:7px;transition:all .15s}.btn-logout:hover{background:rgba(231,76,60,.15)}
-.topbar{position:sticky;top:0;z-index:50;padding:12px 20px;background:rgba(8,12,16,.9);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:14px}
-.btn-hamburger{background:none;border:none;color:var(--text2);cursor:pointer;padding:7px;border-radius:9px;transition:all .15s;line-height:1;display:flex;align-items:center;justify-content:center}.btn-hamburger:hover{background:var(--surface2);color:var(--text)}
-.topbar-title{font-size:15px;font-weight:600}.topbar-sub{font-size:11px;color:var(--text3);margin-top:1px}
-.main{position:relative;z-index:1;min-height:100vh;display:flex;flex-direction:column}
-.content{padding:20px;flex:1}
 .stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
-.stat-box{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;display:flex;align-items:center;gap:12px}
-.stat-icon{width:38px;height:38px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.stat-val{font-size:20px;font-weight:700;font-family:'DM Mono',monospace}
-.stat-label{font-size:11px;color:var(--text3);margin-top:2px}
-.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:16px}
-.card-header{padding:14px 16px;border-bottom:1px solid var(--border2);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
-.card-title{font-size:13px;font-weight:600;display:flex;align-items:center;gap:8px}
-.card-title svg{width:15px;height:15px;color:var(--green)}
-.card-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-.tbl-wrap{overflow-x:auto}
-table{width:100%;border-collapse:collapse;min-width:700px}
-thead th{font-size:10px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.07em;padding:10px 14px;text-align:left;border-bottom:1px solid var(--border2);white-space:nowrap}
-tbody td{padding:11px 14px;font-size:13px;border-bottom:1px solid var(--border2);vertical-align:middle}
-tbody tr:last-child td{border-bottom:none}
-tbody tr:hover td{background:rgba(255,255,255,.02)}
-.mono{font-family:'DM Mono',monospace;font-size:12px}
-.td-actions{display:flex;gap:6px;align-items:center}
-.badge{display:inline-flex;align-items:center;padding:3px 9px;border-radius:6px;font-size:11px;font-weight:500}
-.b-green{background:rgba(46,204,113,.12);color:var(--green)}.b-orange{background:rgba(243,156,18,.12);color:var(--orange)}.b-red{background:rgba(231,76,60,.12);color:var(--red)}.b-blue{background:rgba(52,152,219,.12);color:var(--blue)}.b-gray{background:rgba(255,255,255,.06);color:var(--text3)}
-.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:9px;font-size:13px;font-weight:500;cursor:pointer;border:none;font-family:'DM Sans',sans-serif;transition:all .15s;white-space:nowrap}
-.btn svg{width:15px;height:15px}
-.btn-green{background:linear-gradient(135deg,var(--green),var(--green2));color:#fff;box-shadow:0 2px 10px rgba(46,204,113,.2)}.btn-green:hover{box-shadow:0 4px 16px rgba(46,204,113,.3);transform:translateY(-1px)}
-.btn-outline{background:transparent;color:var(--text2);border:1px solid var(--border)}.btn-outline:hover{background:var(--surface2);color:var(--text)}
-.btn-whatsapp{background:#25D366;color:#fff}.btn-whatsapp:hover{background:#1da851}
-.btn-red{background:rgba(231,76,60,.1);color:var(--red);border:1px solid rgba(231,76,60,.2)}.btn-red:hover{background:rgba(231,76,60,.2)}
-.btn-sm{padding:6px 12px;font-size:12px}.btn-xs{padding:5px 9px;font-size:11px}
-
-/* TIPO PAGO TOGGLE */
-.tipo-pago-wrap{display:flex;gap:10px;margin-bottom:4px}
-.tipo-pago-btn{flex:1;padding:12px 10px;border-radius:10px;border:1px solid var(--border);background:var(--surface2);color:var(--text2);font-size:13px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .2s}
-.tipo-pago-btn svg{width:16px;height:16px}
-.tipo-pago-btn.selected{border-color:var(--green);background:var(--green-glow);color:var(--green)}
-.tipo-pago-btn.selected-abono{border-color:var(--orange);background:rgba(243,156,18,.1);color:var(--orange)}
-
-/* INFO CUOTA */
-.cuota-info-box{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:14px}
-.cuota-info-row{display:flex;justify-content:space-between;align-items:center;padding:4px 0;font-size:12px}
-.cuota-info-row:not(:last-child){border-bottom:1px solid var(--border2)}
-.cuota-info-label{color:var(--text3)}
-.cuota-info-val{font-family:'DM Mono',monospace;font-weight:600;color:var(--text)}
+.stat-box{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:13px 15px;display:flex;align-items:center;gap:11px}
+.stat-icon{width:34px;height:34px;border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.stat-val{font-size:17px;font-weight:bold;color:var(--text)}
+.stat-label{font-size:11px;color:var(--text3);margin-top:1px}
+.tipo-pago-wrap{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.tipo-pago-btn{flex:1;min-width:120px;padding:10px;border:1.5px solid var(--border);border-radius:6px;background:var(--surface);color:var(--text2);font-size:12px;font-weight:bold;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:5px;text-align:center}
+.tipo-pago-btn svg{width:18px;height:18px}
+.tipo-pago-btn.selected{border-color:var(--navy);background:var(--navy-soft);color:var(--navy)}
+.tipo-pago-btn.selected-abono{border-color:var(--navy);background:var(--navy-soft);color:var(--navy)}
+.cuota-info-box{background:var(--surface2);border:1px solid var(--border2);border-radius:6px;padding:11px 13px}
+.cuota-info-row{display:flex;justify-content:space-between;padding:5px 0;font-size:12.5px;border-bottom:1px solid var(--border2)}
+.cuota-info-row:last-child{border-bottom:none}
+.cuota-info-label{color:var(--text2)}
+.cuota-info-val{font-weight:bold;color:var(--text)}
 .cuota-info-val.green{color:var(--green)}
-.cuota-info-val.orange{color:var(--orange)}
-
-/* FORMAS DE PAGO */
-.formas-pago-section{margin-top:6px}
-.formas-pago-title{font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:10px;display:flex;align-items:center;gap:6px}
-.forma-pago-item{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:8px;position:relative}
-.forma-pago-header{display:flex;align-items:center;gap:10px;margin-bottom:10px}
-.forma-pago-header select{flex:1;background:var(--surface3);border:1px solid var(--border);color:var(--text);padding:8px 10px;border-radius:8px;font-size:13px;font-family:'DM Sans',sans-serif;outline:none;-webkit-appearance:none}
-.forma-pago-header select:focus{border-color:var(--green)}
-.forma-pago-monto-wrap{display:flex;align-items:center;gap:8px}
-.forma-pago-monto-wrap label{font-size:11px;color:var(--text3);white-space:nowrap}
-.forma-pago-monto-wrap input{background:var(--surface3);border:1px solid var(--border);color:var(--text);padding:8px 10px;border-radius:8px;font-size:13px;font-family:'DM Mono',monospace;outline:none;width:130px;transition:border-color .2s}
-.forma-pago-monto-wrap input:focus{border-color:var(--green)}
-.btn-remove-forma{background:none;border:none;color:var(--text3);cursor:pointer;padding:4px;border-radius:6px;transition:all .15s;line-height:1;position:absolute;top:10px;right:10px}
-.btn-remove-forma:hover{background:rgba(231,76,60,.1);color:var(--red)}
-.btn-add-forma{width:100%;padding:10px;background:transparent;border:1px dashed var(--border);color:var(--text3);border-radius:10px;font-size:12px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;display:flex;align-items:center;justify-content:center;gap:7px;transition:all .15s;margin-top:4px}
-.btn-add-forma:hover{border-color:var(--green);color:var(--green);background:var(--green-glow)}
-.btn-add-forma svg{width:14px;height:14px}
-
-/* RESUMEN PAGO */
-.resumen-pago-box{background:var(--green-glow);border:1px solid rgba(46,204,113,.2);border-radius:10px;padding:12px 14px;margin-top:8px}
-.resumen-row{display:flex;justify-content:space-between;font-size:12px;padding:3px 0}
-.resumen-row.total{font-size:14px;font-weight:700;color:var(--green);border-top:1px solid rgba(46,204,113,.2);margin-top:6px;padding-top:8px}
+.cuota-info-val.orange{color:var(--amber)}
+.section-label{font-size:11px;font-weight:bold;color:var(--text2);text-transform:uppercase;letter-spacing:.04em;margin:14px 0 8px}
+.form-divider{height:1px;background:var(--border2);margin:14px 0}
+.formas-pago-section{background:var(--surface2);border:1px solid var(--border2);border-radius:6px;padding:13px}
+.formas-pago-title{font-size:12px;font-weight:bold;color:var(--text);margin-bottom:9px}
+.forma-pago-item{background:var(--surface);border:1px solid var(--border2);border-radius:6px;padding:10px;margin-bottom:8px}
+.forma-pago-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:7px}
+.forma-pago-monto-wrap{display:flex;gap:8px;align-items:center}
+.btn-add-forma{background:var(--navy-soft);color:var(--navy);border:1px solid #cbdaea;border-radius:6px;padding:7px 12px;font-size:12px;font-weight:bold;cursor:pointer;width:100%}
+.btn-remove-forma{background:var(--red-soft);color:var(--red);border:none;border-radius:5px;padding:4px 8px;font-size:11px;cursor:pointer}
+.resumen-pago-box{background:var(--navy-soft);border:1px solid #cbdaea;border-radius:6px;padding:12px;margin-top:10px}
+.resumen-row{display:flex;justify-content:space-between;padding:3px 0;font-size:13px;color:var(--text)}
+.resumen-row.total{font-weight:bold;font-size:14px;border-top:1px solid #cbdaea;margin-top:6px;padding-top:8px;color:var(--navy)}
 .resumen-label{color:var(--text2)}
-.resumen-val{font-family:'DM Mono',monospace;color:var(--text)}
-.diferencia-warn{font-size:11px;color:var(--orange);margin-top:6px;display:none;align-items:center;gap:5px}
-.diferencia-warn svg{width:13px;height:13px;flex-shrink:0}
-
-/* MODAL */
-.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:300;align-items:flex-end;justify-content:center;backdrop-filter:blur(4px)}.modal-overlay.open{display:flex}
-@media(min-width:600px){.modal-overlay{align-items:center}}
-.modal{background:var(--surface);border:1px solid var(--border);border-radius:16px 16px 0 0;width:100%;max-width:560px;max-height:92vh;overflow-y:auto;animation:slideUp .25s ease}
-@keyframes slideUp{from{transform:translateY(30px);opacity:0}to{transform:translateY(0);opacity:1}}
-@media(min-width:600px){.modal{border-radius:16px}}
-.modal-header{padding:16px 18px;border-bottom:1px solid var(--border2);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:var(--surface);z-index:10}
-.modal-title{font-size:14px;font-weight:600;display:flex;align-items:center;gap:8px}
-.modal-title svg{width:16px;height:16px;color:var(--green)}
-.modal-close{background:none;border:none;color:var(--text3);cursor:pointer;padding:4px;border-radius:6px;transition:all .15s;line-height:1}.modal-close:hover{background:var(--surface2);color:var(--text)}
-.modal-body{padding:18px}.modal-footer{padding:14px 18px;border-top:1px solid var(--border2);display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap}
-.field label{display:block;font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:7px}
-.field input,.field select,.field textarea{width:100%;background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:10px 12px;border-radius:10px;font-size:13px;font-family:'DM Sans',sans-serif;outline:none;transition:border-color .2s,box-shadow .2s;-webkit-appearance:none}
-.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--green);box-shadow:0 0 0 3px rgba(46,204,113,.08)}
-.field input::placeholder{color:var(--text3)}.field select option{background:var(--surface2)}
-.field input[readonly]{color:var(--green);font-weight:600;cursor:default}
-.form-divider{height:1px;background:var(--border);margin:16px 0}
-.section-label{font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px;display:flex;align-items:center;gap:7px}
-.section-label svg{width:13px;height:13px;color:var(--green)}
-
-/* COMPROBANTE */
-.comp-modal{max-width:420px}
-.comprobante-wrap{padding:8px}
-#comprobante-visual{background:#fff;color:#1a1a1a;border-radius:12px;overflow:hidden;font-family:'DM Sans',sans-serif;}
-.comp-header{background:linear-gradient(135deg,#0d3322,#1a5c3a);padding:24px;text-align:center;}
-.comp-logo{width:52px;height:52px;border-radius:14px;background:rgba(46,204,113,.2);border:2px solid rgba(46,204,113,.4);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;color:#2ecc71;margin:0 auto 12px;font-family:'DM Mono',monospace;}
-.comp-org{font-size:13px;font-weight:700;color:#fff;margin-bottom:3px}
-.comp-sub{font-size:10px;color:rgba(255,255,255,.6);text-transform:uppercase;letter-spacing:.1em}
-.comp-badge{display:inline-block;margin-top:12px;background:rgba(46,204,113,.2);border:1px solid rgba(46,204,113,.4);color:#2ecc71;font-size:11px;font-weight:600;padding:4px 14px;border-radius:20px;letter-spacing:.06em;text-transform:uppercase;}
-.comp-body{padding:20px}
-.comp-monto-wrap{text-align:center;padding:16px 0;border-bottom:1px solid #e8ecf0;margin-bottom:16px}
-.comp-monto-label{font-size:11px;color:#888;text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px}
-.comp-monto{font-size:36px;font-weight:700;color:#1a5c3a;font-family:'DM Mono',monospace;line-height:1}
-.comp-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #f0f0f0;font-size:13px}
+.resumen-val{font-weight:bold}
+.diferencia-warn{color:var(--red);font-size:11px;margin-top:6px;font-weight:bold}
+/* COMPROBANTE — diseño impreso, mantiene su propia identidad visual */
+.comp-modal{max-width:400px}
+.comprobante-wrap{padding:6px}
+#comprobante-visual{background:#fff;color:#1c2530;border-radius:6px;overflow:hidden;border:1px solid #dde2e8}
+.comp-header{background:var(--navy);padding:22px;text-align:center}
+.comp-logo{width:46px;height:46px;border-radius:6px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:bold;color:#fff;margin:0 auto 10px}
+.comp-org{font-size:13px;font-weight:bold;color:#fff;margin-bottom:2px}
+.comp-sub{font-size:10px;color:#c4d2e0;text-transform:uppercase;letter-spacing:.06em}
+.comp-badge{display:inline-block;margin-top:11px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.3);color:#fff;font-size:10px;font-weight:bold;padding:3px 12px;border-radius:4px;letter-spacing:.04em;text-transform:uppercase}
+.comp-body{padding:18px}
+.comp-monto-wrap{text-align:center;padding:14px 0;border-bottom:1px solid #e8ecf0;margin-bottom:14px}
+.comp-monto-label{font-size:10px;color:#888;text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px}
+.comp-monto{font-size:30px;font-weight:bold;color:#1a3a5c;line-height:1}
+.comp-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid #f0f0f0;font-size:12.5px}
 .comp-row:last-child{border-bottom:none}
-.comp-row-label{color:#666;font-weight:500}
-.comp-row-val{font-weight:600;color:#1a1a1a;font-family:'DM Mono',monospace;font-size:12px}
-.comp-footer{background:#f8f9fa;padding:14px 20px;text-align:center;border-top:1px solid #e8ecf0}
-.comp-footer-txt{font-size:11px;color:#999;line-height:1.6}
-.comp-num{font-size:10px;color:#bbb;font-family:'DM Mono',monospace;margin-top:4px}
-.comp-actions{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:12px}
-.comp-action-btn{display:flex;flex-direction:column;align-items:center;gap:5px;padding:10px 6px;border-radius:10px;cursor:pointer;border:1px solid var(--border);background:var(--surface2);color:var(--text2);font-size:11px;font-weight:500;transition:all .15s;font-family:'DM Sans',sans-serif}
-.comp-action-btn:hover{background:var(--surface3);color:var(--text)}
-.comp-action-btn svg{width:20px;height:20px}
-.comp-action-btn.green{background:rgba(46,204,113,.1);border-color:rgba(46,204,113,.2);color:var(--green)}
-.comp-action-btn.green:hover{background:rgba(46,204,113,.2)}
-.comp-action-btn.whatsapp{background:rgba(37,211,102,.1);border-color:rgba(37,211,102,.2);color:#25D366}
-.comp-action-btn.whatsapp:hover{background:rgba(37,211,102,.2)}
-/* CONFIRM */
-.confirm-body{padding:24px 18px;text-align:center}
-.confirm-icon{width:56px;height:56px;border-radius:50%;background:rgba(231,76,60,.1);border:2px solid rgba(231,76,60,.2);display:flex;align-items:center;justify-content:center;margin:0 auto 16px}
-.confirm-title{font-size:16px;font-weight:700;margin-bottom:8px}.confirm-msg{font-size:13px;color:var(--text2);line-height:1.6}
-/* LOADING */
-.loading-overlay{display:none;position:fixed;inset:0;background:rgba(8,12,16,.85);z-index:400;align-items:center;justify-content:center;flex-direction:column;gap:14px;backdrop-filter:blur(4px)}.loading-overlay.show{display:flex}
-.loading-spinner{width:36px;height:36px;border:3px solid rgba(46,204,113,.2);border-top-color:var(--green);border-radius:50%;animation:spin .7s linear infinite}
-@keyframes spin{to{transform:rotate(360deg)}}
-.loading-text{font-size:13px;color:var(--text2)}
-.empty-cell{text-align:center;padding:40px;color:var(--text3);font-size:13px}
+.comp-row-label{color:#666;font-weight:bold}
+.comp-row-val{font-weight:bold;color:#1c2530;font-size:12px}
+.comp-footer{background:#f8f9fa;padding:13px 18px;text-align:center;border-top:1px solid #e8ecf0}
+.comp-footer-txt{font-size:10.5px;color:#999;line-height:1.5}
+.comp-num{font-size:10px;color:#bbb;margin-top:4px}
+.comp-actions{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:11px}
+.comp-action-btn{display:flex;flex-direction:column;align-items:center;gap:5px;padding:9px 5px;border-radius:6px;cursor:pointer;border:1px solid var(--border);background:var(--surface2);color:var(--text2);font-size:11px;font-weight:bold}
+.comp-action-btn svg{width:18px;height:18px}
+.comp-action-btn.green{background:var(--navy-soft);border-color:#cbdaea;color:var(--navy)}
+.comp-action-btn.whatsapp{background:var(--green-soft);border-color:#c3e2d2;color:var(--green)}
 @media(max-width:768px){.stats-row{grid-template-columns:1fr 1fr}}
-@media(max-width:480px){.stats-row{grid-template-columns:1fr 1fr}}
 </style>
 </head>
 <body>
@@ -224,20 +124,20 @@ tbody tr:hover td{background:rgba(255,255,255,.02)}
     <!-- STATS -->
     <div class="stats-row">
       <div class="stat-box">
-        <div class="stat-icon" style="background:rgba(46,204,113,.12)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 1 0 0 7h5a3.5 3.5 0 1 1 0 7H6"/></svg></div>
-        <div><div class="stat-val" style="color:var(--green)" id="stat-hoy-total">$0.00</div><div class="stat-label">Total cobrado hoy</div></div>
+        <div class="stat-icon" style="background:var(--green-soft)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 1 0 0 7h5a3.5 3.5 0 1 1 0 7H6"/></svg></div>
+        <div><div class="stat-val" style="color:var(--navy)" id="stat-hoy-total">$0.00</div><div class="stat-label">Total cobrado hoy</div></div>
       </div>
       <div class="stat-box">
-        <div class="stat-icon" style="background:rgba(46,204,113,.12)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M12 12h.01"/></svg></div>
-        <div><div class="stat-val" style="color:var(--green)" id="stat-hoy-ef">$0.00</div><div class="stat-label">Efectivo hoy</div></div>
+        <div class="stat-icon" style="background:var(--green-soft)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M12 12h.01"/></svg></div>
+        <div><div class="stat-val" style="color:var(--navy)" id="stat-hoy-ef">$0.00</div><div class="stat-label">Efectivo hoy</div></div>
       </div>
       <div class="stat-box">
-        <div class="stat-icon" style="background:rgba(52,152,219,.12)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg></div>
-        <div><div class="stat-val" style="color:var(--blue)" id="stat-hoy-tr">$0.00</div><div class="stat-label">Transferencia hoy</div></div>
+        <div class="stat-icon" style="background:var(--navy-soft)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg></div>
+        <div><div class="stat-val" style="color:var(--navy)" id="stat-hoy-tr">$0.00</div><div class="stat-label">Transferencia hoy</div></div>
       </div>
       <div class="stat-box">
-        <div class="stat-icon" style="background:rgba(243,156,18,.12)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--orange)" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/></svg></div>
-        <div><div class="stat-val" style="color:var(--orange)" id="stat-mes">$0.00</div><div class="stat-label">Cobros este mes</div></div>
+        <div class="stat-icon" style="background:var(--amber-soft)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--amber)" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/></svg></div>
+        <div><div class="stat-val" style="color:var(--amber)" id="stat-mes">$0.00</div><div class="stat-label">Cobros este mes</div></div>
       </div>
     </div>
 
@@ -436,7 +336,7 @@ tbody tr:hover td{background:rgba(255,255,255,.02)}
             <div class="comp-row"><span class="comp-row-label">Crédito</span><span class="comp-row-val" id="cv-credito">—</span></div>
             <div class="comp-row"><span class="comp-row-label">Capital</span><span class="comp-row-val" id="cv-capital">$0.00</span></div>
             <div class="comp-row"><span class="comp-row-label">Interés</span><span class="comp-row-val" id="cv-interes">$0.00</span></div>
-            <div class="comp-row" id="cv-mora-row" style="display:none"><span class="comp-row-label" style="color:#c0392b">Interés de mora</span><span class="comp-row-val" style="color:#c0392b" id="cv-mora">$0.00</span></div>
+            <div class="comp-row" id="cv-mora-row" style="display:none"><span class="comp-row-label" style="color:var(--red)">Interés de mora</span><span class="comp-row-val" style="color:var(--red)" id="cv-mora">$0.00</span></div>
             <div class="comp-row"><span class="comp-row-label">Saldo restante</span><span class="comp-row-val" id="cv-saldo">$0.00</span></div>
             <div class="comp-row"><span class="comp-row-label">Fecha de pago</span><span class="comp-row-val" id="cv-fecha">—</span></div>
             <div class="comp-row"><span class="comp-row-label">Forma de pago</span><span class="comp-row-val" id="cv-metodo">—</span></div>
@@ -597,9 +497,9 @@ function renderPagos(lista){
     return `<tr>
       <td class="mono">${p.Fecha||'—'}</td>
       <td><strong>${p.ClienteNombre||'—'}</strong></td>
-      <td class="mono" style="color:var(--green)">${p.CreditoCodigo||'—'}</td>
+      <td class="mono" style="color:var(--navy)">${p.CreditoCodigo||'—'}</td>
       <td class="mono">${EC.fmt(p.Capital||0)}</td>
-      <td class="mono" style="color:var(--orange)">${EC.fmt(p.Interes||0)}</td>
+      <td class="mono" style="color:var(--amber)">${EC.fmt(p.Interes||0)}</td>
       <td class="mono" style="color:var(--green);font-weight:600">${EC.fmt(tot)}</td>
       <td><span class="badge ${metBadge}" style="max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${metodo}">${metodo}</span></td>
       <td class="mono" style="color:var(--text3)">${p.NumComprobante||'—'}</td>

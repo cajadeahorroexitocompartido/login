@@ -92,14 +92,15 @@
         el = document.createElement('div');
         el.id = 'ec-toast';
         el.style.cssText = `position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);
-          padding:11px 18px;border-radius:10px;font-size:13px;font-weight:500;z-index:9999;
+          padding:10px 16px;border-radius:6px;font-size:13px;font-weight:bold;z-index:9999;
           transition:transform .3s ease;display:flex;align-items:center;gap:8px;
-          box-shadow:0 4px 20px rgba(0,0,0,.4);white-space:nowrap;
-          font-family:'DM Sans',sans-serif;`;
+          box-shadow:0 2px 8px rgba(16,24,32,.15);white-space:nowrap;border:1px solid;
+          font-family:Arial,Helvetica,sans-serif;`;
         document.body.appendChild(el);
       }
-      el.style.background = tipo==='error' ? '#e74c3c' : tipo==='warn' ? '#f39c12' : '#2ecc71';
-      el.style.color      = '#fff';
+      if(tipo==='error'){ el.style.background = '#fbe9e7'; el.style.color = '#b3261e'; el.style.borderColor = '#f0c4c0'; }
+      else if(tipo==='warn'){ el.style.background = '#fbf2e3'; el.style.color = '#8a6116'; el.style.borderColor = '#ecdcb3'; }
+      else { el.style.background = '#e7f3ec'; el.style.color = '#1d7a4c'; el.style.borderColor = '#c3e2d2'; }
       el.textContent      = msg;
       el.style.transform  = 'translateX(-50%) translateY(0)';
       clearTimeout(window._ecToastTimer);
