@@ -102,7 +102,7 @@
       </div>
       <div class="stat-box">
         <div class="stat-icon" style="background:rgba(231,76,60,.12)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="2"><polyline points="1 6 10.5 15.5 15.5 10.5 23 18"/></svg></div>
-        <div><div class="stat-val" style="color:var(--red)" id="stat-retiros">$0.00</div><div class="stat-label">Total retiros</div></div>
+        <div><div class="stat-val" style="color:var(--red)" id="stat-retiros">$0.00</div><div class="stat-label">Total retiros de capital</div></div>
       </div>
     </div>
 
@@ -173,7 +173,7 @@
           <select id="m-tipo">
             <option value="aporte">Aporte de capital</option>
             <option value="retiro">Retiro de capital</option>
-            <option value="dividendo">Pago de dividendo</option>
+            <option value="dividendo">Pago de utilidades (suma al capital del socio)</option>
           </select>
         </div>
         <div class="field"><label>Monto ($) *</label><input type="number" id="m-monto" placeholder="0.00" step="0.01" min="0.01"></div>
@@ -272,24 +272,24 @@ function calcularStats(){
   const aportes=todosMovimientos.filter(m=>m.Tipo==='aporte').reduce((a,m)=>a+parseFloat(m.Monto||0),0);
   const retiros=todosMovimientos.filter(m=>m.Tipo==='retiro').reduce((a,m)=>a+parseFloat(m.Monto||0),0);
   const divs=todosMovimientos.filter(m=>m.Tipo==='dividendo').reduce((a,m)=>a+parseFloat(m.Monto||0),0);
-  const capital=aportes-retiros-divs;
+  const capital=aportes+divs-retiros;
   document.getElementById('stat-capital').textContent=EC.fmt(capital);
   document.getElementById('stat-socios').textContent=todosSocios.length;
   document.getElementById('stat-aportes').textContent=EC.fmt(aportes);
-  document.getElementById('stat-retiros').textContent=EC.fmt(retiros+divs);
+  document.getElementById('stat-retiros').textContent=EC.fmt(retiros);
 }
 
 // ── RENDER SOCIOS ─────────────────────────────────────────────
 function renderSocios(lista){
   document.getElementById('badge-socios').textContent=lista.length;
-  const totalCapital=todosMovimientos.reduce((a,m)=>m.Tipo==='aporte'?a+parseFloat(m.Monto||0):m.Tipo==='retiro'||m.Tipo==='dividendo'?a-parseFloat(m.Monto||0):a,0);
+  const totalCapital=todosMovimientos.reduce((a,m)=>(m.Tipo==='aporte'||m.Tipo==='dividendo')?a+parseFloat(m.Monto||0):m.Tipo==='retiro'?a-parseFloat(m.Monto||0):a,0);
   if(!lista.length){
     document.getElementById('lista-socios').innerHTML='<div style="text-align:center;padding:30px;color:var(--text3)">No se encontraron socios</div>';
     return;
   }
   document.getElementById('lista-socios').innerHTML=lista.map(s=>{
     const movs=todosMovimientos.filter(m=>m.SocioID===s.ID);
-    const aporte=movs.reduce((a,m)=>m.Tipo==='aporte'?a+parseFloat(m.Monto||0):m.Tipo==='retiro'||m.Tipo==='dividendo'?a-parseFloat(m.Monto||0):a,0);
+    const aporte=movs.reduce((a,m)=>(m.Tipo==='aporte'||m.Tipo==='dividendo')?a+parseFloat(m.Monto||0):m.Tipo==='retiro'?a-parseFloat(m.Monto||0):a,0);
     const pct=totalCapital>0?Math.round(aporte/totalCapital*100):0;
     const ini=((s.Nombres||'')[0]||'')+((s.Apellidos||'')[0]||'');
     return `<div class="socio-item">
@@ -330,7 +330,7 @@ function renderMovimientos(){
   if(!ultimos.length){ document.getElementById('lista-movimientos').innerHTML='<div style="text-align:center;padding:30px;color:var(--text3)">Sin movimientos</div>'; return; }
   document.getElementById('lista-movimientos').innerHTML=ultimos.map(m=>{
     const esAporte=m.Tipo==='aporte';
-    const esRetiro=m.Tipo==='retiro'||m.Tipo==='dividendo';
+    const esRetiro=m.Tipo==='retiro';
     const color=esAporte?'var(--green)':esRetiro?'var(--red)':'var(--orange)';
     const bg=esAporte?'rgba(46,204,113,.12)':esRetiro?'rgba(231,76,60,.12)':'rgba(243,156,18,.12)';
     const label={aporte:'Aporte',retiro:'Retiro',dividendo:'Dividendo'}[m.Tipo]||m.Tipo;
@@ -448,7 +448,7 @@ function verDetalle(sid){
   socioSeleccionado=sid;
   const s=todosSocios.find(x=>x.ID===sid)||{};
   const movs=todosMovimientos.filter(m=>m.SocioID===sid);
-  const total=movs.reduce((a,m)=>m.Tipo==='aporte'?a+parseFloat(m.Monto||0):m.Tipo==='retiro'||m.Tipo==='dividendo'?a-parseFloat(m.Monto||0):a,0);
+  const total=movs.reduce((a,m)=>(m.Tipo==='aporte'||m.Tipo==='dividendo')?a+parseFloat(m.Monto||0):m.Tipo==='retiro'?a-parseFloat(m.Monto||0):a,0);
   document.getElementById('d-nombre').value=(s.Nombres||'')+' '+(s.Apellidos||'');
   document.getElementById('d-cedula').value=s.Cedula||'';
   document.getElementById('d-total').value=EC.fmt(total);
@@ -459,7 +459,7 @@ function verDetalle(sid){
       const badge=m.Tipo==='aporte'?'b-green':m.Tipo==='retiro'?'b-red':'b-orange';
       const label={aporte:'Aporte',retiro:'Retiro',dividendo:'Dividendo'}[m.Tipo]||m.Tipo;
       const color=m.Tipo==='aporte'?'var(--green)':m.Tipo==='retiro'?'var(--red)':'var(--orange)';
-      return `<tr><td class="mono">${m.Fecha||'—'}</td><td><span class="badge ${badge}">${label}</span></td><td class="mono" style="color:${color};font-weight:600">${m.Tipo==='retiro'||m.Tipo==='dividendo'?'-':'+'} ${EC.fmt(m.Monto||0)}</td><td>${m.Descripcion||'—'}</td></tr>`;
+      return `<tr><td class="mono">${m.Fecha||'—'}</td><td><span class="badge ${badge}">${label}</span></td><td class="mono" style="color:${color};font-weight:600">${m.Tipo==='retiro'?'-':'+'} ${EC.fmt(m.Monto||0)}</td><td>${m.Descripcion||'—'}</td></tr>`;
     }).join('')
     :'<tr><td colspan="4" class="empty-cell">Sin movimientos registrados</td></tr>';
   document.getElementById('modal-detalle').classList.add('open');
