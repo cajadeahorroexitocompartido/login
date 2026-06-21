@@ -38,6 +38,12 @@
 .resumen-label{color:var(--text2)}
 .resumen-val{font-weight:bold}
 .diferencia-warn{color:var(--red);font-size:11px;margin-top:6px;font-weight:bold}
+.cliente-pago-item{display:flex;align-items:center;justify-content:space-between;padding:11px 13px;border-bottom:1px solid var(--border2);cursor:pointer}
+.cliente-pago-item:last-child{border-bottom:none}
+.cliente-pago-item:hover{background:var(--surface2)}
+.cliente-pago-nombre{font-size:13px;font-weight:bold;color:var(--text)}
+.cliente-pago-cedula{font-size:11px;color:var(--text3);margin-top:1px}
+.cliente-pago-saldo{font-size:12px;font-weight:bold;color:var(--text2);text-align:right;white-space:nowrap}
 /* COMPROBANTE — diseño impreso, mantiene su propia identidad visual */
 .comp-modal{max-width:400px}
 .comprobante-wrap{padding:6px}
@@ -185,10 +191,24 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
         Cliente con crédito activo
       </div>
-      <div class="field" style="margin-bottom:16px">
-        <select id="p-cliente" onchange="alSeleccionarCliente(this.value)">
-          <option value="">— Seleccionar cliente —</option>
-        </select>
+      <input type="hidden" id="p-cliente" value="">
+      <div class="field" style="margin-bottom:10px">
+        <div class="search-wrap" style="width:100%">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="text" id="p-cliente-buscar" placeholder="Buscar por nombre o cédula..." oninput="filtrarClientesPago(this.value)" style="width:100%;padding-left:32px">
+        </div>
+      </div>
+      <div id="p-cliente-seleccionado" style="display:none;margin-bottom:14px">
+        <div class="cuota-info-box" style="display:flex;align-items:center;justify-content:space-between">
+          <div>
+            <div style="font-size:13px;font-weight:bold;color:var(--text)" id="p-cliente-nombre-sel">—</div>
+            <div style="font-size:11px;color:var(--text3)" id="p-cliente-cedula-sel">—</div>
+          </div>
+          <button class="btn btn-outline btn-xs" onclick="cambiarClientePago()">Cambiar</button>
+        </div>
+      </div>
+      <div id="p-cliente-lista" class="card" style="margin-bottom:14px;max-height:240px;overflow-y:auto">
+        <!-- se llena dinámicamente -->
       </div>
 
       <!-- PASO 2: INFO CRÉDITO + TIPO PAGO (aparece tras seleccionar cliente) -->
@@ -551,18 +571,81 @@ function abrirModalPago(){
   document.getElementById('btn-cuota-completa').className = 'tipo-pago-btn';
   document.getElementById('btn-abono').className          = 'tipo-pago-btn';
 
-  // Poblar selector de clientes — SOLO con crédito activo
-  const clientesConCredito = todosClientes.filter(c =>
-    todosCreditos.some(cr => cr.ClienteID === c.ID && cr.Estado === 'activo')
-  );
-  const sel = document.getElementById('p-cliente');
-  sel.innerHTML = '<option value="">— Seleccionar cliente —</option>' +
-    clientesConCredito.map(c =>
-      `<option value="${c.ID}">${c.Nombres} ${c.Apellidos} — ${c.Cedula}</option>`
-    ).join('');
-  sel.value = '';
+  // Reset selección de cliente
+  document.getElementById('p-cliente').value = '';
+  document.getElementById('p-cliente-buscar').value = '';
+  document.getElementById('p-cliente-seleccionado').style.display = 'none';
+  document.getElementById('p-cliente-buscar').style.display = '';
+  document.getElementById('p-cliente-lista').style.display = '';
+
+  renderListaClientesPago('');
 
   document.getElementById('modal-pago').classList.add('open');
+  setTimeout(()=>document.getElementById('p-cliente-buscar').focus(), 150);
+}
+
+// Lista de clientes con crédito activo, buscable por nombre o cédula
+function clientesConCreditoActivo(){
+  return todosClientes.filter(c =>
+    todosCreditos.some(cr => cr.ClienteID === c.ID && cr.Estado === 'activo')
+  );
+}
+
+function renderListaClientesPago(filtro){
+  const lista = clientesConCreditoActivo();
+  const f = (filtro||'').toLowerCase().trim();
+  const filtrados = f
+    ? lista.filter(c =>
+        ((c.Nombres||'')+' '+(c.Apellidos||'')).toLowerCase().includes(f) ||
+        String(c.Cedula||'').includes(f)
+      )
+    : lista;
+
+  const cont = document.getElementById('p-cliente-lista');
+  if(!filtrados.length){
+    cont.innerHTML = '<div class="empty-cell">No se encontraron clientes con crédito activo</div>';
+    return;
+  }
+  cont.innerHTML = filtrados.map(c=>{
+    const creditosCliente = todosCreditos.filter(cr=>cr.ClienteID===c.ID && cr.Estado==='activo');
+    const saldoTotal = creditosCliente.reduce((a,cr)=>a+parseFloat(cr.Saldo||0),0);
+    return `<div class="cliente-pago-item" onclick="seleccionarClientePago('${c.ID}')">
+      <div>
+        <div class="cliente-pago-nombre">${c.Nombres} ${c.Apellidos}</div>
+        <div class="cliente-pago-cedula">${c.Cedula||'—'}</div>
+      </div>
+      <div class="cliente-pago-saldo">${EC.fmt(saldoTotal)}<br><span style="font-size:10px;color:var(--text3);font-weight:normal">saldo</span></div>
+    </div>`;
+  }).join('');
+}
+
+function filtrarClientesPago(valor){
+  renderListaClientesPago(valor);
+}
+
+function seleccionarClientePago(clienteId){
+  const c = todosClientes.find(x=>x.ID===clienteId);
+  if(!c) return;
+  document.getElementById('p-cliente').value = clienteId;
+  document.getElementById('p-cliente-nombre-sel').textContent = `${c.Nombres} ${c.Apellidos}`;
+  document.getElementById('p-cliente-cedula-sel').textContent = c.Cedula||'—';
+  document.getElementById('p-cliente-seleccionado').style.display = 'block';
+  document.getElementById('p-cliente-buscar').style.display = 'none';
+  document.getElementById('p-cliente-lista').style.display = 'none';
+  alSeleccionarCliente(clienteId);
+}
+
+function cambiarClientePago(){
+  document.getElementById('p-cliente').value = '';
+  document.getElementById('p-cliente-buscar').value = '';
+  document.getElementById('p-cliente-seleccionado').style.display = 'none';
+  document.getElementById('p-cliente-buscar').style.display = '';
+  document.getElementById('p-cliente-lista').style.display = '';
+  document.getElementById('seccion-credito').style.display = 'none';
+  document.getElementById('seccion-formas-pago').style.display = 'none';
+  document.getElementById('btn-registrar-pago').style.display = 'none';
+  renderListaClientesPago('');
+  setTimeout(()=>document.getElementById('p-cliente-buscar').focus(), 100);
 }
 
 function cerrarModalPago(){ document.getElementById('modal-pago').classList.remove('open'); }
