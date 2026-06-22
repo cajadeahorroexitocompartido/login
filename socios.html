@@ -245,18 +245,36 @@ let socioAEliminar = null;
 (async function init(){
   document.getElementById('s-fecha').value = EC.hoy();
   document.getElementById('m-fecha').value = EC.hoy();
-  await Promise.all([cargarSocios(), cargarMovimientos()]);
+  EC.showLoading('Cargando socios...');
+  await cargarTodo();
+  EC.hideLoading();
 })();
 
-// ── CARGAR ────────────────────────────────────────────────────
+// ── CARGAR TODO Y RENDERIZAR UNA SOLA VEZ AL FINAL ────────────
+async function cargarTodo(){
+  try{
+    const [rS, rM] = await Promise.all([
+      fetch(`${EC.api}?accion=leer&tab=socios`),
+      fetch(`${EC.api}?accion=leer&tab=capital`),
+    ]);
+    const jS = await rS.json();
+    const jM = await rM.json();
+    if(jS.ok) todosSocios     = (jS.data||[]).filter(s=>s.Activo==='true'||s.Activo===true);
+    if(jM.ok) todosMovimientos = jM.data||[];
+    // Renderizar solo después de tener AMBOS conjuntos de datos completos
+    calcularStats();
+    renderSocios(todosSocios);
+    renderMovimientos();
+  }catch(e){ EC.toast('Error cargando datos: '+e.message,'error'); }
+}
+
+// ── CARGAR (recarga individual, usada tras crear/editar) ──────
 async function cargarSocios(){
-  EC.showLoading('Cargando socios...');
   try{
     const r=await fetch(`${EC.api}?accion=leer&tab=socios`);
     const j=await r.json();
     if(j.ok){ todosSocios=(j.data||[]).filter(s=>s.Activo==='true'||s.Activo===true); renderSocios(todosSocios); }
   }catch(e){ EC.toast('Error cargando socios','error'); }
-  EC.hideLoading();
 }
 
 async function cargarMovimientos(){
@@ -407,7 +425,7 @@ async function guardarSocio(){
       await fetch(EC.api,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({accion:'agregar',tab:'capital',datos:{SocioID:sid,SocioNombre:n+' '+a,Tipo:'aporte',Monto:aporte,Fecha:EC.hoy(),Descripcion:'Aporte inicial'}})});
     }
     cerrarModalSocio();
-    await Promise.all([cargarSocios(),cargarMovimientos()]);
+    await cargarTodo();
     EC.toast(id?'Socio actualizado':'Socio registrado exitosamente');
   }catch(e){ EC.toast('Error: '+e.message,'error'); }
   EC.hideLoading();
@@ -493,7 +511,7 @@ async function ejecutarEliminar(){
   EC.showLoading('Eliminando...');
   cerrarConfirm();
   try{
-    await fetch(EC.api,{method:'POST',body:JSON.stringify({accion:'actualizar',tab:'socios',id:socioAEliminar,datos:{Activo:false}})});
+    await fetch(EC.api,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({accion:'actualizar',tab:'socios',id:socioAEliminar,datos:{Activo:false}})});
     await cargarSocios();
     EC.toast('Socio eliminado');
   }catch(e){ EC.toast('Error','error'); }
