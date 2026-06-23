@@ -38,6 +38,8 @@
 .balance-row{display:flex;justify-content:flex-end;gap:20px;padding:11px 0;border-top:1px solid var(--border2);margin-top:7px;font-size:13px}
 .balance-ok{color:var(--green);font-weight:bold}
 .balance-err{color:var(--red);font-weight:bold}
+.field-date{background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:7px 10px;border-radius:6px;font-size:12px;outline:none}
+.field-date:focus{border-color:var(--navy)}
 @media(max-width:640px){.partida-row{grid-template-columns:1fr 85px 85px 28px}}
 </style>
 </head>
@@ -112,8 +114,12 @@
       <div class="card">
         <div class="card-header">
           <div class="card-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>Asientos contables <span class="badge b-gray" id="badge-asientos">0</span></div>
-          <div style="display:flex;gap:8px">
+          <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+            <input type="date" id="lib-desde" class="field-date" onchange="filtrarLibroDiario()">
+            <span style="color:var(--text3);font-size:12px">al</span>
+            <input type="date" id="lib-hasta" class="field-date" onchange="filtrarLibroDiario()">
             <button class="btn btn-outline btn-sm" onclick="window.print()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>Imprimir</button>
+            <button class="btn btn-green btn-sm" onclick="exportarLibroPDF()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Exportar PDF</button>
           </div>
         </div>
         <div class="card-body" id="lista-asientos"><div style="text-align:center;padding:30px;color:var(--text3)">Cargando asientos...</div></div>
@@ -138,7 +144,13 @@
       <div class="card">
         <div class="card-header">
           <div class="card-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>Balance de sumas y saldos</div>
-          <button class="btn btn-outline btn-sm" onclick="window.print()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>Imprimir</button>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+            <input type="date" id="bal-desde" class="field-date" onchange="filtrarBalance()">
+            <span style="color:var(--text3);font-size:12px">al</span>
+            <input type="date" id="bal-hasta" class="field-date" onchange="filtrarBalance()">
+            <button class="btn btn-outline btn-sm" onclick="window.print()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>Imprimir</button>
+            <button class="btn btn-green btn-sm" onclick="exportarBalancePDF()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Exportar PDF</button>
+          </div>
         </div>
         <div class="tbl-wrap">
           <table>
@@ -239,6 +251,8 @@
   </div>
 </div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
 <script>
 // ── AUTH ─────────────────────────────────────────────────────
 EC.initSidebar();
@@ -274,7 +288,8 @@ const PLAN_BASE = [
 ];
 
 let cuentasExtra = JSON.parse(localStorage.getItem('ec_cuentas_extra')||'[]');
-let todosAsientos= [];
+let todosAsientos= [];          // lista FILTRADA mostrada actualmente
+let todosAsientosCompleto = []; // lista COMPLETA sin filtrar, fuente de verdad
 let contadorAsiento = 0;
 
 function todasLasCuentas(){
@@ -287,7 +302,7 @@ function switchTab(name, el){
   document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
   document.getElementById('tab-'+name).classList.add('active');
   if(el) el.classList.add('active');
-  if(name==='balance') renderBalance();
+  if(name==='balance') filtrarBalance();
 }
 
 function openModal(id){ document.getElementById(id).classList.add('open'); }
@@ -297,10 +312,38 @@ document.querySelectorAll('.modal-overlay').forEach(m=>{
 });
 document.addEventListener('keydown',e=>{ if(e.key==='Escape') document.querySelectorAll('.modal-overlay.open').forEach(m=>m.classList.remove('open')); });
 
+// ── FILTROS DE FECHA (libro diario y balance) ─────────────────
+function filtrarLibroDiario(){
+  const desde = document.getElementById('lib-desde').value;
+  const hasta = document.getElementById('lib-hasta').value;
+  todosAsientos = todosAsientosCompleto.filter(a => {
+    const f = String(a.fecha||'');
+    return (!desde || f>=desde) && (!hasta || f<=hasta);
+  });
+  renderAsientos();
+}
+
+function filtrarBalance(){
+  const desde = document.getElementById('bal-desde').value;
+  const hasta = document.getElementById('bal-hasta').value;
+  const filtrados = todosAsientosCompleto.filter(a => {
+    const f = String(a.fecha||'');
+    return (!desde || f>=desde) && (!hasta || f<=hasta);
+  });
+  renderBalance(filtrados);
+}
+
 // ── INIT ─────────────────────────────────────────────────────
 (async function init(){
-  document.getElementById('a-fecha').value = EC.hoy();
+  const hoy = EC.hoy();
+  const primerDia = hoy.substr(0,8)+'01';
+  document.getElementById('a-fecha').value   = hoy;
+  document.getElementById('lib-desde').value = primerDia;
+  document.getElementById('lib-hasta').value = hoy;
+  document.getElementById('bal-desde').value = primerDia;
+  document.getElementById('bal-hasta').value = hoy;
   await cargarAsientos();
+  filtrarLibroDiario();
   renderPlanCuentas();
   agregarPartida();
   agregarPartida();
@@ -392,7 +435,8 @@ async function cargarAsientos(){
     }
 
     // Ordenar por fecha desc
-    todosAsientos = asientosGenerados.sort((a,b)=>String(b.fecha).localeCompare(String(a.fecha)));
+    todosAsientosCompleto = asientosGenerados.sort((a,b)=>String(b.fecha).localeCompare(String(a.fecha)));
+    todosAsientos = todosAsientosCompleto;
     contadorAsiento = num;
     renderAsientos();
   }catch(e){
@@ -544,7 +588,7 @@ function guardarAsiento(){
   manuales.push(nuevo);
   localStorage.setItem('ec_asientos_manuales', JSON.stringify(manuales));
   closeModal('modal-asiento');
-  cargarAsientos();
+  cargarAsientos().then(()=> filtrarLibroDiario());
   EC.toast('Asiento '+codigo+' registrado correctamente');
   document.getElementById('a-desc').value='';
   document.getElementById('partidas-container').innerHTML='';
@@ -552,11 +596,12 @@ function guardarAsiento(){
 }
 
 // ── BALANCE DE SUMAS ─────────────────────────────────────────
-function renderBalance(){
+function renderBalance(listaAsientos){
+  const asientos = listaAsientos || todosAsientosCompleto;
   const cuentas = todasLasCuentas().filter(c=>c.nivel===3);
   const saldos  = {};
   cuentas.forEach(c=>{ saldos[c.codigo]={debe:0,haber:0,nombre:c.nombre,tipo:c.tipo}; });
-  todosAsientos.forEach(a=>{
+  asientos.forEach(a=>{
     a.partidas.forEach(p=>{
       const cod = p.cuenta.split(' ')[0];
       if(saldos[cod]){
@@ -591,6 +636,166 @@ function renderBalance(){
     <td class="mono" style="text-align:right;color:var(--green)">${EC.fmt(totSD)}</td>
     <td class="mono" style="text-align:right;color:var(--red)">${EC.fmt(totSA)}</td>
   </tr>`;
+
+  // Guardar totales calculados para reutilizar en el PDF
+  window._balanceTotales = {totD, totH, totSD, totSA};
+}
+
+// ── ENCABEZADO PROFESIONAL COMPARTIDO PARA LOS PDFS ───────────
+function dibujarEncabezadoPDF(doc, titulo, desde, hasta){
+  const hoy = new Date().toLocaleDateString('es-EC',{day:'2-digit',month:'long',year:'numeric'});
+  doc.setFillColor(26,58,92); // navy
+  doc.rect(0,0,210,38,'F');
+  doc.setTextColor(255,255,255);
+  doc.setFontSize(15);doc.setFont('helvetica','bold');
+  doc.text('Caja de Ahorro y Crédito Éxito Compartido', 15, 16);
+  doc.setFontSize(11);doc.setFont('helvetica','normal');
+  doc.text(titulo, 15, 24);
+  doc.setFontSize(9);
+  doc.text(`Período: ${desde||'—'} al ${hasta||'—'}`, 15, 31);
+  doc.setFontSize(8);
+  doc.text(`Generado el ${hoy}`, 195, 31, {align:'right'});
+  doc.setTextColor(0,0,0);
+  return 48; // posición Y donde continúa el contenido
+}
+
+function dibujarPiePDF(doc){
+  const totalPags = doc.internal.getNumberOfPages();
+  for(let i=1;i<=totalPags;i++){
+    doc.setPage(i);
+    doc.setFontSize(8);doc.setTextColor(140,140,140);
+    doc.line(15,284,195,284);
+    doc.text('Caja de Ahorro y Crédito Éxito Compartido — Documento contable interno', 15, 289);
+    doc.text(`Página ${i} de ${totalPags}`, 195, 289, {align:'right'});
+  }
+}
+
+// ── EXPORTAR LIBRO DIARIO A PDF ────────────────────────────────
+function exportarLibroPDF(){
+  if(!todosAsientos.length){ EC.toast('No hay asientos en el período seleccionado','error'); return; }
+  EC.showLoading('Generando PDF del libro diario...');
+  try{
+    const desde = document.getElementById('lib-desde').value;
+    const hasta = document.getElementById('lib-hasta').value;
+    const doc = new jspdf.jsPDF({orientation:'portrait', unit:'mm', format:'a4'});
+    let y = dibujarEncabezadoPDF(doc, 'Libro Diario — Asientos Contables', desde, hasta);
+
+    let totDebeGlobal = 0, totHaberGlobal = 0;
+
+    // Ordenar cronológicamente (ascendente) para el libro diario, como corresponde contablemente
+    const asientosOrdenados = [...todosAsientos].sort((a,b)=>String(a.fecha).localeCompare(String(b.fecha)));
+
+    asientosOrdenados.forEach((a, idx) => {
+      const totalDebe  = a.partidas.reduce((s,p)=>s+(+p.debe||0),0);
+      const totalHaber = a.partidas.reduce((s,p)=>s+(+p.haber||0),0);
+      totDebeGlobal  += totalDebe;
+      totHaberGlobal += totalHaber;
+
+      if(y > 255){ doc.addPage(); y = 18; }
+
+      doc.setFontSize(9);doc.setFont('helvetica','bold');
+      doc.setTextColor(26,58,92);
+      doc.text(`${a.codigo}  ·  ${a.fecha}`, 15, y);
+      doc.setTextColor(90,90,90);
+      doc.setFont('helvetica','normal');
+      doc.text(a.desc, 50, y);
+      y += 5;
+
+      const body = a.partidas.map(p=>[p.cuenta, p.debe?EC.fmt(p.debe):'', p.haber?EC.fmt(p.haber):'']);
+      body.push(['TOTAL', EC.fmt(totalDebe), EC.fmt(totalHaber)]);
+
+      doc.autoTable({
+        startY:y,
+        head:[['Cuenta','Debe','Haber']],
+        body,
+        theme:'grid',
+        styles:{fontSize:8,cellPadding:2.2},
+        headStyles:{fillColor:[234,240,246],textColor:[26,58,92],fontStyle:'bold',fontSize:8},
+        columnStyles:{1:{halign:'right',cellWidth:30},2:{halign:'right',cellWidth:30}},
+        margin:{left:15,right:15},
+        didParseCell:(data)=>{
+          if(data.row.index === body.length-1){
+            data.cell.styles.fontStyle='bold';
+            data.cell.styles.fillColor=[245,248,251];
+          }
+        },
+      });
+      y = doc.lastAutoTable.finalY + 7;
+    });
+
+    // Totales generales del período
+    if(y > 250){ doc.addPage(); y = 20; }
+    doc.setDrawColor(26,58,92);
+    doc.setLineWidth(0.5);
+    doc.line(15, y, 195, y);
+    y += 7;
+    doc.setFontSize(10);doc.setFont('helvetica','bold');doc.setTextColor(26,58,92);
+    doc.text('TOTALES DEL PERÍODO', 15, y);
+    doc.text(`Debe: ${EC.fmt(totDebeGlobal)}`, 130, y, {align:'left'});
+    y += 6;
+    doc.text(`Haber: ${EC.fmt(totHaberGlobal)}`, 130, y, {align:'left'});
+    const diferencia = Math.abs(totDebeGlobal-totHaberGlobal);
+    y += 6;
+    doc.setTextColor(diferencia<0.01 ? 29:179, diferencia<0.01 ? 122:38, diferencia<0.01 ? 76:30);
+    doc.text(diferencia<0.01 ? 'Libro diario balanceado ✓' : `Diferencia: ${EC.fmt(diferencia)}`, 130, y);
+
+    dibujarPiePDF(doc);
+    doc.save(`libro_diario_${desde}_${hasta}.pdf`);
+    EC.toast('Libro diario exportado exitosamente');
+  }catch(e){ EC.toast('Error generando PDF: '+e.message,'error'); }
+  EC.hideLoading();
+}
+
+// ── EXPORTAR BALANCE DE SUMAS Y SALDOS A PDF ──────────────────
+function exportarBalancePDF(){
+  EC.showLoading('Generando PDF del balance...');
+  try{
+    const desde = document.getElementById('bal-desde').value;
+    const hasta = document.getElementById('bal-hasta').value;
+    const doc = new jspdf.jsPDF({orientation:'portrait', unit:'mm', format:'a4'});
+    let y = dibujarEncabezadoPDF(doc, 'Balance de Sumas y Saldos', desde, hasta);
+
+    // Reconstruir filas desde la tabla ya renderizada en pantalla
+    const filas = [...document.querySelectorAll('#tbody-balance tr')];
+    if(!filas.length || (filas[0].querySelector('.empty-cell'))){
+      EC.toast('No hay movimientos en el período seleccionado','error');
+      EC.hideLoading();
+      return;
+    }
+
+    const body = filas.map(tr => [...tr.querySelectorAll('td')].map(td => td.textContent.trim()));
+    const filaTotales = body[body.length-1];
+    const filasCuentas = body.slice(0, -1);
+
+    doc.autoTable({
+      startY:y,
+      head:[['Código','Cuenta','Debe','Haber','Saldo Deudor','Saldo Acreedor']],
+      body: filasCuentas,
+      foot: [filaTotales],
+      theme:'grid',
+      styles:{fontSize:8.5,cellPadding:3},
+      headStyles:{fillColor:[26,58,92],textColor:255,fontStyle:'bold',fontSize:8.5},
+      footStyles:{fillColor:[234,240,246],textColor:[26,58,92],fontStyle:'bold',fontSize:9},
+      columnStyles:{
+        0:{cellWidth:22},
+        2:{halign:'right'},3:{halign:'right'},4:{halign:'right'},5:{halign:'right'},
+      },
+      margin:{left:15,right:15},
+    });
+
+    let yFinal = doc.lastAutoTable.finalY + 12;
+    const tot = window._balanceTotales || {totD:0,totH:0,totSD:0,totSA:0};
+    const cuadra = Math.abs(tot.totD - tot.totH) < 0.01;
+
+    doc.setFontSize(10);doc.setFont('helvetica','bold');
+    doc.setTextColor(cuadra?29:179, cuadra?122:38, cuadra?76:30);
+    doc.text(cuadra ? '✓ El balance está cuadrado (Debe = Haber)' : '⚠ El balance NO cuadra — revisar movimientos', 15, yFinal);
+
+    dibujarPiePDF(doc);
+    doc.save(`balance_sumas_saldos_${desde}_${hasta}.pdf`);
+    EC.toast('Balance exportado exitosamente');
+  }catch(e){ EC.toast('Error generando PDF: '+e.message,'error'); }
+  EC.hideLoading();
 }
 </script>
 </body>
