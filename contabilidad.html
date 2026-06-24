@@ -138,6 +138,41 @@
       </div>
     </div>
 
+    <!-- LIBRO MAYOR -->
+    <div class="tab-content" id="tab-mayor">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3h18v18H3z"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="9" x2="9" y2="21"/></svg>Libro mayor por cuenta</div>
+        </div>
+        <div class="card-body">
+          <div class="form-grid" style="align-items:end">
+            <div class="field"><label>Cuenta a consultar</label>
+              <select id="mayor-cuenta"></select>
+            </div>
+            <div class="field"><label>Desde</label><input type="date" id="mayor-desde" class="field-date" style="width:100%"></div>
+            <div class="field"><label>Hasta</label><input type="date" id="mayor-hasta" class="field-date" style="width:100%"></div>
+            <div class="field">
+              <button class="btn btn-green" style="width:100%" onclick="consultarLibroMayor()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>Consultar
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>Movimientos de la cuenta <span class="badge b-gray" id="mayor-cuenta-titulo" style="margin-left:4px">—</span></div>
+          <button class="btn btn-green btn-sm" onclick="exportarMayorPDF()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Exportar PDF</button>
+        </div>
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr><th>Fecha</th><th>Código asiento</th><th>Glosa / Concepto</th><th style="text-align:right">Debe</th><th style="text-align:right">Haber</th><th style="text-align:right">Saldo acumulado</th></tr></thead>
+            <tbody id="tbody-mayor"><tr><td colspan="6" class="empty-cell">Selecciona una cuenta y un rango de fechas, luego presiona Consultar</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
     <!-- PLAN DE CUENTAS -->
     <div class="tab-content" id="tab-plan">
       <div class="card">
