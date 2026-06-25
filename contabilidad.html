@@ -351,10 +351,11 @@
 <div class="modal-overlay" id="modal-cuenta">
   <div class="modal" style="max-width:480px">
     <div class="modal-header">
-      <div class="modal-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Nueva cuenta contable</div>
+      <div class="modal-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg><span id="modal-cuenta-titulo">Nueva cuenta contable</span></div>
       <button class="modal-close" onclick="closeModal('modal-cuenta')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
     </div>
     <div class="modal-body">
+      <input type="hidden" id="c-codigo-original" value="">
       <div class="form-grid">
         <div class="field"><label>Código *</label><input type="text" id="c-codigo" placeholder="Ej: 1.1.03"></div>
         <div class="field"><label>Nivel</label>
@@ -384,7 +385,7 @@
     </div>
     <div class="modal-footer">
       <button class="btn btn-outline" onclick="closeModal('modal-cuenta')">Cancelar</button>
-      <button class="btn btn-green" onclick="guardarCuenta()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>Guardar cuenta</button>
+      <button class="btn btn-green" onclick="guardarCuenta()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg><span id="modal-cuenta-btn-txt">Guardar cuenta</span></button>
     </div>
   </div>
 </div>
