@@ -427,12 +427,24 @@ const PLAN_BASE = [
 ];
 
 let cuentasExtra = JSON.parse(localStorage.getItem('ec_cuentas_extra')||'[]');
+// Sobrescrituras de cuentas del PLAN_BASE editadas por el usuario: { "codigoOriginal": {codigo,nombre,tipo,nivel,naturaleza} }
+let cuentasOverrides = JSON.parse(localStorage.getItem('ec_cuentas_overrides')||'{}');
+// Códigos de cuentas del PLAN_BASE que el usuario eliminó
+let cuentasEliminadas = JSON.parse(localStorage.getItem('ec_cuentas_eliminadas')||'[]');
 let todosAsientos= [];          // lista FILTRADA mostrada actualmente
 let todosAsientosCompleto = []; // lista COMPLETA sin filtrar, fuente de verdad
 let contadorAsiento = 0;
 
 function todasLasCuentas(){
-  return [...PLAN_BASE, ...cuentasExtra].sort((a,b)=>a.codigo.localeCompare(b.codigo));
+  // Aplicar overrides a PLAN_BASE y excluir las eliminadas
+  const baseConOverrides = PLAN_BASE
+    .filter(c => !cuentasEliminadas.includes(c.codigo))
+    .map(c => {
+      const ov = cuentasOverrides[c.codigo];
+      return ov ? {...c, ...ov, _origCodigo:c.codigo} : {...c, _origCodigo:c.codigo};
+    });
+  const extra = cuentasExtra.filter(c => !cuentasEliminadas.includes(c._origCodigo||c.codigo));
+  return [...baseConOverrides, ...extra].sort((a,b)=>a.codigo.localeCompare(b.codigo));
 }
 
 // ── TABS ─────────────────────────────────────────────────────
