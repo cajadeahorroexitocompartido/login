@@ -178,7 +178,7 @@
       <div class="card">
         <div class="card-header">
           <div class="card-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/></svg>Plan de cuentas</div>
-          <button class="btn btn-green btn-sm solo-admin" onclick="openModal('modal-cuenta')">
+          <button class="btn btn-green btn-sm solo-admin" onclick="abrirNuevaCuenta()">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Nueva cuenta
           </button>
         </div>
@@ -656,23 +656,93 @@ function renderPlanCuentas(){
       <span class="cuenta-codigo">${c.codigo}</span>
       <span class="cuenta-nombre">${c.nombre}</span>
       ${c.nivel===3?`<span class="cuenta-tipo ${tipoCls[c.tipo]||''}">${c.tipo}</span>`:''}
+      <div class="td-actions" style="margin-left:auto;flex-shrink:0">
+        <button class="btn btn-outline btn-xs" onclick="abrirEditarCuenta('${c.codigo}')" title="Editar cuenta">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>Editar
+        </button>
+        <button class="btn btn-red btn-xs" onclick="eliminarCuenta('${c.codigo}')" title="Eliminar cuenta">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>Eliminar
+        </button>
+      </div>
     </div>`).join('');
 }
 
+function abrirNuevaCuenta(){
+  document.getElementById('modal-cuenta-titulo').textContent = 'Nueva cuenta contable';
+  document.getElementById('modal-cuenta-btn-txt').textContent = 'Guardar cuenta';
+  document.getElementById('c-codigo-original').value = '';
+  document.getElementById('c-codigo').value = '';
+  document.getElementById('c-nombre').value = '';
+  document.getElementById('c-tipo').value = 'activo';
+  document.getElementById('c-nivel').value = '2';
+  document.getElementById('c-naturaleza').value = 'deudora';
+  openModal('modal-cuenta');
+}
+
+function abrirEditarCuenta(codigo){
+  const c = todasLasCuentas().find(x=>x.codigo===codigo);
+  if(!c){ EC.toast('Cuenta no encontrada','error'); return; }
+  document.getElementById('modal-cuenta-titulo').textContent = 'Editar cuenta contable';
+  document.getElementById('modal-cuenta-btn-txt').textContent = 'Guardar cambios';
+  document.getElementById('c-codigo-original').value = c._origCodigo || c.codigo;
+  document.getElementById('c-codigo').value = c.codigo;
+  document.getElementById('c-nombre').value = c.nombre;
+  document.getElementById('c-tipo').value = c.tipo;
+  document.getElementById('c-nivel').value = String(c.nivel);
+  document.getElementById('c-naturaleza').value = c.naturaleza;
+  openModal('modal-cuenta');
+}
+
 function guardarCuenta(){
+  const codigoOriginal = document.getElementById('c-codigo-original').value;
   const codigo = document.getElementById('c-codigo').value.trim();
   const nombre = document.getElementById('c-nombre').value.trim();
   const tipo   = document.getElementById('c-tipo').value;
   const nivel  = parseInt(document.getElementById('c-nivel').value);
   const nat    = document.getElementById('c-naturaleza').value;
   if(!codigo||!nombre){ EC.toast('Código y nombre son obligatorios','error'); return; }
-  cuentasExtra.push({codigo,nombre,tipo,nivel,naturaleza:nat});
-  cuentasExtra.sort((a,b)=>a.codigo.localeCompare(b.codigo));
-  localStorage.setItem('ec_cuentas_extra', JSON.stringify(cuentasExtra));
+
+  if(codigoOriginal){
+    // Edición: ¿la cuenta original pertenece a PLAN_BASE o a cuentasExtra?
+    const esBase = PLAN_BASE.some(c=>c.codigo===codigoOriginal);
+    if(esBase){
+      cuentasOverrides[codigoOriginal] = {codigo,nombre,tipo,nivel,naturaleza:nat};
+      localStorage.setItem('ec_cuentas_overrides', JSON.stringify(cuentasOverrides));
+    } else {
+      const idx = cuentasExtra.findIndex(c=>(c._origCodigo||c.codigo)===codigoOriginal);
+      if(idx>=0) cuentasExtra[idx] = {...cuentasExtra[idx], codigo,nombre,tipo,nivel,naturaleza:nat,_origCodigo:codigoOriginal};
+      localStorage.setItem('ec_cuentas_extra', JSON.stringify(cuentasExtra));
+    }
+    EC.toast('Cuenta actualizada correctamente');
+  } else {
+    // Nueva cuenta
+    cuentasExtra.push({codigo,nombre,tipo,nivel,naturaleza:nat,_origCodigo:codigo});
+    cuentasExtra.sort((a,b)=>a.codigo.localeCompare(b.codigo));
+    localStorage.setItem('ec_cuentas_extra', JSON.stringify(cuentasExtra));
+    EC.toast('Cuenta contable creada');
+  }
+
   closeModal('modal-cuenta');
   renderPlanCuentas();
-  EC.toast('Cuenta contable creada');
-  ['c-codigo','c-nombre'].forEach(id=>document.getElementById(id).value='');
+  poblarSelectCuentasMayor();
+}
+
+function eliminarCuenta(codigo){
+  if(!confirm(`¿Eliminar la cuenta "${codigo}"? Esta acción no se puede deshacer.`)) return;
+  const esBase = PLAN_BASE.some(c=>c.codigo===codigo);
+  if(esBase){
+    if(!cuentasEliminadas.includes(codigo)) cuentasEliminadas.push(codigo);
+    localStorage.setItem('ec_cuentas_eliminadas', JSON.stringify(cuentasEliminadas));
+    // Limpiar también cualquier override que tuviera, ya no aplica
+    delete cuentasOverrides[codigo];
+    localStorage.setItem('ec_cuentas_overrides', JSON.stringify(cuentasOverrides));
+  } else {
+    cuentasExtra = cuentasExtra.filter(c=>(c._origCodigo||c.codigo)!==codigo);
+    localStorage.setItem('ec_cuentas_extra', JSON.stringify(cuentasExtra));
+  }
+  renderPlanCuentas();
+  poblarSelectCuentasMayor();
+  EC.toast('Cuenta eliminada correctamente');
 }
 
 // ── ASIENTO MANUAL ───────────────────────────────────────────
@@ -773,8 +843,8 @@ function renderBalance(listaAsientos){
     const saldoA = s.haber>s.debe?s.haber-s.debe:0;
     totD+=s.debe;totH+=s.haber;totSD+=saldoD;totSA+=saldoA;
     return `<tr>
-      <td class="mono" style="color:var(--text3)">${c.codigo}</td>
-      <td>${c.nombre}</td>
+      <td class="mono"><a href="#" onclick="verDetalleMayor('${c.codigo}');return false;" style="color:var(--navy);text-decoration:underline;cursor:pointer">${c.codigo}</a></td>
+      <td><a href="#" onclick="verDetalleMayor('${c.codigo}');return false;" style="color:var(--text);text-decoration:none;cursor:pointer" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'">${c.nombre}</a></td>
       <td class="mono" style="text-align:right">${s.debe?EC.fmt(s.debe):'—'}</td>
       <td class="mono" style="text-align:right;color:var(--orange)">${s.haber?EC.fmt(s.haber):'—'}</td>
       <td class="mono" style="text-align:right;color:var(--green)">${saldoD?EC.fmt(saldoD):'—'}</td>
