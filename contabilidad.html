@@ -484,6 +484,107 @@ function filtrarBalance(){
   renderBalance(filtrados);
 }
 
+// ── LIBRO MAYOR ────────────────────────────────────────────────
+function poblarSelectCuentasMayor(){
+  const sel = document.getElementById('mayor-cuenta');
+  if(!sel) return;
+  const valorActual = sel.value;
+  const cuentas = todasLasCuentas().filter(c=>c.nivel===3);
+  sel.innerHTML = '<option value="">— Seleccionar cuenta —</option>' +
+    cuentas.map(c=>`<option value="${c.codigo}">${c.codigo} — ${c.nombre}</option>`).join('');
+  if(valorActual) sel.value = valorActual;
+}
+
+function consultarLibroMayor(){
+  const codigo = document.getElementById('mayor-cuenta').value;
+  const desde  = document.getElementById('mayor-desde').value;
+  const hasta  = document.getElementById('mayor-hasta').value;
+  if(!codigo){ EC.toast('Selecciona una cuenta para consultar','error'); return; }
+
+  const cuenta = todasLasCuentas().find(c=>c.codigo===codigo);
+  document.getElementById('mayor-cuenta-titulo').textContent = cuenta ? `${cuenta.codigo} — ${cuenta.nombre}` : codigo;
+
+  const asientosFiltrados = todosAsientosCompleto
+    .filter(a => {
+      const f = String(a.fecha||'');
+      return (!desde || f>=desde) && (!hasta || f<=hasta);
+    })
+    .filter(a => a.partidas.some(p=>p.cuenta.split(' ')[0]===codigo))
+    .sort((a,b)=>String(a.fecha).localeCompare(String(b.fecha)));
+
+  if(!asientosFiltrados.length){
+    document.getElementById('tbody-mayor').innerHTML = '<tr><td colspan="6" class="empty-cell">No hay movimientos para esta cuenta en el período seleccionado</td></tr>';
+    window._mayorFilas = [];
+    return;
+  }
+
+  let saldoAcumulado = 0;
+  const esDeudora = !cuenta || cuenta.naturaleza !== 'acreedora';
+  const filasParaPDF = [];
+
+  document.getElementById('tbody-mayor').innerHTML = asientosFiltrados.map(a=>{
+    const partida = a.partidas.find(p=>p.cuenta.split(' ')[0]===codigo);
+    const debe  = parseFloat(partida.debe||0);
+    const haber = parseFloat(partida.haber||0);
+    saldoAcumulado += esDeudora ? (debe-haber) : (haber-debe);
+    filasParaPDF.push({fecha:a.fecha, codigo:a.codigo, desc:a.desc, debe, haber, saldo:saldoAcumulado});
+    return `<tr>
+      <td class="mono">${a.fecha}</td>
+      <td class="mono"><a href="#" onclick="verAsientoDetalle('${a.codigo}');return false;" style="color:var(--navy);text-decoration:underline;cursor:pointer">${a.codigo}</a></td>
+      <td>${a.desc}</td>
+      <td class="mono" style="text-align:right">${debe?EC.fmt(debe):'—'}</td>
+      <td class="mono" style="text-align:right;color:var(--orange)">${haber?EC.fmt(haber):'—'}</td>
+      <td class="mono" style="text-align:right;font-weight:bold">${EC.fmt(saldoAcumulado)}</td>
+    </tr>`;
+  }).join('');
+
+  window._mayorFilas = filasParaPDF;
+  window._mayorCuentaActual = cuenta;
+}
+
+function verAsientoDetalle(codigoAsiento){
+  const a = todosAsientosCompleto.find(x=>x.codigo===codigoAsiento);
+  if(!a){ EC.toast('Asiento no encontrado','error'); return; }
+  const totalDebe  = a.partidas.reduce((s,p)=>s+(+p.debe||0),0);
+  const totalHaber = a.partidas.reduce((s,p)=>s+(+p.haber||0),0);
+  document.getElementById('det-asiento-titulo').textContent = `${a.codigo} — ${a.fecha}`;
+  document.getElementById('det-asiento-desc').textContent   = a.desc;
+  document.getElementById('tbody-det-asiento').innerHTML = a.partidas.map(p=>`
+    <tr>
+      <td>${p.cuenta}</td>
+      <td class="mono" style="text-align:right">${p.debe?EC.fmt(p.debe):'—'}</td>
+      <td class="mono" style="text-align:right;color:var(--orange)">${p.haber?EC.fmt(p.haber):'—'}</td>
+    </tr>`).join('') + `
+    <tr style="font-weight:bold;background:var(--surface2)">
+      <td>TOTALES</td>
+      <td class="mono" style="text-align:right">${EC.fmt(totalDebe)}</td>
+      <td class="mono" style="text-align:right;color:var(--orange)">${EC.fmt(totalHaber)}</td>
+    </tr>`;
+  openModal('modal-detalle-asiento');
+}
+
+// ── DRILL-DOWN: ir desde Balance hasta Libro Mayor de una cuenta ──
+function verDetalleMayor(codigo){
+  const desde = document.getElementById('bal-desde').value;
+  const hasta = document.getElementById('bal-hasta').value;
+
+  // Cambiar a la pestaña Libro mayor
+  document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-mayor').classList.add('active');
+  const btnMayor = [...document.querySelectorAll('.tab-btn')].find(b=>b.textContent.trim()==='Libro mayor');
+  if(btnMayor) btnMayor.classList.add('active');
+
+  // Arrastrar el rango de fechas del balance y seleccionar la cuenta
+  document.getElementById('mayor-desde').value = desde;
+  document.getElementById('mayor-hasta').value = hasta;
+  poblarSelectCuentasMayor();
+  document.getElementById('mayor-cuenta').value = codigo;
+
+  // Ejecutar la consulta automáticamente
+  consultarLibroMayor();
+}
+
 // ── INIT ─────────────────────────────────────────────────────
 (async function init(){
   const hoy = EC.hoy();
@@ -493,6 +594,17 @@ function filtrarBalance(){
   document.getElementById('lib-hasta').value = hoy;
   document.getElementById('bal-desde').value = primerDia;
   document.getElementById('bal-hasta').value = hoy;
+  document.getElementById('mayor-desde').value = primerDia;
+  document.getElementById('mayor-hasta').value = hoy;
+  document.getElementById('er-desde').value  = primerDia;
+  document.getElementById('er-hasta').value  = hoy;
+  document.getElementById('bg-hasta').value  = hoy;
+  document.getElementById('fe-desde').value  = primerDia;
+  document.getElementById('fe-hasta').value  = hoy;
+  document.getElementById('mor-desde').value = primerDia;
+  document.getElementById('mor-hasta').value = hoy;
+  document.getElementById('arq-fecha').value = hoy;
+  poblarSelectCuentasMayor();
   await cargarAsientos();
   filtrarLibroDiario();
   renderPlanCuentas();
