@@ -347,6 +347,23 @@
   </div>
 </div>
 
+<!-- MODAL DETALLE DE ASIENTO (drill-down desde Libro Mayor) -->
+<div class="modal-overlay" id="modal-detalle-asiento">
+  <div class="modal" style="max-width:560px">
+    <div class="modal-header">
+      <div class="modal-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg><span id="det-asiento-titulo">—</span></div>
+      <button class="modal-close" onclick="closeModal('modal-detalle-asiento')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div class="modal-body">
+      <div style="font-size:13px;color:var(--text2);margin-bottom:12px" id="det-asiento-desc">—</div>
+      <table class="asiento-table">
+        <thead><tr><th>Cuenta</th><th style="text-align:right">Debe</th><th style="text-align:right">Haber</th></tr></thead>
+        <tbody id="tbody-det-asiento"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
 <!-- MODAL NUEVA CUENTA -->
 <div class="modal-overlay" id="modal-cuenta">
   <div class="modal" style="max-width:480px">
@@ -972,6 +989,187 @@ function renderBalance(listaAsientos){
 
   // Guardar totales calculados para reutilizar en el PDF
   window._balanceTotales = {totD, totH, totSD, totSA};
+}
+
+// ── HELPER: sumar movimientos de un grupo de cuentas (por prefijo de código) ──
+function sumarPorGrupo(asientos, prefijoGrupo, lado){
+  // lado: 'debe' o 'haber' — qué columna sumar
+  let total = 0;
+  asientos.forEach(a=>{
+    a.partidas.forEach(p=>{
+      const cod = p.cuenta.split(' ')[0];
+      if(cod.startsWith(prefijoGrupo)){
+        total += parseFloat(p[lado]||0);
+      }
+    });
+  });
+  return total;
+}
+
+function asientosEnRango(desde, hasta){
+  return todosAsientosCompleto.filter(a=>{
+    const f = String(a.fecha||'');
+    return (!desde || f>=desde) && (!hasta || f<=hasta);
+  });
+}
+
+// ── ESTADO DE RESULTADOS ───────────────────────────────────────
+function calcularEstadoResultados(desde, hasta){
+  const asientos = asientosEnRango(desde, hasta);
+  // Ingresos (grupo 4): naturaleza acreedora → saldo = haber - debe
+  const ingresos = sumarPorGrupo(asientos,'4','haber') - sumarPorGrupo(asientos,'4','debe');
+  // Gastos (grupo 5): naturaleza deudora → saldo = debe - haber
+  const gastos   = sumarPorGrupo(asientos,'5','debe')  - sumarPorGrupo(asientos,'5','haber');
+  const utilidad = ingresos - gastos;
+  return {ingresos, gastos, utilidad};
+}
+
+function generarEstadoResultados(){
+  const desde = document.getElementById('er-desde').value;
+  const hasta = document.getElementById('er-hasta').value;
+  const r = calcularEstadoResultados(desde, hasta);
+  window._erActual = {...r, desde, hasta};
+  const cls = r.utilidad>=0 ? 'balance-ok' : 'balance-err';
+  document.getElementById('cont-estado-resultados').innerHTML = `
+    <div class="rep-row"><span>Total Ingresos (grupo 4)</span><span class="rep-val" style="color:var(--green)">${EC.fmt(r.ingresos)}</span></div>
+    <div class="rep-row"><span>Total Gastos (grupo 5)</span><span class="rep-val" style="color:var(--red)">${EC.fmt(r.gastos)}</span></div>
+    <div class="rep-row total"><span>${r.utilidad>=0?'UTILIDAD':'PÉRDIDA'} NETA DEL EJERCICIO</span><span class="rep-val ${cls}">${EC.fmt(Math.abs(r.utilidad))}</span></div>`;
+}
+
+// ── BALANCE GENERAL ─────────────────────────────────────────────
+function calcularBalanceGeneral(hasta){
+  const asientos = asientosEnRango('', hasta); // desde el inicio hasta la fecha de corte
+  const activo     = sumarPorGrupo(asientos,'1','debe')  - sumarPorGrupo(asientos,'1','haber');
+  const pasivo     = sumarPorGrupo(asientos,'2','haber') - sumarPorGrupo(asientos,'2','debe');
+  const patrimonioBase = sumarPorGrupo(asientos,'3','haber') - sumarPorGrupo(asientos,'3','debe');
+  // Utilidad/pérdida del ejercicio calculada desde el inicio hasta la fecha de corte,
+  // se incorpora al patrimonio para asegurar Activo = Pasivo + Patrimonio
+  const er = calcularEstadoResultados('', hasta);
+  const patrimonio = patrimonioBase + er.utilidad;
+  return {activo, pasivo, patrimonioBase, utilidadEjercicio:er.utilidad, patrimonio};
+}
+
+function generarBalanceGeneral(){
+  const hasta = document.getElementById('bg-hasta').value;
+  const r = calcularBalanceGeneral(hasta);
+  window._bgActual = {...r, hasta};
+  const diferencia = Math.abs(r.activo - (r.pasivo + r.patrimonio));
+  const cuadra = diferencia < 0.01;
+  document.getElementById('cont-balance-general').innerHTML = `
+    <div class="rep-section">
+      <div class="rep-title">Activo</div>
+      <div class="rep-row total"><span>TOTAL ACTIVO</span><span class="rep-val">${EC.fmt(r.activo)}</span></div>
+    </div>
+    <div class="rep-section">
+      <div class="rep-title">Pasivo</div>
+      <div class="rep-row"><span>Total Pasivo</span><span class="rep-val" style="color:var(--red)">${EC.fmt(r.pasivo)}</span></div>
+    </div>
+    <div class="rep-section">
+      <div class="rep-title">Patrimonio</div>
+      <div class="rep-row"><span>Capital social y reservas</span><span class="rep-val">${EC.fmt(r.patrimonioBase)}</span></div>
+      <div class="rep-row"><span>Utilidad/Pérdida del ejercicio</span><span class="rep-val" style="color:${r.utilidadEjercicio>=0?'var(--green)':'var(--red)'}">${EC.fmt(r.utilidadEjercicio)}</span></div>
+      <div class="rep-row total"><span>TOTAL PATRIMONIO</span><span class="rep-val">${EC.fmt(r.patrimonio)}</span></div>
+    </div>
+    <div class="rep-row total" style="margin-top:6px"><span>PASIVO + PATRIMONIO</span><span class="rep-val">${EC.fmt(r.pasivo+r.patrimonio)}</span></div>
+    <div style="margin-top:10px;font-size:12px;font-weight:bold" class="${cuadra?'balance-ok':'balance-err'}">
+      ${cuadra ? '✓ El balance general está cuadrado (Activo = Pasivo + Patrimonio)' : '⚠ Diferencia de '+EC.fmt(diferencia)+' — revisar movimientos'}
+    </div>`;
+}
+
+// ── ESTADO DE FLUJO DE EFECTIVO ─────────────────────────────────
+function calcularFlujoEfectivo(desde, hasta){
+  const asientos = asientosEnRango(desde, hasta);
+  const cuentasDisponible = ['1.1.01','1.2.01']; // Caja y Cartera vigente
+  const movimientos = [];
+  asientos.forEach(a=>{
+    a.partidas.forEach(p=>{
+      const cod = p.cuenta.split(' ')[0];
+      if(cuentasDisponible.includes(cod)){
+        const monto = parseFloat(p.debe||0) - parseFloat(p.haber||0);
+        if(monto !== 0){
+          movimientos.push({fecha:a.fecha, codigo:a.codigo, desc:a.desc, cuenta:p.cuenta, monto});
+        }
+      }
+    });
+  });
+  const entradas = movimientos.filter(m=>m.monto>0).reduce((s,m)=>s+m.monto,0);
+  const salidas  = movimientos.filter(m=>m.monto<0).reduce((s,m)=>s+Math.abs(m.monto),0);
+  return {movimientos, entradas, salidas, flujoNeto: entradas-salidas};
+}
+
+function generarFlujoEfectivo(){
+  const desde = document.getElementById('fe-desde').value;
+  const hasta = document.getElementById('fe-hasta').value;
+  const r = calcularFlujoEfectivo(desde, hasta);
+  window._feActual = {...r, desde, hasta};
+  if(!r.movimientos.length){
+    document.getElementById('cont-flujo-efectivo').innerHTML = '<div class="empty-cell">Sin movimientos de efectivo en el período seleccionado</div>';
+    return;
+  }
+  const filasHtml = r.movimientos.map(m=>`
+    <tr>
+      <td class="mono">${m.fecha}</td>
+      <td class="mono">${m.codigo}</td>
+      <td>${m.desc}</td>
+      <td style="font-size:11px;color:var(--text3)">${m.cuenta}</td>
+      <td class="mono" style="text-align:right;color:${m.monto>=0?'var(--green)':'var(--red)'}">${m.monto>=0?'+':''}${EC.fmt(m.monto)}</td>
+    </tr>`).join('');
+  document.getElementById('cont-flujo-efectivo').innerHTML = `
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Fecha</th><th>Asiento</th><th>Concepto</th><th>Cuenta</th><th style="text-align:right">Movimiento</th></tr></thead>
+      <tbody>${filasHtml}</tbody>
+    </table></div>
+    <div class="rep-row" style="margin-top:10px"><span>Total entradas de efectivo</span><span class="rep-val" style="color:var(--green)">${EC.fmt(r.entradas)}</span></div>
+    <div class="rep-row"><span>Total salidas de efectivo</span><span class="rep-val" style="color:var(--red)">${EC.fmt(r.salidas)}</span></div>
+    <div class="rep-row total"><span>FLUJO NETO DE EFECTIVO</span><span class="rep-val">${EC.fmt(r.flujoNeto)}</span></div>`;
+}
+
+// ── REPORTE DE MOROSIDAD ────────────────────────────────────────
+function calcularMorosidad(desde, hasta){
+  const asientos = asientosEnRango(desde, hasta);
+  const carteraVigente = sumarPorGrupo(asientos,'1.2.01','debe') - sumarPorGrupo(asientos,'1.2.01','haber');
+  const carteraVencida = sumarPorGrupo(asientos,'1.2.02','debe') - sumarPorGrupo(asientos,'1.2.02','haber');
+  const carteraTotal   = carteraVigente + carteraVencida;
+  const indice = carteraTotal>0 ? (carteraVencida/carteraTotal*100) : 0;
+  return {carteraVigente, carteraVencida, carteraTotal, indice};
+}
+
+function generarReporteMorosidad(){
+  const desde = document.getElementById('mor-desde').value;
+  const hasta = document.getElementById('mor-hasta').value;
+  const r = calcularMorosidad(desde, hasta);
+  window._morActual = {...r, desde, hasta};
+  const nivel = r.indice<=5 ? 'var(--green)' : r.indice<=10 ? 'var(--amber)' : 'var(--red)';
+  document.getElementById('cont-morosidad').innerHTML = `
+    <div class="info-grid">
+      <div class="info-item"><div class="info-label">Cartera vigente (1.2.01)</div><div class="info-val" style="color:var(--green)">${EC.fmt(r.carteraVigente)}</div></div>
+      <div class="info-item"><div class="info-label">Cartera vencida (1.2.02)</div><div class="info-val" style="color:var(--red)">${EC.fmt(r.carteraVencida)}</div></div>
+      <div class="info-item"><div class="info-label">Cartera total</div><div class="info-val">${EC.fmt(r.carteraTotal)}</div></div>
+      <div class="info-item" style="background:var(--navy-soft)"><div class="info-label">Índice de morosidad</div><div class="info-val" style="color:${nivel};font-size:18px">${r.indice.toFixed(2)}%</div></div>
+    </div>
+    <div style="font-size:12px;color:var(--text3)">El índice de morosidad se calcula como Cartera vencida ÷ Cartera total, en el rango de fechas seleccionado.</div>`;
+}
+
+// ── ARQUEO DE CAJA DIARIO ───────────────────────────────────────
+function calcularArqueoCaja(fecha){
+  const asientos = asientosEnRango('', fecha); // saldo acumulado desde el inicio hasta esa fecha
+  const saldoCaja = sumarPorGrupo(asientos,'1.1.01','debe') - sumarPorGrupo(asientos,'1.1.01','haber');
+  const movsDelDia = asientosEnRango(fecha, fecha);
+  const ingresosDia = sumarPorGrupo(movsDelDia,'1.1.01','debe');
+  const egresosDia  = sumarPorGrupo(movsDelDia,'1.1.01','haber');
+  return {saldoCaja, ingresosDia, egresosDia};
+}
+
+function generarArqueoCaja(){
+  const fecha = document.getElementById('arq-fecha').value;
+  const r = calcularArqueoCaja(fecha);
+  window._arqActual = {...r, fecha};
+  document.getElementById('cont-arqueo').innerHTML = `
+    <div class="info-grid">
+      <div class="info-item"><div class="info-label">Ingresos del día</div><div class="info-val" style="color:var(--green)">${EC.fmt(r.ingresosDia)}</div></div>
+      <div class="info-item"><div class="info-label">Egresos del día</div><div class="info-val" style="color:var(--red)">${EC.fmt(r.egresosDia)}</div></div>
+    </div>
+    <div class="rep-row total" style="margin-top:6px"><span>SALDO DE CIERRE DE CAJA (1.1.01) AL ${fecha}</span><span class="rep-val">${EC.fmt(r.saldoCaja)}</span></div>`;
 }
 
 // ── ENCABEZADO PROFESIONAL COMPARTIDO PARA LOS PDFS ───────────
