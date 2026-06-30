@@ -1328,6 +1328,224 @@ function exportarBalancePDF(){
   }catch(e){ EC.toast('Error generando PDF: '+e.message,'error'); }
   EC.hideLoading();
 }
+
+// ── EXPORTAR LIBRO MAYOR A PDF ─────────────────────────────────
+function exportarMayorPDF(){
+  const filas = window._mayorFilas || [];
+  if(!filas.length){ EC.toast('Consulta una cuenta primero','error'); return; }
+  EC.showLoading('Generando PDF del libro mayor...');
+  try{
+    const desde = document.getElementById('mayor-desde').value;
+    const hasta = document.getElementById('mayor-hasta').value;
+    const cuenta = window._mayorCuentaActual;
+    const doc = new jspdf.jsPDF({orientation:'portrait', unit:'mm', format:'a4'});
+    let y = dibujarEncabezadoPDF(doc, `Libro Mayor — ${cuenta?cuenta.codigo+' '+cuenta.nombre:document.getElementById('mayor-cuenta-titulo').textContent}`, desde, hasta);
+
+    const body = filas.map(f=>[f.fecha, f.codigo, f.desc, f.debe?EC.fmt(f.debe):'', f.haber?EC.fmt(f.haber):'', EC.fmt(f.saldo)]);
+    doc.autoTable({
+      startY:y,
+      head:[['Fecha','Asiento','Glosa','Debe','Haber','Saldo acumulado']],
+      body,
+      theme:'grid',
+      styles:{fontSize:8.5,cellPadding:2.5},
+      headStyles:{fillColor:[26,58,92],textColor:255,fontStyle:'bold',fontSize:8.5},
+      columnStyles:{3:{halign:'right'},4:{halign:'right'},5:{halign:'right',fontStyle:'bold'}},
+      margin:{left:15,right:15},
+    });
+
+    let yFinal = doc.lastAutoTable.finalY + 10;
+    const saldoFinal = filas[filas.length-1].saldo;
+    doc.setFontSize(10);doc.setFont('helvetica','bold');doc.setTextColor(26,58,92);
+    doc.text(`Saldo final de la cuenta al ${hasta}: ${EC.fmt(saldoFinal)}`, 15, yFinal);
+
+    dibujarPiePDF(doc);
+    doc.save(`libro_mayor_${(cuenta?cuenta.codigo:'cuenta')}_${desde}_${hasta}.pdf`);
+    EC.toast('Libro mayor exportado exitosamente');
+  }catch(e){ EC.toast('Error generando PDF: '+e.message,'error'); }
+  EC.hideLoading();
+}
+
+// ── EXPORTAR ESTADO DE RESULTADOS A PDF ─────────────────────────
+function exportarEstadoResultadosPDF(){
+  if(!window._erActual){ EC.toast('Genera el estado de resultados primero','error'); return; }
+  EC.showLoading('Generando PDF...');
+  try{
+    const r = window._erActual;
+    const doc = new jspdf.jsPDF({orientation:'portrait', unit:'mm', format:'a4'});
+    let y = dibujarEncabezadoPDF(doc, 'Estado de Resultados', r.desde, r.hasta);
+
+    doc.autoTable({
+      startY:y,
+      head:[['Concepto','Valor']],
+      body:[
+        ['Total Ingresos (grupo 4)', EC.fmt(r.ingresos)],
+        ['Total Gastos (grupo 5)',   EC.fmt(r.gastos)],
+        [(r.utilidad>=0?'UTILIDAD':'PÉRDIDA')+' NETA DEL EJERCICIO', EC.fmt(Math.abs(r.utilidad))],
+      ],
+      theme:'grid',
+      styles:{fontSize:10,cellPadding:5},
+      headStyles:{fillColor:[26,58,92],textColor:255,fontStyle:'bold'},
+      columnStyles:{1:{halign:'right'}},
+      didParseCell:(data)=>{ if(data.row.index===2){data.cell.styles.fontStyle='bold';data.cell.styles.fillColor=r.utilidad>=0?[231,243,236]:[251,233,231];data.cell.styles.fontSize=11;} },
+      margin:{left:15,right:15},
+    });
+
+    dibujarPiePDF(doc);
+    doc.save(`estado_resultados_${r.desde}_${r.hasta}.pdf`);
+    EC.toast('Estado de resultados exportado exitosamente');
+  }catch(e){ EC.toast('Error generando PDF: '+e.message,'error'); }
+  EC.hideLoading();
+}
+
+// ── EXPORTAR BALANCE GENERAL A PDF ──────────────────────────────
+function exportarBalanceGeneralPDF(){
+  if(!window._bgActual){ EC.toast('Genera el balance general primero','error'); return; }
+  EC.showLoading('Generando PDF...');
+  try{
+    const r = window._bgActual;
+    const doc = new jspdf.jsPDF({orientation:'portrait', unit:'mm', format:'a4'});
+    let y = dibujarEncabezadoPDF(doc, 'Balance General', '', r.hasta);
+
+    doc.autoTable({
+      startY:y,
+      head:[['Concepto','Valor']],
+      body:[
+        ['TOTAL ACTIVO', EC.fmt(r.activo)],
+        ['Total Pasivo', EC.fmt(r.pasivo)],
+        ['Capital social y reservas', EC.fmt(r.patrimonioBase)],
+        ['Utilidad/Pérdida del ejercicio', EC.fmt(r.utilidadEjercicio)],
+        ['TOTAL PATRIMONIO', EC.fmt(r.patrimonio)],
+        ['PASIVO + PATRIMONIO', EC.fmt(r.pasivo+r.patrimonio)],
+      ],
+      theme:'grid',
+      styles:{fontSize:10,cellPadding:5},
+      headStyles:{fillColor:[26,58,92],textColor:255,fontStyle:'bold'},
+      columnStyles:{1:{halign:'right'}},
+      didParseCell:(data)=>{ if([0,4,5].includes(data.row.index)){data.cell.styles.fontStyle='bold';data.cell.styles.fillColor=[245,248,251];} },
+      margin:{left:15,right:15},
+    });
+
+    let yFinal = doc.lastAutoTable.finalY + 10;
+    const diferencia = Math.abs(r.activo - (r.pasivo+r.patrimonio));
+    const cuadra = diferencia < 0.01;
+    doc.setFontSize(10);doc.setFont('helvetica','bold');
+    doc.setTextColor(cuadra?29:179, cuadra?122:38, cuadra?76:30);
+    doc.text(cuadra ? 'Balance cuadrado: Activo = Pasivo + Patrimonio' : `Diferencia de ${EC.fmt(diferencia)} — revisar movimientos`, 15, yFinal);
+
+    dibujarPiePDF(doc);
+    doc.save(`balance_general_${r.hasta}.pdf`);
+    EC.toast('Balance general exportado exitosamente');
+  }catch(e){ EC.toast('Error generando PDF: '+e.message,'error'); }
+  EC.hideLoading();
+}
+
+// ── EXPORTAR FLUJO DE EFECTIVO A PDF ────────────────────────────
+function exportarFlujoEfectivoPDF(){
+  if(!window._feActual || !window._feActual.movimientos.length){ EC.toast('Genera el flujo de efectivo primero','error'); return; }
+  EC.showLoading('Generando PDF...');
+  try{
+    const r = window._feActual;
+    const doc = new jspdf.jsPDF({orientation:'portrait', unit:'mm', format:'a4'});
+    let y = dibujarEncabezadoPDF(doc, 'Estado de Flujo de Efectivo', r.desde, r.hasta);
+
+    const body = r.movimientos.map(m=>[m.fecha, m.codigo, m.desc, m.cuenta, (m.monto>=0?'+':'')+EC.fmt(m.monto)]);
+    doc.autoTable({
+      startY:y,
+      head:[['Fecha','Asiento','Concepto','Cuenta','Movimiento']],
+      body,
+      theme:'grid',
+      styles:{fontSize:8,cellPadding:2.5},
+      headStyles:{fillColor:[26,58,92],textColor:255,fontStyle:'bold',fontSize:8},
+      columnStyles:{4:{halign:'right'}},
+      margin:{left:15,right:15},
+    });
+
+    let yFinal = doc.lastAutoTable.finalY + 10;
+    doc.autoTable({
+      startY:yFinal,
+      body:[
+        ['Total entradas de efectivo', EC.fmt(r.entradas)],
+        ['Total salidas de efectivo',  EC.fmt(r.salidas)],
+        ['FLUJO NETO DE EFECTIVO',     EC.fmt(r.flujoNeto)],
+      ],
+      theme:'grid',
+      styles:{fontSize:10,cellPadding:5},
+      columnStyles:{1:{halign:'right'}},
+      didParseCell:(data)=>{ if(data.row.index===2){data.cell.styles.fontStyle='bold';data.cell.styles.fillColor=[245,248,251];} },
+      margin:{left:15,right:15},
+    });
+
+    dibujarPiePDF(doc);
+    doc.save(`flujo_efectivo_${r.desde}_${r.hasta}.pdf`);
+    EC.toast('Flujo de efectivo exportado exitosamente');
+  }catch(e){ EC.toast('Error generando PDF: '+e.message,'error'); }
+  EC.hideLoading();
+}
+
+// ── EXPORTAR MOROSIDAD A PDF ────────────────────────────────────
+function exportarMorosidadPDF(){
+  if(!window._morActual){ EC.toast('Genera el reporte de morosidad primero','error'); return; }
+  EC.showLoading('Generando PDF...');
+  try{
+    const r = window._morActual;
+    const doc = new jspdf.jsPDF({orientation:'portrait', unit:'mm', format:'a4'});
+    let y = dibujarEncabezadoPDF(doc, 'Morosidad y Maduración de Cartera', r.desde, r.hasta);
+
+    doc.autoTable({
+      startY:y,
+      head:[['Indicador','Valor']],
+      body:[
+        ['Cartera vigente (1.2.01)', EC.fmt(r.carteraVigente)],
+        ['Cartera vencida (1.2.02)', EC.fmt(r.carteraVencida)],
+        ['Cartera total', EC.fmt(r.carteraTotal)],
+        ['Índice de morosidad', r.indice.toFixed(2)+'%'],
+      ],
+      theme:'grid',
+      styles:{fontSize:10,cellPadding:5},
+      headStyles:{fillColor:[26,58,92],textColor:255,fontStyle:'bold'},
+      columnStyles:{1:{halign:'right'}},
+      didParseCell:(data)=>{ if(data.row.index===3){data.cell.styles.fontStyle='bold';data.cell.styles.fillColor=[245,248,251];} },
+      margin:{left:15,right:15},
+    });
+
+    dibujarPiePDF(doc);
+    doc.save(`morosidad_cartera_${r.desde}_${r.hasta}.pdf`);
+    EC.toast('Reporte de morosidad exportado exitosamente');
+  }catch(e){ EC.toast('Error generando PDF: '+e.message,'error'); }
+  EC.hideLoading();
+}
+
+// ── EXPORTAR ARQUEO DE CAJA A PDF ───────────────────────────────
+function exportarArqueoCajaPDF(){
+  if(!window._arqActual){ EC.toast('Genera el arqueo de caja primero','error'); return; }
+  EC.showLoading('Generando PDF...');
+  try{
+    const r = window._arqActual;
+    const doc = new jspdf.jsPDF({orientation:'portrait', unit:'mm', format:'a4'});
+    let y = dibujarEncabezadoPDF(doc, 'Arqueo de Caja Diario', r.fecha, r.fecha);
+
+    doc.autoTable({
+      startY:y,
+      head:[['Concepto','Valor']],
+      body:[
+        ['Ingresos del día', EC.fmt(r.ingresosDia)],
+        ['Egresos del día',  EC.fmt(r.egresosDia)],
+        ['SALDO DE CIERRE DE CAJA (1.1.01)', EC.fmt(r.saldoCaja)],
+      ],
+      theme:'grid',
+      styles:{fontSize:10,cellPadding:5},
+      headStyles:{fillColor:[26,58,92],textColor:255,fontStyle:'bold'},
+      columnStyles:{1:{halign:'right'}},
+      didParseCell:(data)=>{ if(data.row.index===2){data.cell.styles.fontStyle='bold';data.cell.styles.fillColor=[245,248,251];data.cell.styles.fontSize=11;} },
+      margin:{left:15,right:15},
+    });
+
+    dibujarPiePDF(doc);
+    doc.save(`arqueo_caja_${r.fecha}.pdf`);
+    EC.toast('Arqueo de caja exportado exitosamente');
+  }catch(e){ EC.toast('Error generando PDF: '+e.message,'error'); }
+  EC.hideLoading();
+}
 </script>
 </body>
 </html>
