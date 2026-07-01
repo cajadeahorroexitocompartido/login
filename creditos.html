@@ -41,16 +41,11 @@
 </head>
 <body>
 <script src="auth.js"></script>
-<!-- ============================================================
-  ÉXITO COMPARTIDO — Módulo de Créditos
-  🔗 ENLACE APP SCRIPT (BASE DE DATOS):
-     https://script.google.com/macros/s/AKfycby-BrSpUIdQ_v08SYjsg7lFDcMCMxfgbqAjPIlfZZGFRVEoyyTHrRIzJmZFMoUIDAzTFw/exec
-  ============================================================ -->
+
 <div class="bg-grid"></div>
 <div class="loading-overlay" id="loading-overlay"><div class="loading-spinner"></div><div class="loading-text" id="loading-text">Cargando...</div></div>
 <div class="overlay" id="overlay" onclick="EC.closeSidebar()"></div>
 
-<!-- SIDEBAR -->
 <aside class="sidebar" id="sidebar">
   <div class="sidebar-header">
     <div class="sidebar-logo"><div class="sidebar-logo-icon">EC</div><div><div class="sidebar-logo-text">Éxito Compartido</div><div class="sidebar-logo-sub">Caja de Ahorro y Crédito</div></div></div>
@@ -75,7 +70,6 @@
   </div>
 </aside>
 
-<!-- MAIN -->
 <div class="main">
   <div class="topbar">
     <button class="btn-hamburger" onclick="EC.openSidebar()"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
@@ -93,7 +87,6 @@
   </div>
 
   <div class="content">
-    <!-- KPIs CARTERA -->
     <div class="kpi-grid">
       <div class="kpi g"><div class="kpi-icon ig"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></div><div class="kpi-label">Cartera total</div><div class="kpi-value" style="color:var(--navy)" id="kpi-total">$0.00</div><div class="kpi-sub" id="kpi-total-n">0 créditos</div></div>
       <div class="kpi b"><div class="kpi-icon ib"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg></div><div class="kpi-label">Cartera al día</div><div class="kpi-value" style="color:var(--blue)" id="kpi-aldia">$0.00</div><div class="kpi-sub" id="kpi-aldia-n">0 créditos</div></div>
@@ -101,7 +94,6 @@
       <div class="kpi o"><div class="kpi-icon io"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 1 0 0 7h5a3.5 3.5 0 1 1 0 7H6"/></svg></div><div class="kpi-label">Capital recuperado</div><div class="kpi-value" style="color:var(--amber)" id="kpi-rec">$0.00</div><div class="kpi-sub">Total pagos recibidos</div></div>
     </div>
 
-    <!-- CLIENTES CON CRÉDITO -->
     <div class="card">
       <div class="card-header">
         <div class="card-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>Clientes con crédito <span class="badge b-gray" id="badge-clientes" style="margin-left:4px">0</span></div>
@@ -113,7 +105,6 @@
       <div id="lista-clientes"><div class="empty-cell">Cargando clientes...</div></div>
     </div>
 
-    <!-- HISTORIAL CRÉDITOS FINALIZADOS -->
     <div class="card">
       <div class="card-header">
         <div class="card-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>Historial de créditos finalizados <span class="badge b-gray" id="badge-finalizados" style="margin-left:4px">0</span></div>
@@ -132,7 +123,6 @@
   </div>
 </div>
 
-<!-- MODAL DETALLE CRÉDITO -->
 <div class="modal-overlay" id="modal-detalle">
   <div class="modal modal-lg">
     <div class="modal-header">
@@ -144,7 +134,6 @@
       </div>
     </div>
     <div class="modal-body" style="padding:0">
-      <!-- ENCABEZADO DETALLE -->
       <div class="det-header">
         <div class="det-cliente" id="det-cliente">—</div>
         <div style="display:flex;gap:8px;align-items:center;margin-top:6px;flex-wrap:wrap">
@@ -153,7 +142,6 @@
         </div>
       </div>
       <div style="padding:16px 18px">
-        <!-- INFO CRÉDITO -->
         <div class="section-sep">Información del crédito</div>
         <div class="info-grid">
           <div class="info-item"><div class="info-label">Capital otorgado</div><div class="info-val" id="det-monto">—</div></div>
@@ -165,7 +153,6 @@
           <div class="info-item" style="border:1px solid rgba(243,156,18,.25);background:rgba(243,156,18,.04)"><div class="info-label">Total interés a pagar</div><div class="info-val" style="color:var(--amber)" id="det-total-int">—</div></div>
           <div class="info-item" style="border:1px solid rgba(241,196,15,.25);background:rgba(241,196,15,.04)"><div class="info-label">Total deuda (capital+interés)</div><div class="info-val" style="color:var(--amber)" id="det-total-deuda">—</div></div>
         </div>
-        <!-- DATOS ACTUALES -->
         <div class="section-sep">Datos actuales</div>
         <div class="info-grid" style="grid-template-columns:repeat(3,1fr)">
           <div class="info-item" style="border:1px solid rgba(46,204,113,.25);background:rgba(46,204,113,.04)"><div class="info-label">Saldo pendiente</div><div class="info-val" style="color:var(--amber)" id="det-saldo">—</div></div>
@@ -182,7 +169,6 @@
           <div class="info-item" style="border:1px solid rgba(231,76,60,.3);background:rgba(231,76,60,.05)"><div class="info-label">Interés de mora acumulado</div><div class="info-val" style="color:var(--red)" id="det-int-mora">—</div></div>
           <div class="info-item" style="border:1px solid rgba(231,76,60,.4);background:rgba(231,76,60,.08)"><div class="info-label">TOTAL EN MORA (capital+interés mora)</div><div class="info-val" style="color:var(--red);font-size:16px" id="det-total-mora">—</div></div>
         </div>
-        <!-- TABLA AMORTIZACIÓN -->
         <div class="section-sep">Tabla de amortización</div>
         <div class="tbl-wrap">
           <table>
@@ -195,7 +181,6 @@
   </div>
 </div>
 
-<!-- MODAL NUEVO CRÉDITO -->
 <div class="modal-overlay" id="modal-nuevo">
   <div class="modal">
     <div class="modal-header">
@@ -211,7 +196,7 @@
         <div class="field"><label>Frecuencia</label><select id="n-frec" onchange="calcNuevo()"><option value="mensual">Mensual</option><option value="quincenal">Quincenal</option><option value="semanal">Semanal</option><option value="diario">Diario</option></select></div>
         <div class="field"><label>Tabla amortización</label><select id="n-tabla" onchange="calcNuevo()"><option value="francesa">Francesa (cuota fija)</option><option value="alemana">Alemana (capital fijo)</option><option value="americana">Americana</option></select></div>
         <div class="field"><label>Fecha de inicio</label><input type="date" id="n-fecha"></div>
-        <div class="field"><label>Tasa de mora (% diario)</label><input type="number" id="n-mora" placeholder="0.00 (opcional)" step="0.01" min="0" title="% diario sobre el monto de la cuota vencida"></div>
+        <div class="field"><label>Tasa de mora (% diario)</label><input type="number" id="n-mora" placeholder="0.00 (opcional)" step="0.01" min="0"></div>
         <div class="field col-2"><label>Observaciones</label><input type="text" id="n-obs" placeholder="Notas del crédito (opcional)"></div>
       </div>
       <div class="resumen-grid">
@@ -228,7 +213,6 @@
   </div>
 </div>
 
-<!-- MODAL SIMULADOR -->
 <div class="modal-overlay" id="modal-simulador">
   <div class="modal modal-lg">
     <div class="modal-header">
@@ -237,710 +221,513 @@
     </div>
     <div class="modal-body">
       <div class="form-grid" style="margin-bottom:14px">
-        <div class="field"><label>Monto ($)</label><input type="number" id="s-monto" value="5000" step="100" min="1" oninput="calcSimulador()"></div>
-        <div class="field"><label>Tasa mensual (%)</label><input type="number" id="s-tasa" value="1.5" step="0.01" min="0.01" oninput="calcSimulador()"></div>
-        <div class="field"><label>Número de cuotas</label><input type="number" id="s-plazo" value="12" min="1" max="360" oninput="calcSimulador()"></div>
+        <div class="field"><label>Monto ($)</label><input type="number" id="s-monto" value="1000" step="100" oninput="calcSimulador()"></div>
+        <div class="field"><label>Tasa mensual (%)</label><input type="number" id="s-tasa" value="2" step="0.1" oninput="calcSimulador()"></div>
+        <div class="field"><label>Cuotas</label><input type="number" id="s-plazo" value="12" oninput="calcSimulador()"></div>
         <div class="field"><label>Frecuencia</label><select id="s-frec" onchange="calcSimulador()"><option value="mensual">Mensual</option><option value="quincenal">Quincenal</option><option value="semanal">Semanal</option><option value="diario">Diario</option></select></div>
-        <div class="field"><label>Tabla amortización</label><select id="s-tabla" onchange="calcSimulador()"><option value="francesa">Francesa (cuota fija)</option><option value="alemana">Alemana (capital fijo)</option><option value="americana">Americana</option></select></div>
-        <div class="field"><label>Fecha de inicio</label><input type="date" id="s-fecha"></div>
+        <div class="field"><label>Tabla</label><select id="s-tabla" onchange="calcSimulador()"><option value="francesa">Francesa</option><option value="alemana">Alemana</option><option value="americana">Americana</option></select></div>
+        <div class="field"><label>Fecha inicio</label><input type="date" id="s-fecha" onchange="calcSimulador()"></div>
       </div>
-      <div class="resumen-grid" style="margin-bottom:16px">
-        <div class="res-box hl"><div class="res-label">Cuota a pagar</div><div class="res-val" style="color:var(--navy)" id="rs-cuota">$0.00</div></div>
-        <div class="res-box"><div class="res-label">Total intereses</div><div class="res-val" style="color:var(--amber)" id="rs-int">$0.00</div></div>
-        <div class="res-box"><div class="res-label">Total a pagar</div><div class="res-val" style="color:var(--amber)" id="rs-total">$0.00</div></div>
-        <div class="res-box"><div class="res-label">Última cuota</div><div class="res-val" style="font-size:13px" id="rs-ultima">—</div></div>
+      <div class="resumen-grid" style="margin-bottom:14px">
+        <div class="res-box hl"><div class="res-label">Cuota Promedio</div><div class="res-val" id="rs-cuota">$0.00</div></div>
+        <div class="res-box"><div class="res-label">Total Intereses</div><div class="res-val" id="rs-int">$0.00</div></div>
+        <div class="res-box"><div class="res-label">Total a Pagar</div><div class="res-val" id="rs-total">$0.00</div></div>
+        <div class="res-box"><div class="res-label">Vence fin</div><div class="res-val" style="font-size:13px" id="rs-fecha">—</div></div>
       </div>
       <div class="tbl-wrap">
-        <table><thead><tr><th>#</th><th>Fecha</th><th>Cuota</th><th>Capital</th><th>Interés</th><th>Saldo</th></tr></thead>
-        <tbody id="tbody-sim"></tbody></table>
+        <table>
+          <thead><tr><th>#</th><th>Fecha</th><th>Cuota</th><th>Capital</th><th>Interés</th><th>Saldo</th></tr></thead>
+          <tbody id="tbody-simulador"></tbody>
+        </table>
       </div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-outline btn-sm" onclick="window.print()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>Imprimir simulación</button>
     </div>
   </div>
 </div>
 
-<!-- jsPDF -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
-
 <script>
-EC.initSidebar();
-EC.aplicarPermisos();
-
-const API = EC.api;
-let todosCreditos = [];
+let API = "";
 let todosClientes = [];
-let todosPagos    = [];
-let creditoDetalle= null;
+let todosCreditos = [];
+let todosPagos = [];
+let creditoSeleccionado = null;
 
-// ── INIT ─────────────────────────────────────────────────────
-(async function init(){
-  document.getElementById('n-fecha').value = EC.hoy();
-  document.getElementById('s-fecha').value = EC.hoy();
+document.addEventListener("DOMContentLoaded", async () => {
+  API = sessionStorage.getItem('api_url');
+  if(!API) {
+    window.location.replace('index.html');
+    return;
+  }
+  
+  // Renderizar información de usuario en la barra lateral
+  const uLog = JSON.parse(sessionStorage.getItem('ec_user') || '{}');
+  document.getElementById('sb-name').textContent = uLog.Nombre || 'Usuario';
+  document.getElementById('sb-role').textContent = sessionStorage.getItem('ec_rol') || 'Personal';
+  
   await cargarTodo();
-})();
+});
 
-async function cargarTodo(){
+async function cargarTodo() {
   EC.showLoading('Cargando cartera...');
-  try{
-    const [rC,rCl,rP] = await Promise.all([
-      fetch(`${API}?accion=leer&tab=creditos`),
-      fetch(`${API}?accion=leer&tab=clientes`),
-      fetch(`${API}?accion=leer&tab=pagos`),
+  try {
+    // Cargar datos en paralelo para agilizar
+    const [cRes, crRes, pRes] = await Promise.all([
+      fetch(`${API}?accion=listar&tab=clientes`).then(r => r.json()),
+      fetch(`${API}?accion=listar&tab=creditos`).then(r => r.json()),
+      fetch(`${API}?accion=listar&tab=pagos`).then(r => r.json())
     ]);
-    const jC  = await rC.json();
-    const jCl = await rCl.json();
-    const jP  = await rP.json();
-    todosCreditos = jC.ok  ? jC.data  || [] : [];
-    todosClientes = jCl.ok ? jCl.data || [] : [];
-    todosPagos    = jP.ok  ? (jP.data||[]) : [];  // Apps Script ya filtra eliminados
-    calcularKPIs();
-    renderClientes(todosCreditos);
-    renderFinalizados(todosCreditos);
-    cargarSelectClientes();
-  }catch(e){ EC.toast('Error cargando datos: '+e.message,'error'); }
+
+    todosClientes = cRes.ok ? cRes.data : [];
+    todosCreditos = crRes.ok ? crRes.data : [];
+    todosPagos = pRes.ok ? pRes.data : [];
+
+    // Llenar selector de clientes en modal nuevo
+    const sel = document.getElementById('n-cliente');
+    sel.innerHTML = '<option value="">— Seleccionar cliente —</option>';
+    todosClientes.sort((a,b)=>String(a.Nombre).localeCompare(b.Nombre)).forEach(c => {
+      sel.innerHTML += `<option value="${c.ID}">${c.Nombre} (${c.Cedula || 'S/N'})</option>`;
+    });
+
+    procesarCartera();
+  } catch(e) {
+    EC.toast('Error al sincronizar datos', 'error');
+    console.error(e);
+  }
   EC.hideLoading();
 }
 
-// ── CALCULAR MORA DINÁMICAMENTE ───────────────────────────────
-// Un crédito está en mora si la fecha de su próxima cuota pendiente
-// ya pasó y esa cuota no ha sido pagada. No depende de un campo
-// "Estado" guardado manualmente — se calcula siempre en tiempo real.
-function estaEnMora(credito){
-  if(credito.Estado === 'cancelado') return false;
-  const pagosCredito = todosPagos.filter(p=>(p.CreditoID||p.creditoId||'')===credito.ID);
-  const cuotasPagadas = pagosCredito.length;
-  const numCuotas = parseInt(credito.NumCuotas||0);
-  if(cuotasPagadas >= numCuotas) return false; // ya pagó todo
-  const filas = generarAmortizacion(
-    parseFloat(credito.MontoOriginal||0),
-    parseFloat(credito.TasaMensual||0),
-    numCuotas,
-    credito.Frecuencia||'mensual',
-    credito.Tabla||'francesa',
-    credito.FechaInicio||EC.hoy()
-  );
-  const proximaCuota = filas[cuotasPagadas]; // la siguiente cuota a pagar
-  if(!proximaCuota) return false;
-  return proximaCuota.fecha < EC.hoy();
-}
+function procesarCartera() {
+  let totalCartera = 0, nTotal = 0;
+  let totalAlDia = 0, nAlDia = 0;
+  let totalMora = 0, nMora = 0;
+  let totalRecuperado = 0;
 
-function diasEnMora(credito){
-  const pagosCredito = todosPagos.filter(p=>(p.CreditoID||p.creditoId||'')===credito.ID);
-  const cuotasPagadas = pagosCredito.length;
-  const filas = generarAmortizacion(
-    parseFloat(credito.MontoOriginal||0),
-    parseFloat(credito.TasaMensual||0),
-    parseInt(credito.NumCuotas||0),
-    credito.Frecuencia||'mensual',
-    credito.Tabla||'francesa',
-    credito.FechaInicio||EC.hoy()
-  );
-  const proximaCuota = filas[cuotasPagadas];
-  if(!proximaCuota) return 0;
-  const hoyD = new Date(EC.hoy()+'T12:00:00');
-  const fechaCuota = new Date(proximaCuota.fecha+'T12:00:00');
-  return Math.max(0, Math.floor((hoyD-fechaCuota)/(1000*60*60*24)));
-}
+  // Filtrar créditos activos e historial
+  const activos = todosCreditos.filter(c => String(c.Estado).toLowerCase() === 'activo');
+  const finalizados = todosCreditos.filter(c => String(c.Estado).toLowerCase() === 'finalizado' || String(c.Estado).toLowerCase() === 'cancelado');
 
-// ── KPIs ─────────────────────────────────────────────────────
-function calcularKPIs(){
-  const activos  = todosCreditos.filter(c=>c.Estado!=='cancelado');
-  const mora     = activos.filter(c=>estaEnMora(c));
-  const alDia    = activos.filter(c=>!estaEnMora(c));
-  const cartera  = activos.reduce((a,c)=>a+(+c.Saldo||0),0);
-  const cartMora = mora.reduce((a,c)=>a+(+c.Saldo||0),0);
-  const cartDia  = alDia.reduce((a,c)=>a+(+c.Saldo||0),0);
-  const recuperado = todosPagos.reduce((a,p)=>a+(+p.Capital||0),0);
-  document.getElementById('kpi-total').textContent    = EC.fmt(cartera);
-  document.getElementById('kpi-total-n').textContent  = activos.length+' créditos activos';
-  document.getElementById('kpi-aldia').textContent    = EC.fmt(cartDia);
-  document.getElementById('kpi-aldia-n').textContent  = alDia.length+' créditos';
-  document.getElementById('kpi-mora').textContent     = EC.fmt(cartMora);
-  document.getElementById('kpi-mora-n').textContent   = mora.length+' créditos';
-  document.getElementById('kpi-rec').textContent      = EC.fmt(recuperado);
-  document.getElementById('badge-mora').textContent   = mora.length;
-}
-
-// ── RENDER CLIENTES CON CRÉDITO ───────────────────────────────
-function renderClientes(creditos, filtro=''){
-  // Agrupar por cliente
-  const mapa = {};
-  creditos.filter(c=>c.Estado!=='cancelado').forEach(c=>{
-    const cid = c.ClienteID||c.clienteId||'';
-    if(!mapa[cid]) mapa[cid]={clienteId:cid,nombre:c.ClienteNombre||'—',creditos:[]};
-    mapa[cid].creditos.push(c);
+  // Calcular capital recuperado desde la pestaña de pagos válidos
+  todosPagos.forEach(p => {
+    if(String(p.Estado).toLowerCase() !== 'eliminado' && String(p.Estado).toLowerCase() !== 'revertido') {
+      totalRecuperado += parseFloat(p.Capital || 0);
+    }
   });
-  let lista = Object.values(mapa);
-  if(filtro) lista = lista.filter(x=>x.nombre.toLowerCase().includes(filtro.toLowerCase()));
-  document.getElementById('badge-clientes').textContent = lista.length;
-  if(!lista.length){
-    document.getElementById('lista-clientes').innerHTML = '<div class="empty-cell">No se encontraron clientes con créditos activos</div>';
+
+  // Procesar activos para KPIs
+  activos.forEach(c => {
+    const saldo = parseFloat(c.Saldo || 0);
+    totalCartera += saldo;
+    nTotal++;
+
+    // Verificar si tiene cuotas en mora atrasadas
+    const tabla = desarmarTabla(c.TablaAmortizacionJSON);
+    let tieneMora = false;
+    const hoyStr = EC.hoy();
+
+    tabla.forEach(cuota => {
+      if(cuota.estado === 'pendiente' && cuota.fechaVencimiento < hoyStr) {
+        tieneMora = true;
+      }
+    });
+
+    if(tieneMora) {
+      totalMora += saldo;
+      nMora++;
+    } else {
+      totalAlDia += saldo;
+      nAlDia++;
+    }
+  });
+
+  // Actualizar UI de KPIs
+  document.getElementById('kpi-total').textContent = EC.fmt(totalCartera);
+  document.getElementById('kpi-total-n').textContent = `${nTotal} créditos activos`;
+  document.getElementById('kpi-aldia').textContent = EC.fmt(totalAlDia);
+  document.getElementById('kpi-aldia-n').textContent = `${nAlDia} al día`;
+  document.getElementById('kpi-mora').textContent = EC.fmt(totalMora);
+  document.getElementById('kpi-mora-n').textContent = `${nMora} en mora`;
+  document.getElementById('badge-mora').textContent = nMora;
+  document.getElementById('kpi-rec').textContent = EC.fmt(totalRecuperado);
+
+  renderListaClientes(activos);
+  renderHistorialFinalizados(finalizados);
+}
+
+function renderListaClientes(activos) {
+  const container = document.getElementById('lista-clientes');
+  document.getElementById('badge-clientes').textContent = activos.length;
+
+  if(activos.length === 0) {
+    container.innerHTML = '<div class="empty-cell">No hay créditos activos registrados.</div>';
     return;
   }
-  document.getElementById('lista-clientes').innerHTML = lista.map(item=>{
-    const saldo   = item.creditos.reduce((a,c)=>a+(+c.Saldo||0),0);
-    const monto   = item.creditos.reduce((a,c)=>a+(+c.MontoOriginal||0),0);
-    const pct     = monto>0 ? Math.round((1-(saldo/monto))*100) : 0;
-    const tienenMora = item.creditos.some(c=>estaEnMora(c));
-    const ini     = item.nombre.split(' ').map(n=>n[0]).slice(0,2).join('').toUpperCase();
-    const numCreds= item.creditos.length;
-    return `<div class="cliente-card" onclick="verDetalleCliente('${item.clienteId}')">
-      <div class="cli-avatar">${ini}</div>
-      <div class="cli-info">
-        <div class="cli-nombre">${item.nombre}</div>
-        <div class="cli-meta">${numCreds} crédito${numCreds!==1?'s':''} activo${numCreds!==1?'s':''} &nbsp;·&nbsp; ${pct}% pagado ${tienenMora?'<span style="color:var(--red)">⚠ Mora</span>':''}</div>
-        <div class="prog-bg"><div class="prog-fill" style="width:${pct}%"></div></div>
+
+  let html = "";
+  activos.forEach(cred => {
+    // BÚSQUEDA ROBUSTA DE CLIENTE MULTI-VARIABLE PARA EVITAR PANTALLA EN GRIS
+    const cliente = todosClientes.find(c => 
+      (c.ID && cred.Cliente && String(c.ID) === String(cred.Cliente)) ||
+      (c.Nombre && cred.Cliente && String(c.Nombre).toLowerCase() === String(cred.Cliente).toLowerCase())
+    );
+
+    // Mapeo seguro con Fallback integrado
+    const nombreCliente = cliente ? cliente.Nombre : (cred.ClienteNombre || cred.Cliente || 'Cliente Desconocido');
+    const identificacion = cliente ? (cliente.Cedula || 'Sin cédula') : 'ID Desconocido';
+    
+    html += `
+      <div class="cliente-card" onclick="verDetalleCredito('${cred.ID}')">
+        <div class="cli-avatar">${String(nombreCliente).substring(0,2).toUpperCase()}</div>
+        <div class="cli-info">
+          <div class="cli-nombre">${nombreCliente}</div>
+          <div class="cli-meta">Cod: <b>${cred.Codigo || '—'}</b> | Frecuencia: ${cred.Frecuencia || 'Mensual'} | Inicio: ${EC.fmtDate(cred.FechaInicio)}</div>
+        </div>
+        <div class="cli-saldo">
+          <div class="cli-saldo-val">${EC.fmt(cred.Saldo)}</div>
+          <div class="cli-saldo-lbl">Saldo Pendiente</div>
+        </div>
       </div>
-      <div class="cli-saldo">
-        <div class="cli-saldo-val">${EC.fmt(saldo)}</div>
-        <div class="cli-saldo-lbl">Saldo pendiente</div>
-      </div>
-    </div>`;
-  }).join('');
+    `;
+  });
+
+  container.innerHTML = html;
 }
 
-function filtrarClientes(q){ renderClientes(todosCreditos, q); }
+function renderHistorialFinalizados(lista) {
+  const tbody = document.getElementById('tbody-finalizados');
+  document.getElementById('badge-finalizados').textContent = lista.length;
 
-// ── HISTORIAL DE CRÉDITOS FINALIZADOS ─────────────────────────
-function renderFinalizados(creditos, filtro=''){
-  let finalizados = creditos.filter(c=>c.Estado==='cancelado');
-  if(filtro) finalizados = finalizados.filter(c=>(c.ClienteNombre||'').toLowerCase().includes(filtro.toLowerCase())||(c.Codigo||'').toLowerCase().includes(filtro.toLowerCase()));
-  document.getElementById('badge-finalizados').textContent = finalizados.length;
-  if(!finalizados.length){
-    document.getElementById('tbody-finalizados').innerHTML = '<tr><td colspan="7" class="empty-cell">Aún no hay créditos finalizados</td></tr>';
+  if(lista.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="7" class="empty-cell">No hay historial de créditos finalizados.</td></tr>';
     return;
   }
-  document.getElementById('tbody-finalizados').innerHTML = finalizados.map(c=>{
-    const pagosCredito = todosPagos.filter(p=>(p.CreditoID||p.creditoId||'')===c.ID);
-    const totalPagado  = pagosCredito.reduce((a,p)=>a+(+p.Capital||0)+(+p.Interes||0),0);
-    return `<tr>
-      <td class="mono" style="color:var(--navy)">${c.Codigo||'—'}</td>
-      <td>${c.ClienteNombre||'—'}</td>
-      <td class="mono">${EC.fmt(c.MontoOriginal||0)}</td>
-      <td class="mono" style="color:var(--green);font-weight:600">${EC.fmt(totalPagado)}</td>
-      <td class="mono">${c.FechaInicio||'—'}</td>
-      <td class="mono">${c.NumCuotas||'—'}</td>
-      <td><button class="btn btn-blue btn-xs" onclick='verDetalle(${JSON.stringify(c).replace(/'/g,"&#39;")})'>
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>Ver
-      </button></td>
-    </tr>`;
-  }).join('');
+
+  let html = "";
+  lista.forEach(cred => {
+    const cliente = todosClientes.find(c => 
+      (c.ID && cred.Cliente && String(c.ID) === String(cred.Cliente)) ||
+      (c.Nombre && cred.Cliente && String(c.Nombre).toLowerCase() === String(cred.Cliente).toLowerCase())
+    );
+    const nombreCliente = cliente ? cliente.Nombre : (cred.ClienteNombre || cred.Cliente || 'Cliente Desconocido');
+    const capital = parseFloat(cred.Monto || 0);
+    const pagado = capital - parseFloat(cred.Saldo || 0);
+
+    html += `
+      <tr>
+        <td><b>${cred.Codigo || '—'}</b></td>
+        <td>${nombreCliente}</td>
+        <td>${EC.fmt(capital)}</td>
+        <td><span class="est-cancelado">${EC.fmt(cred.TotalPagado || pagado)}</span></td>
+        <td>${EC.fmtDate(cred.FechaInicio)}</td>
+        <td>${cred.Plazo || '—'}</td>
+        <td>
+          <button class="btn btn-outline btn-xs" onclick="verDetalleCredito('${cred.ID}')">Ver detalles</button>
+        </td>
+      </tr>
+    `;
+  });
+  tbody.innerHTML = html;
 }
 
-function filtrarFinalizados(q){ renderFinalizados(todosCreditos, q); }
+function verDetalleCredito(id) {
+  const cred = todosCreditos.find(c => String(c.ID) === String(id));
+  if(!cred) return;
+  creditoSeleccionado = cred;
 
-// ── VER DETALLE CLIENTE / CRÉDITO ─────────────────────────────
-function verDetalleCliente(clienteId){
-  const creds = todosCreditos.filter(c=>
-    (c.ClienteID||c.clienteId||'')===clienteId && c.Estado!=='cancelado'
+  const cliente = todosClientes.find(c => 
+    (c.ID && cred.Cliente && String(c.ID) === String(cred.Cliente)) ||
+    (c.Nombre && cred.Cliente && String(c.Nombre).toLowerCase() === String(cred.Cliente).toLowerCase())
   );
-  if(!creds.length){ EC.toast('No se encontraron créditos para este cliente','error'); return; }
-  // Mostrar el primero (si tiene varios se puede expandir)
-  verDetalle(creds[0]);
-}
+  const nombreCliente = cliente ? cliente.Nombre : (cred.ClienteNombre || cred.Cliente || 'Cliente Desconocido');
 
-function verDetalle(cr){
-  creditoDetalle = cr;
-  const pagosCredito = todosPagos.filter(p=>(p.CreditoID||p.creditoId||'')===cr.ID);
-  const capPagado    = pagosCredito.reduce((a,p)=>a+(+p.Capital||0),0);
-  const intPagado    = pagosCredito.reduce((a,p)=>a+(+p.Interes||0),0);
-  const monto        = parseFloat(cr.MontoOriginal||0);
-  const saldo        = parseFloat(cr.Saldo||0);
-  const pct          = monto>0 ? Math.round((1-(saldo/monto))*100) : 0;
+  // Poblar información general
+  document.getElementById('det-cliente').textContent = nombreCliente;
+  document.getElementById('det-codigo').textContent = `CÓDIGO DE CRÉDITO: ${cred.Codigo || '—'}`;
+  
+  const bEst = document.getElementById('det-estado-badge');
+  bEst.textContent = String(cred.Estado).toUpperCase();
+  bEst.className = `badge ${String(cred.Estado).toLowerCase() === 'activo' ? 'b-blue' : 'b-green'}`;
 
-  // Generar tabla amortización
-  const filas = generarAmortizacion(
-    monto,
-    parseFloat(cr.TasaMensual||0),
-    parseInt(cr.NumCuotas||0),
-    cr.Frecuencia||'mensual',
-    cr.Tabla||'francesa',
-    cr.FechaInicio||EC.hoy()
-  );
-  const cuotasPagadas = pagosCredito.length;
-  const cuotasPend    = filas.length - cuotasPagadas;
+  document.getElementById('det-monto').textContent = EC.fmt(cred.Monto);
+  document.getElementById('det-tasa').textContent = `${cred.TasaInteres || 0}%`;
+  document.getElementById('det-cuotas').textContent = cred.Plazo || '—';
+  document.getElementById('det-frec').textContent = String(cred.Frecuencia || 'mensual').toUpperCase();
+  document.getElementById('det-tabla').textContent = String(cred.TipoTabla || 'francesa').toUpperCase();
+  document.getElementById('det-fecha').textContent = EC.fmtDate(cred.FechaInicio);
+  document.getElementById('det-saldo').textContent = EC.fmt(cred.Saldo);
 
-  // Llenar encabezado
-  document.getElementById('det-cliente').textContent  = cr.ClienteNombre||'—';
-  document.getElementById('det-codigo').textContent   = cr.Codigo||cr.codigo||'—';
-  const enMoraReal   = estaEnMora(cr);
-  const estadoReal   = cr.Estado === 'cancelado' ? 'cancelado' : (enMoraReal ? 'en_mora' : 'activo');
-  const estadoBadge = {activo:'b-green',al_dia:'b-green',en_mora:'b-red',cancelado:'b-gray'}[estadoReal]||'b-gray';
-  const estadoLabel = {activo:'Al día',al_dia:'Al día',en_mora:'En mora ('+diasEnMora(cr)+' días)',cancelado:'Cancelado'}[estadoReal]||estadoReal;
-  document.getElementById('det-estado-badge').className = 'badge '+estadoBadge;
-  document.getElementById('det-estado-badge').textContent = estadoLabel;
+  // Parsear y recalcular datos de amortización actuales reales
+  const tabla = desarmarTabla(cred.TablaAmortizacionJSON);
+  let capPagado = 0, intPagado = 0;
+  let capCobrar = 0, intCobrar = 0;
+  let cPagadas = 0, cPend = 0, cMora = 0;
+  let capMora = 0, intCorrienteMora = 0, intMoraAcumulado = 0;
 
-  // Info crédito
-  document.getElementById('det-monto').textContent    = EC.fmt(monto);
-  document.getElementById('det-tasa').textContent     = (cr.TasaMensual||'—')+'% mensual';
-  document.getElementById('det-cuotas').textContent   = (cr.NumCuotas||'—')+' cuotas';
-  document.getElementById('det-frec').textContent     = cr.Frecuencia||'—';
-  document.getElementById('det-tabla').textContent    = {francesa:'Francesa',alemana:'Alemana',americana:'Americana'}[cr.Tabla]||cr.Tabla||'—';
-  document.getElementById('det-fecha').textContent    = cr.FechaInicio||'—';
+  const hoyStr = EC.hoy();
 
-  // Totales del crédito completo (a partir de la tabla de amortización)
-  const totalInteres = filas.reduce((a,f)=>a+f.int,0);
-  const totalDeuda    = monto + totalInteres;
-  document.getElementById('det-total-int').textContent   = EC.fmt(totalInteres);
-  document.getElementById('det-total-deuda').textContent = EC.fmt(totalDeuda);
+  tabla.forEach(cuota => {
+    const cMonto = parseFloat(cuota.capital || 0);
+    const iMonto = parseFloat(cuota.interes || 0);
 
-  // Datos actuales — si el crédito está finalizado, todo pendiente queda en cero
-  const creditoFinalizado2 = cr.Estado === 'cancelado';
-  const saldoMostrarDet = creditoFinalizado2 ? 0 : saldo;
-  const capPorCobrar = creditoFinalizado2 ? 0 : Math.max(0, monto - capPagado);
-  const intPorCobrar = creditoFinalizado2 ? 0 : Math.max(0, totalInteres - intPagado);
-  const pctMostrar    = creditoFinalizado2 ? 100 : pct;
-  const cuotasPagadasMostrar = creditoFinalizado2 ? filas.length : cuotasPagadas;
-  const cuotasPendMostrar    = creditoFinalizado2 ? 0 : cuotasPend;
+    if(cuota.estado === 'pagado') {
+      capPagado += cMonto;
+      intPagado += iMonto;
+      cPagadas++;
+    } else {
+      capCobrar += cMonto;
+      intCobrar += iMonto;
+      cPend++;
 
-  document.getElementById('det-saldo').textContent          = EC.fmt(saldoMostrarDet);
-  document.getElementById('det-cap-pagado').textContent     = EC.fmt(creditoFinalizado2 ? monto : capPagado);
-  document.getElementById('det-int-pagado').textContent     = EC.fmt(creditoFinalizado2 ? intPagado : intPagado);
-  document.getElementById('det-cap-cobrar').textContent     = EC.fmt(capPorCobrar);
-  document.getElementById('det-int-cobrar').textContent     = EC.fmt(intPorCobrar);
-  document.getElementById('det-cuotas-pagadas').textContent = cuotasPagadasMostrar+' / '+filas.length;
-  document.getElementById('det-cuotas-pend').textContent    = cuotasPendMostrar+' cuotas';
-  document.getElementById('det-pct').textContent            = pctMostrar+'%';
-
-  // ── CÁLCULO DE MORA: cuotas vencidas no pagadas ────────────
-  // Recorre todas las cuotas pendientes y marca las que ya vencieron
-  const hoyMora = EC.hoy();
-  const tasaMoraDiaria = parseFloat(cr.TasaMora||0)/100;
-  let cuotasEnMora = 0, capitalEnMora = 0, interesCorrienteEnMora = 0, interesMoraAcumulado = 0;
-
-  if(!creditoFinalizado2){
-    for(let i=cuotasPagadas; i<filas.length; i++){
-      const f = filas[i];
-      if(f.fecha < hoyMora){
-        cuotasEnMora++;
-        capitalEnMora += f.cap;
-        interesCorrienteEnMora += f.int; // interés normal/corriente de esa cuota vencida
-        if(tasaMoraDiaria > 0){
-          const dias = Math.floor((new Date(hoyMora+'T12:00:00') - new Date(f.fecha+'T12:00:00')) / (1000*60*60*24));
-          interesMoraAcumulado += parseFloat((f.cuota * tasaMoraDiaria * dias).toFixed(2));
+      // Validar atraso (Mora)
+      if(cuota.fechaVencimiento < hoyStr) {
+        cMora++;
+        capMora += cMonto;
+        intCorrienteMora += iMonto;
+        
+        // Calcular interés por mora acumulado diario
+        if(cred.TasaMora && parseFloat(cred.TasaMora) > 0) {
+          const diasAtraso = Math.max(0, Math.floor((new Date(hoyStr) - new Date(cuota.fechaVencimiento)) / (1000*60*60*24)));
+          intMoraAcumulado += (cMonto + iMonto) * (parseFloat(cred.TasaMora) / 100) * diasAtraso;
         }
       }
     }
-  }
-  const totalEnMora = capitalEnMora + interesCorrienteEnMora + interesMoraAcumulado;
+  });
 
-  document.getElementById('det-cuotas-mora').textContent = cuotasEnMora+' cuota'+(cuotasEnMora!==1?'s':'');
-  document.getElementById('det-cap-mora').textContent    = EC.fmt(capitalEnMora);
-  document.getElementById('det-int-corriente-mora').textContent = EC.fmt(interesCorrienteEnMora);
-  document.getElementById('det-int-mora').textContent    = EC.fmt(interesMoraAcumulado);
-  document.getElementById('det-total-mora').textContent  = EC.fmt(totalEnMora);
+  const totalInteresOriginal = tabla.reduce((acc, curr) => acc + parseFloat(curr.interes || 0), 0);
+  const totalDeudaOriginal = parseFloat(cred.Monto || 0) + totalInteresOriginal;
+  const totalEnMoraRuedas = capMora + intCorrienteMora + intMoraAcumulado;
 
-  // Tabla amortización con estados
-  // Si el crédito está cancelado (pagado completo o precancelado),
-  // TODAS las cuotas se muestran como Cancelado y sin saldo pendiente
-  const hoy = EC.hoy();
-  const creditoFinalizado = cr.Estado === 'cancelado';
-  document.getElementById('tbody-amort-detalle').innerHTML = filas.map((f,i)=>{
-    let estado, cls, saldoMostrar = f.saldo;
-    if(creditoFinalizado){
-      estado='Cancelado'; cls='est-cancelado'; saldoMostrar=0;
-    } else if(i < cuotasPagadas){
-      estado='Cancelado'; cls='est-cancelado';
-    } else if(f.fecha < hoy){
-      estado='Vencido'; cls='est-vencido';
-    } else {
-      estado='Por pagar'; cls='est-pagar';
-    }
-    return `<tr>
-      <td class="mono">${f.n}</td>
-      <td class="mono">${f.fecha}</td>
-      <td class="mono">${EC.fmt(f.cuota)}</td>
-      <td class="mono">${EC.fmt(f.cap)}</td>
-      <td class="mono" style="color:var(--amber)">${EC.fmt(f.int)}</td>
-      <td class="mono">${EC.fmt(saldoMostrar)}</td>
-      <td><span class="${cls}">${estado}</span></td>
-    </tr>`;
-  }).join('');
+  document.getElementById('det-total-int').textContent = EC.fmt(totalInteresOriginal);
+  document.getElementById('det-total-deuda').textContent = EC.fmt(totalDeudaOriginal);
+  document.getElementById('det-cap-pagado').textContent = EC.fmt(capPagado);
+  document.getElementById('det-int-pagado').textContent = EC.fmt(intPagado);
+  document.getElementById('det-cap-cobrar').textContent = EC.fmt(capCobrar);
+  document.getElementById('det-int-cobrar').textContent = EC.fmt(intCobrar);
+  
+  const pct = totalDeudaOriginal > 0 ? ((capPagado + intPagado) / totalDeudaOriginal) * 100 : 0;
+  document.getElementById('det-pct').textContent = `${pct.toFixed(1)}%`;
+  
+  document.getElementById('det-cuotas-pagadas').textContent = `${cPagadas} cuotas`;
+  document.getElementById('det-cuotas-pend').textContent = `${cPend} cuotas`;
+  document.getElementById('det-cuotas-mora').textContent = `${cMora} cuotas atrasadas`;
+  document.getElementById('det-cap-mora').textContent = EC.fmt(capMora);
+  document.getElementById('det-int-corriente-mora').textContent = EC.fmt(intCorrienteMora);
+  document.getElementById('det-int-mora').textContent = EC.fmt(intMoraAcumulado);
+  document.getElementById('det-total-mora').textContent = EC.fmt(totalEnMoraRuedas);
+
+  // Renderizar tabla interna
+  const tbody = document.getElementById('tbody-amort-detalle');
+  tbody.innerHTML = "";
+  tabla.forEach(cuota => {
+    let estHtml = `<span class="est-pagar">Pendiente</span>`;
+    if(cuota.estado === 'pagado') estHtml = `<span class="est-cancelado">Pagado</span>`;
+    else if(cuota.fechaVencimiento < hoyStr) estHtml = `<span class="est-vencido">Vencido</span>`;
+
+    tbody.innerHTML += `
+      <tr>
+        <td>${cuota.num}</td>
+        <td>${EC.fmtDate(cuota.fechaVencimiento)}</td>
+        <td><b>${EC.fmt(cuota.cuota)}</b></td>
+        <td>${EC.fmt(cuota.capital)}</td>
+        <td>${EC.fmt(cuota.interes)}</td>
+        <td>${EC.fmt(cuota.saldoRestante)}</td>
+        <td>${estHtml}</td>
+      </tr>
+    `;
+  });
 
   openModal('modal-detalle');
 }
 
-// ── IMPRIMIR CRÉDITO ORIGINAL (documento de otorgamiento) ─────
-async function imprimirCreditoOriginal(){
-  if(!creditoDetalle){ EC.toast('No hay crédito seleccionado','error'); return; }
-  const cr = creditoDetalle;
-  EC.showLoading('Generando documento de crédito...');
-  try{
-    const {jsPDF} = window.jspdf;
-    const doc     = new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
-    const monto   = parseFloat(cr.MontoOriginal||0);
-    const hoy     = new Date().toLocaleDateString('es-EC',{day:'2-digit',month:'long',year:'numeric'});
-    const filas   = generarAmortizacion(monto, parseFloat(cr.TasaMensual||0), parseInt(cr.NumCuotas||0), cr.Frecuencia||'mensual', cr.Tabla||'francesa', cr.FechaInicio||EC.hoy());
-    const totalInteres = filas.reduce((a,f)=>a+f.int,0);
-    const totalDeuda    = monto + totalInteres;
-
-    // ── ENCABEZADO ──────────────────────────────────────────
-    doc.setFillColor(8,20,14);
-    doc.rect(0,0,210,48,'F');
-    doc.setFontSize(10);doc.setFont('helvetica','normal');
-    doc.setTextColor(163,200,163);
-    doc.text('CAJA DE AHORRO Y CRÉDITO', 15, 14);
-    doc.setFontSize(20);doc.setFont('helvetica','bold');
-    doc.setTextColor(46,204,113);
-    doc.text('Éxito Compartido', 15, 24);
-    doc.setFontSize(11);doc.setFont('helvetica','bold');
-    doc.setTextColor(255,255,255);
-    doc.text('CONTRATO DE CRÉDITO OTORGADO', 15, 34);
-    doc.setFontSize(9);doc.setFont('helvetica','normal');
-    doc.setTextColor(163,200,163);
-    doc.text(`Emitido: ${hoy}`, 15, 41);
-    doc.setFontSize(14);doc.setFont('helvetica','bold');
-    doc.setTextColor(255,255,255);
-    doc.text(cr.Codigo||'—', 195, 24,{align:'right'});
-    doc.setFontSize(9);doc.setFont('helvetica','normal');
-    doc.setTextColor(163,200,163);
-    doc.text('CÓDIGO DE CRÉDITO', 195, 30,{align:'right'});
-
-    let y = 58;
-
-    // ── DATOS DEL CLIENTE Y CRÉDITO ──────────────────────────
-    doc.setTextColor(0,0,0);
-    doc.setFontSize(12);doc.setFont('helvetica','bold');
-    doc.text('DATOS DEL CLIENTE Y CRÉDITO OTORGADO', 15, y); y+=8;
-    doc.autoTable({
-      startY:y,
-      body:[
-        ['Cliente',           cr.ClienteNombre||'—'],
-        ['Capital otorgado',  EC.fmt(monto)],
-        ['Tasa de interés mensual', (cr.TasaMensual||'—')+'%'],
-        ['Número de cuotas',  (cr.NumCuotas||'—')+' cuotas'],
-        ['Frecuencia de pago',cr.Frecuencia||'—'],
-        ['Tabla de amortización', {francesa:'Francesa (cuota fija)',alemana:'Alemana (capital fijo)',americana:'Americana'}[cr.Tabla]||cr.Tabla||'—'],
-        ['Fecha de otorgamiento', cr.FechaInicio||'—'],
-      ],
-      theme:'grid',
-      styles:{fontSize:10,cellPadding:5},
-      columnStyles:{0:{fontStyle:'bold',fillColor:[245,250,245],cellWidth:70}},
-      margin:{left:15,right:15},
-    });
-    y = doc.lastAutoTable.finalY + 10;
-
-    // ── RESUMEN FINANCIERO DEL CRÉDITO ───────────────────────
-    doc.setFontSize(12);doc.setFont('helvetica','bold');
-    doc.text('RESUMEN FINANCIERO DEL CRÉDITO', 15, y); y+=8;
-    doc.autoTable({
-      startY:y,
-      body:[
-        ['Capital otorgado',          EC.fmt(monto)],
-        ['Total de interés a pagar',  EC.fmt(totalInteres)],
-        ['TOTAL DE LA DEUDA (Capital + Interés)', EC.fmt(totalDeuda)],
-        ['Valor de la cuota '+(cr.Frecuencia||''), EC.fmt(filas[0]?.cuota||0)],
-      ],
-      theme:'grid',
-      styles:{fontSize:10,cellPadding:5},
-      columnStyles:{0:{fontStyle:'bold',fillColor:[245,250,245],cellWidth:90}},
-      didParseCell:(data)=>{ if(data.row.index===2){ data.cell.styles.fillColor=[230,255,238]; data.cell.styles.fontStyle='bold'; data.cell.styles.fontSize=11; } },
-      margin:{left:15,right:15},
-    });
-    y = doc.lastAutoTable.finalY + 10;
-
-    // ── TABLA DE AMORTIZACIÓN ORIGINAL (sin estados) ─────────
-    if(y > 200){ doc.addPage(); y = 20; }
-    doc.setFontSize(12);doc.setFont('helvetica','bold');
-    doc.text('TABLA DE AMORTIZACIÓN', 15, y); y+=8;
-    const bodyAmort = filas.map(f=>[f.n, f.fecha, EC.fmt(f.cuota), EC.fmt(f.cap), EC.fmt(f.int), EC.fmt(f.saldo)]);
-    doc.autoTable({
-      startY:y,
-      head:[['#','Fecha de pago','Cuota total','Capital','Interés','Saldo restante']],
-      body:bodyAmort,
-      theme:'striped',
-      headStyles:{fillColor:[46,204,113],textColor:0,fontStyle:'bold',fontSize:9},
-      styles:{fontSize:9,cellPadding:3},
-      columnStyles:{0:{halign:'center'},2:{halign:'right'},3:{halign:'right'},4:{halign:'right'},5:{halign:'right'}},
-      foot:[['','TOTALES','', EC.fmt(monto), EC.fmt(totalInteres), '']],
-      footStyles:{fillColor:[230,255,238],textColor:0,fontStyle:'bold',fontSize:9},
-      margin:{left:15,right:15},
-    });
-    y = doc.lastAutoTable.finalY + 14;
-
-    // ── FIRMAS ────────────────────────────────────────────────
-    if(y > 250){ doc.addPage(); y = 30; }
-    doc.setFontSize(9);doc.setTextColor(0,0,0);
-    doc.line(20, y+14, 90, y+14);
-    doc.line(120, y+14, 190, y+14);
-    doc.text('Firma del cliente', 55, y+19,{align:'center'});
-    doc.text('Firma autorizada — Éxito Compartido', 155, y+19,{align:'center'});
-
-    // ── PIE ─────────────────────────────────────────────────
-    const totalPags = doc.internal.getNumberOfPages();
-    for(let i=1;i<=totalPags;i++){
-      doc.setPage(i);
-      doc.setFontSize(8);doc.setTextColor(150,150,150);
-      doc.line(15,284,195,284);
-      doc.text('Caja de Ahorro y Crédito Éxito Compartido  —  Documento de crédito otorgado', 15, 289);
-      doc.text('Página '+i+' de '+totalPags, 195, 289,{align:'right'});
-    }
-    doc.save(`credito_${cr.Codigo||'doc'}_${cr.ClienteNombre||''}.pdf`);
-    EC.toast('Documento de crédito generado exitosamente');
-  }catch(e){ EC.toast('Error generando documento: '+e.message,'error'); }
-  EC.hideLoading();
+function desarmarTabla(data) {
+  if(!data) return [];
+  if(typeof data === 'object') return data;
+  try { return JSON.parse(data); } catch(e) { return []; }
 }
 
-// ── IMPRIMIR AMORTIZACIÓN PDF (estado actual) ─────────────────
-async function imprimirAmortizacion(){
-  if(!creditoDetalle){ EC.toast('No hay crédito seleccionado','error'); return; }
-  const cr = creditoDetalle;
-  EC.showLoading('Generando PDF...');
-  try{
-    const {jsPDF}  = window.jspdf;
-    const doc      = new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
-    const pagosCredito = todosPagos.filter(p=>(p.CreditoID||p.creditoId||'')===cr.ID);
-    const cuotasPagadas= pagosCredito.length;
-    const monto        = parseFloat(cr.MontoOriginal||0);
-    const hoy          = new Date().toLocaleDateString('es-EC',{day:'2-digit',month:'long',year:'numeric'});
-
-    // ── ENCABEZADO ──────────────────────────────────────────
-    doc.setFillColor(8,20,14);
-    doc.rect(0,0,210,48,'F');
-    doc.setFontSize(10);doc.setFont('helvetica','normal');
-    doc.setTextColor(163,200,163);
-    doc.text('CAJA DE AHORRO Y CRÉDITO', 15, 14);
-    doc.setFontSize(20);doc.setFont('helvetica','bold');
-    doc.setTextColor(46,204,113);
-    doc.text('Éxito Compartido', 15, 24);
-    doc.setFontSize(10);doc.setFont('helvetica','normal');
-    doc.setTextColor(163,200,163);
-    doc.text('TABLA DE AMORTIZACIÓN DE CRÉDITO', 15, 33);
-    doc.text(`Generado: ${hoy}`, 15, 40);
-    // Código arriba derecha
-    doc.setFontSize(14);doc.setFont('helvetica','bold');
-    doc.setTextColor(255,255,255);
-    doc.text(cr.Codigo||'—', 195, 20,{align:'right'});
-    doc.setFontSize(9);doc.setFont('helvetica','normal');
-    doc.setTextColor(163,200,163);
-    doc.text('CÓDIGO', 195, 27,{align:'right'});
-
-    let y = 56;
-
-    // ── DATOS DEL CRÉDITO ───────────────────────────────────
-    doc.setTextColor(0,0,0);
-    doc.setFontSize(11);doc.setFont('helvetica','bold');
-    doc.text('DATOS DEL CRÉDITO', 15, y); y+=8;
-
-    doc.autoTable({
-      startY:y,
-      body:[
-        ['Cliente',           cr.ClienteNombre||'—', 'Fecha de inicio', cr.FechaInicio||'—'],
-        ['Monto otorgado',    EC.fmt(monto),          'Tasa mensual',    (cr.TasaMensual||'—')+'%'],
-        ['Número de cuotas',  (cr.NumCuotas||'—')+' cuotas', 'Frecuencia', cr.Frecuencia||'—'],
-        ['Tabla amortización',{francesa:'Francesa (cuota fija)',alemana:'Alemana (capital fijo)',americana:'Americana'}[cr.Tabla]||cr.Tabla||'—', 'Estado', {activo:'Al día',al_dia:'Al día',en_mora:'EN MORA',cancelado:'Cancelado'}[cr.Estado]||cr.Estado||'—'],
-      ],
-      theme:'grid',
-      styles:{fontSize:10,cellPadding:4},
-      columnStyles:{0:{fontStyle:'bold',fillColor:[245,250,245]},2:{fontStyle:'bold',fillColor:[245,250,245]}},
-      margin:{left:15,right:15},
-    });
-    y = doc.lastAutoTable.finalY + 8;
-
-    // ── DATOS ACTUALES ──────────────────────────────────────
-    doc.setFontSize(11);doc.setFont('helvetica','bold');
-    doc.text('ESTADO ACTUAL DEL CRÉDITO', 15, y); y+=8;
-    const saldo    = parseFloat(cr.Saldo||0);
-    const capPag   = todosPagos.filter(p=>(p.CreditoID||p.creditoId||'')===cr.ID).reduce((a,p)=>a+(+p.Capital||0),0);
-    const intPag   = todosPagos.filter(p=>(p.CreditoID||p.creditoId||'')===cr.ID).reduce((a,p)=>a+(+p.Interes||0),0);
-    const pct      = monto>0?Math.round((1-(saldo/monto))*100):0;
-    doc.autoTable({
-      startY:y,
-      body:[
-        ['Saldo pendiente', EC.fmt(saldo), 'Capital pagado', EC.fmt(capPag)],
-        ['Interés pagado',  EC.fmt(intPag), '% Pagado',      pct+'%'],
-        ['Cuotas pagadas',  cuotasPagadas+' de '+cr.NumCuotas, 'Cuotas pendientes', (parseInt(cr.NumCuotas||0)-cuotasPagadas)+' cuotas'],
-      ],
-      theme:'grid',
-      styles:{fontSize:10,cellPadding:4},
-      columnStyles:{0:{fontStyle:'bold',fillColor:[245,250,245]},2:{fontStyle:'bold',fillColor:[245,250,245]}},
-      margin:{left:15,right:15},
-    });
-    y = doc.lastAutoTable.finalY + 8;
-
-    // ── TABLA DE AMORTIZACIÓN ───────────────────────────────
-    if(y > 200){ doc.addPage(); y = 20; }
-    doc.setFontSize(11);doc.setFont('helvetica','bold');
-    doc.text('TABLA DE AMORTIZACIÓN', 15, y); y+=8;
-    const filas = generarAmortizacion(monto, parseFloat(cr.TasaMensual||0), parseInt(cr.NumCuotas||0), cr.Frecuencia||'mensual', cr.Tabla||'francesa', cr.FechaInicio||hoy);
-    const hoyStr = new Date().toISOString().split('T')[0];
-    const bodyAmort = filas.map((f,i)=>{
-      let estado;
-      if(i<cuotasPagadas) estado='Cancelado';
-      else if(f.fecha<hoyStr) estado='Vencido';
-      else estado='Por pagar';
-      return [f.n, f.fecha, EC.fmt(f.cuota), EC.fmt(f.cap), EC.fmt(f.int), EC.fmt(f.saldo), estado];
-    });
-    doc.autoTable({
-      startY:y,
-      head:[['#','Fecha vencimiento','Cuota total','Capital','Interés','Saldo restante','Estado']],
-      body:bodyAmort,
-      theme:'striped',
-      headStyles:{fillColor:[46,204,113],textColor:0,fontStyle:'bold',fontSize:9},
-      styles:{fontSize:9,cellPadding:3},
-      columnStyles:{0:{halign:'center'},2:{halign:'right'},3:{halign:'right'},4:{halign:'right'},5:{halign:'right'},6:{halign:'center'}},
-      didParseCell:(data)=>{
-        if(data.section==='body'){
-          const est = data.row.cells[6]?.raw||'';
-          if(est==='Cancelado') data.cell.styles.textColor=[39,174,96];
-          else if(est==='Vencido') data.cell.styles.textColor=[231,76,60];
-        }
-      },
-      margin:{left:15,right:15},
-    });
-
-    // ── PIE ─────────────────────────────────────────────────
-    const totalPags = doc.internal.getNumberOfPages();
-    for(let i=1;i<=totalPags;i++){
-      doc.setPage(i);
-      doc.setFontSize(8);doc.setTextColor(150,150,150);
-      doc.line(15,284,195,284);
-      doc.text('Caja de Ahorro y Crédito Éxito Compartido  —  Documento generado el '+hoy, 15, 289);
-      doc.text('Página '+i+' de '+totalPags, 195, 289,{align:'right'});
-    }
-    doc.save(`amortizacion_${cr.Codigo||'credito'}_${cr.ClienteNombre||''}.pdf`);
-    EC.toast('PDF generado exitosamente');
-  }catch(e){ EC.toast('Error generando PDF: '+e.message,'error'); }
-  EC.hideLoading();
-}
-
-// ── GENERAR AMORTIZACIÓN ──────────────────────────────────────
-function generarAmortizacion(monto, tasaMens, plazo, frec, tabla, fechaInicio){
-  const fact = {mensual:1,quincenal:2,semanal:4,diario:30}[frec]||1;
-  const tasa = tasaMens / fact / 100;
-  const filas = [];
-  if(tabla==='francesa'){
-    const cuota = tasa===0 ? monto/plazo : monto*(tasa*Math.pow(1+tasa,plazo))/(Math.pow(1+tasa,plazo)-1);
-    let s = monto;
-    for(let i=1;i<=plazo;i++){
-      const int=parseFloat((s*tasa).toFixed(2)), cap=parseFloat((cuota-int).toFixed(2));
-      s=parseFloat(Math.max(0,s-cap).toFixed(2));
-      filas.push({n:i,fecha:addPer(fechaInicio,frec,i),cuota:parseFloat(cuota.toFixed(2)),cap,int,saldo:s});
-    }
-  } else if(tabla==='alemana'){
-    const capC=parseFloat((monto/plazo).toFixed(2)); let s=monto;
-    for(let i=1;i<=plazo;i++){
-      const int=parseFloat((s*tasa).toFixed(2)), cuota=parseFloat((capC+int).toFixed(2));
-      s=parseFloat(Math.max(0,s-capC).toFixed(2));
-      filas.push({n:i,fecha:addPer(fechaInicio,frec,i),cuota,cap:capC,int,saldo:s});
-    }
-  } else {
-    for(let i=1;i<=plazo;i++){
-      const int=parseFloat((monto*tasa).toFixed(2)), cap=i===plazo?monto:0;
-      filas.push({n:i,fecha:addPer(fechaInicio,frec,i),cuota:parseFloat((int+cap).toFixed(2)),cap,int,saldo:i===plazo?0:monto});
-    }
-  }
-  return filas;
-}
-
-function addPer(d,t,n){
-  const dt=new Date(d+'T12:00:00');
-  if(t==='mensual') dt.setMonth(dt.getMonth()+n);
-  else if(t==='quincenal') dt.setDate(dt.getDate()+n*15);
-  else if(t==='semanal') dt.setDate(dt.getDate()+n*7);
-  else dt.setDate(dt.getDate()+n);
-  return dt.toISOString().split('T')[0];
-}
-
-// ── NUEVO CRÉDITO ─────────────────────────────────────────────
-function cargarSelectClientes(){
-  const activos = todosClientes.filter(c=>c.Activo===true||c.Activo==='true'||c.Activo==='TRUE');
-  const opts = '<option value="">— Seleccionar cliente —</option>'+
-    activos.map(c=>`<option value="${c.ID}">${c.Nombres} ${c.Apellidos} — ${c.Cedula}</option>`).join('');
-  document.getElementById('n-cliente').innerHTML = opts;
-}
-
-function abrirNuevoCredito(){
-  ['n-monto','n-tasa','n-plazo'].forEach(id=>document.getElementById(id).value='');
-  document.getElementById('n-frec').value='mensual';
-  document.getElementById('n-tabla').value='francesa';
-  document.getElementById('n-fecha').value=EC.hoy();
+function abrirNuevoCredito() {
+  document.getElementById('n-fecha').value = EC.hoy();
+  document.getElementById('n-monto').value = "";
+  document.getElementById('n-tasa').value = "1.5";
+  document.getElementById('n-plazo').value = "12";
   calcNuevo();
   openModal('modal-nuevo');
 }
 
-function calcNuevo(){ _calc('n-','rn-'); }
+function calcNuevo() { _calc('n-', 'rn-'); }
+function calcSimulador() { _calc('s-', 'rs-'); }
 
-function _calc(pre, res){
-  const monto=parseFloat(document.getElementById(pre+'monto').value)||0;
-  const tasa =parseFloat(document.getElementById(pre+'tasa').value)||0;
-  const plazo=parseInt(document.getElementById(pre+'plazo').value)||0;
-  const frec =document.getElementById(pre+'frec').value;
-  const tabla=document.getElementById(pre+'tabla').value;
-  const fecha=document.getElementById(pre+'fecha').value||EC.hoy();
-  if(!monto||!tasa||!plazo) return;
-  const filas=generarAmortizacion(monto,tasa,plazo,frec,tabla,fecha);
-  const totP=filas.reduce((a,f)=>a+f.cuota,0);
-  const totI=filas.reduce((a,f)=>a+f.int,0);
-  document.getElementById(res+'cuota').textContent=EC.fmt(filas[0]?.cuota||0);
-  document.getElementById(res+'int').textContent  =EC.fmt(totI);
-  document.getElementById(res+'total').textContent=EC.fmt(totP);
-  document.getElementById(res+'fecha')||null;
-  const elUlt=document.getElementById(res+'ultima')||document.getElementById(res+'fecha');
-  if(elUlt) elUlt.textContent=filas[filas.length-1]?.fecha||'—';
-  // Si es simulador, también llena la tabla
-  if(pre==='s-'){
-    document.getElementById('tbody-sim').innerHTML=filas.map(f=>`<tr>
-      <td class="mono">${f.n}</td><td class="mono">${f.fecha}</td>
-      <td class="mono">${EC.fmt(f.cuota)}</td><td class="mono">${EC.fmt(f.cap)}</td>
-      <td class="mono" style="color:var(--amber)">${EC.fmt(f.int)}</td>
-      <td class="mono">${EC.fmt(f.saldo)}</td></tr>`).join('');
+function _calc(pref, resPref) {
+  const monto = parseFloat(document.getElementById(pref+'monto')?.value || 0);
+  const tasaMensual = parseFloat(document.getElementById(pref+'tasa')?.value || 0);
+  const plazo = parseInt(document.getElementById(pref+'plazo')?.value || 0);
+  const frec = document.getElementById(pref+'frec')?.value || 'mensual';
+  const tipo = document.getElementById(pref+'tabla')?.value || 'francesa';
+  const fechaIn = document.getElementById(pref+'fecha')?.value || EC.hoy();
+
+  if(monto <= 0 || plazo <= 0) return;
+
+  // Ajustar tasa por frecuencia de pago
+  let divisor = 1; 
+  if(frec === 'quincenal') divisor = 2;
+  else if(frec === 'semanal') divisor = 4;
+  else if(frec === 'diario') divisor = 30;
+  const tasaPeriodo = (tasaMensual / divisor) / 100;
+
+  let tabla = [];
+  let saldo = monto;
+  let totalInteres = 0;
+
+  if(tipo === 'francesa') {
+    const cuotaV = tasaPeriodo > 0 ? (monto * tasaPeriodo) / (1 - Math.pow(1 + tasaPeriodo, -plazo)) : (monto / plazo);
+    for(let i=1; i<=plazo; i++) {
+      let inter = saldo * tasaPeriodo;
+      let cap = cuotaV - inter;
+      if(i === plazo) { cap = saldo; inter = cuotaV - cap; }
+      if(inter < 0) inter = 0;
+      saldo -= cap;
+      totalInteres += inter;
+      tabla.push({ num: i, cuota: cuotaV, capital: cap, interes: inter, saldoRestante: Math.max(0, saldo) });
+    }
+  } else if(tipo === 'alemana') {
+    const capFijo = monto / plazo;
+    for(let i=1; i<=plazo; i++) {
+      let inter = saldo * tasaPeriodo;
+      let cuotaV = capFijo + inter;
+      saldo -= capFijo;
+      totalInteres += inter;
+      tabla.push({ num: i, cuota: cuotaV, capital: capFijo, interes: inter, saldoRestante: Math.max(0, saldo) });
+    }
+  } else if(tipo === 'americana') {
+    for(let i=1; i<=plazo; i++) {
+      let inter = monto * tasaPeriodo;
+      let cap = (i === plazo) ? monto : 0;
+      let cuotaV = cap + inter;
+      totalInteres += inter;
+      tabla.push({ num: i, cuota: cuotaV, capital: cap, interes: inter, saldoRestante: (i === plazo) ? 0 : monto });
+    }
   }
+
+  // Generar fechas correlativas por frecuencia
+  let fechaCursor = new Date(fechaIn + "T12:00:00");
+  tabla.forEach(cuota => {
+    if(frec === 'mensual') fechaCursor.setMonth(fechaCursor.getMonth() + 1);
+    else if(frec === 'quincenal') fechaCursor.setDate(fechaCursor.getDate() + 15);
+    else if(frec === 'semanal') fechaCursor.setDate(fechaCursor.getDate() + 7);
+    else if(frec === 'diario') fechaCursor.setDate(fechaCursor.getDate() + 1);
+    
+    cuota.fechaVencimiento = fechaCursor.toISOString().split('T')[0];
+    cuota.estado = 'pendiente';
+  });
+
+  // Mostrar en UI de resumenes
+  const tCuota = tabla[0]?.cuota || 0;
+  document.getElementById(resPref+'cuota').textContent = EC.fmt(tCuota);
+  document.getElementById(resPref+'int').textContent = EC.fmt(totalInteres);
+  document.getElementById(resPref+'total').textContent = EC.fmt(monto + totalInteres);
+  document.getElementById(resPref+'fecha').textContent = tabla.length ? EC.fmtDate(tabla[tabla.length-1].fechaVencimiento) : '—';
+
+  // Si es del simulador, renderizar su tabla visual
+  const tbodySim = document.getElementById('tbody-simulador');
+  if(tbodySim && pref === 's-') {
+    tbodySim.innerHTML = "";
+    tabla.forEach(c => {
+      tbodySim.innerHTML += `<tr><td>${c.num}</td><td>${EC.fmtDate(c.fechaVencimiento)}</td><td><b>${EC.fmt(c.cuota)}</b></td><td>${EC.fmt(c.capital)}</td><td>${EC.fmt(c.interes)}</td><td>${EC.fmt(c.saldoRestante)}</td></tr>`;
+    });
+  }
+
+  return tabla;
 }
 
-async function guardarCredito(){
-  const clienteId=document.getElementById('n-cliente').value;
-  const monto    =parseFloat(document.getElementById('n-monto').value)||0;
-  const tasa     =parseFloat(document.getElementById('n-tasa').value)||0;
-  const plazo    =parseInt(document.getElementById('n-plazo').value)||0;
-  if(!clienteId||!monto||!tasa||!plazo){ EC.toast('Todos los campos son obligatorios','error'); return; }
-  const cliente  = todosClientes.find(c=>c.ID===clienteId)||{};
-  const num      = todosCreditos.length+1;
-  const datos    = {
-    Codigo        :'C-'+String(num).padStart(3,'0'),
-    ClienteID     :clienteId,
-    ClienteNombre :(cliente.Nombres||'')+' '+(cliente.Apellidos||''),
-    MontoOriginal :monto,
-    Saldo         :monto,
-    TasaMensual   :tasa,
-    NumCuotas     :plazo,
-    Frecuencia    :document.getElementById('n-frec').value,
-    Tabla         :document.getElementById('n-tabla').value,
-    FechaInicio   :document.getElementById('n-fecha').value||EC.hoy(),
-    TasaMora      :parseFloat(document.getElementById('n-mora')?.value||0)||0,
-    Observaciones :document.getElementById('n-obs')?.value?.trim()||'',
-    Estado        :'activo',
+async function guardarCredito() {
+  const clienteId = document.getElementById('n-cliente').value;
+  const monto = parseFloat(document.getElementById('n-monto').value || 0);
+  const tasa = parseFloat(document.getElementById('n-tasa').value || 0);
+  const plazo = parseInt(document.getElementById('n-plazo').value || 0);
+
+  if(!clienteId || monto <= 0 || tasa <= 0 || plazo <= 0) {
+    EC.toast('Por favor, complete todos los campos obligatorios (*)', 'error');
+    return;
+  }
+
+  const tablaCalculada = _calc('n-', 'rn-');
+  if(!tablaCalculada || !tablaCalculada.length) return;
+
+  const totalInt = tablaCalculada.reduce((acc, c) => acc + c.interes, 0);
+  const clienteObj = todosClientes.find(c => String(c.ID) === String(clienteId));
+
+  const datos = {
+    Codigo: 'CR-' + Math.floor(100000 + Math.random() * 900000),
+    Cliente: clienteId,
+    ClienteNombre: clienteObj ? clienteObj.Nombre : 'Cliente',
+    Monto: monto,
+    TasaInteres: tasa,
+    Plazo: plazo,
+    Frecuencia: document.getElementById('n-frec').value,
+    TipoTabla: document.getElementById('n-tabla').value,
+    Saldo: (monto + totalInt).toFixed(2), 
+    FechaInicio: document.getElementById('n-fecha').value || EC.hoy(),
+    TasaMora: parseFloat(document.getElementById('n-mora')?.value || 0) || 0,
+    Observaciones: document.getElementById('n-obs')?.value?.trim() || '',
+    Estado: 'activo',
+    TablaAmortizacionJSON: JSON.stringify(tablaCalculada)
   };
-  EC.showLoading('Registrando crédito...');
-  try{
-    const r=await fetch(API,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({accion:'agregar',tab:'creditos',datos})});
-    const j=await r.json();
-    if(j.ok){ closeModal('modal-nuevo'); await cargarTodo(); EC.toast('Crédito '+datos.Codigo+' registrado exitosamente'); }
-    else EC.toast('Error al registrar: '+(j.error||''),'error');
-  }catch(e){ EC.toast('Error de conexión','error'); }
+
+  EC.showLoading('Registrando crédito en el sistema...');
+  try {
+    const r = await fetch(API, {
+      method: 'POST',
+      headers: {'Content-Type': 'text/plain'},
+      body: JSON.stringify({ accion: 'agregar', tab: 'creditos', datos })
+    });
+    const j = await r.json();
+    if(j.ok) {
+      closeModal('modal-nuevo');
+      await cargarTodo();
+      EC.toast(`Crédito ${datos.Codigo} registrado exitosamente`);
+    } else {
+      EC.toast('Error al registrar: ' + (j.error || ''), 'error');
+    }
+  } catch(e) {
+    EC.toast('Error de conexión con el servidor', 'error');
+  }
   EC.hideLoading();
 }
 
-// ── SIMULADOR ─────────────────────────────────────────────────
-function abrirSimulador(){
-  document.getElementById('s-fecha').value=EC.hoy();
-  calcSimulador();
-  openModal('modal-simulador');
+function filtrarClientes(v) {
+  const q = String(v).toLowerCase().trim();
+  const tarjetas = document.querySelectorAll('#lista-clientes .cliente-card');
+  tarjetas.forEach(t => {
+    const txt = t.textContent.toLowerCase();
+    t.style.display = txt.includes(q) ? 'flex' : 'none';
+  });
 }
-function calcSimulador(){ _calc('s-','rs-'); }
 
-// ── MODALES ───────────────────────────────────────────────────
-function openModal(id){ document.getElementById(id).classList.add('open'); }
-function closeModal(id){ document.getElementById(id).classList.remove('open'); }
-document.querySelectorAll('.modal-overlay').forEach(m=>{
-  m.addEventListener('click',e=>{ if(e.target===m) m.classList.remove('open'); });
+function filtrarFinalizados(v) {
+  const q = String(v).toLowerCase().trim();
+  const filas = document.querySelectorAll('#tbody-finalizados tr');
+  filas.forEach(f => {
+    if(f.querySelector('.empty-cell')) return;
+    const txt = f.textContent.toLowerCase();
+    f.style.display = txt.includes(q) ? '' : 'none';
+  });
+}
+
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+document.querySelectorAll('.modal-overlay').forEach(m => {
+  m.addEventListener('click', e => { if(e.target === m) m.classList.remove('open'); });
 });
-document.addEventListener('keydown',e=>{
-  if(e.key==='Escape') document.querySelectorAll('.modal-overlay.open').forEach(m=>m.classList.remove('open'));
+
+document.addEventListener('keydown', e => {
+  if(e.key === 'Escape') {
+    closeModal('modal-detalle');
+    closeModal('modal-nuevo');
+    closeModal('modal-simulador');
+  }
 });
+
+function imprimirCreditoOriginal() { window.print(); }
+function imprimirAmortizacion() { window.print(); }
 </script>
 </body>
 </html>
