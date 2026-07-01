@@ -471,6 +471,7 @@ function switchTab(name, el){
   document.getElementById('tab-'+name).classList.add('active');
   if(el) el.classList.add('active');
   if(name==='balance') filtrarBalance();
+  if(name==='mayor')   poblarSelectCuentasMayor();
 }
 
 function openModal(id){ document.getElementById(id).classList.add('open'); }
@@ -492,13 +493,15 @@ function filtrarLibroDiario(){
 }
 
 function filtrarBalance(){
-  const desde = document.getElementById('bal-desde').value;
-  const hasta = document.getElementById('bal-hasta').value;
-  const filtrados = todosAsientosCompleto.filter(a => {
-    const f = String(a.fecha||'');
-    return (!desde || f>=desde) && (!hasta || f<=hasta);
-  });
-  renderBalance(filtrados);
+  try{
+    const desde = document.getElementById('bal-desde')?.value || '';
+    const hasta = document.getElementById('bal-hasta')?.value || '';
+    const filtrados = todosAsientosCompleto.filter(a => {
+      const f = String(a.fecha||'');
+      return (!desde || f>=desde) && (!hasta || f<=hasta);
+    });
+    renderBalance(filtrados);
+  }catch(e){ console.error('filtrarBalance error:', e); }
 }
 
 // ── LIBRO MAYOR ────────────────────────────────────────────────
@@ -624,6 +627,7 @@ function verDetalleMayor(codigo){
   poblarSelectCuentasMayor();
   await cargarAsientos();
   filtrarLibroDiario();
+  filtrarBalance();
   renderPlanCuentas();
   agregarPartida();
   agregarPartida();
