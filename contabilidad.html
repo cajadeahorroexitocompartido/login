@@ -1545,6 +1545,8 @@ function exportarArqueoCajaPDF(){
     EC.toast('Arqueo de caja exportado exitosamente');
   }catch(e){ EC.toast('Error generando PDF: '+e.message,'error'); }
   EC.hideLoading();
+}
+
 // ── EXPORTAR PLAN DE CUENTAS A PDF ──────────────────────────────
 function exportarPlanCuentasPDF(){
   EC.showLoading('Generando PDF del plan de cuentas...');
