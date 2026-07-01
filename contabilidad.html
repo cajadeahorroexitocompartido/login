@@ -178,10 +178,10 @@
       <div class="card">
         <div class="card-header">
           <div class="card-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/></svg>Plan de cuentas</div>
-          <button class="btn btn-green btn-sm solo-admin" onclick="abrirNuevaCuenta()">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Nueva cuenta
-          </button>
-        </div>
+          <div style="display:flex;gap:8px">
+            <button class="btn btn-green btn-sm" onclick="exportarPlanCuentasPDF()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Exportar PDF</button>
+            <button class="btn btn-green btn-sm solo-admin" onclick="abrirNuevaCuenta()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Nueva cuenta</button>
+          </div>
         <div id="lista-cuentas"></div>
       </div>
     </div>
@@ -1543,6 +1543,61 @@ function exportarArqueoCajaPDF(){
     dibujarPiePDF(doc);
     doc.save(`arqueo_caja_${r.fecha}.pdf`);
     EC.toast('Arqueo de caja exportado exitosamente');
+  }catch(e){ EC.toast('Error generando PDF: '+e.message,'error'); }
+  EC.hideLoading();
+// ── EXPORTAR PLAN DE CUENTAS A PDF ──────────────────────────────
+function exportarPlanCuentasPDF(){
+  EC.showLoading('Generando PDF del plan de cuentas...');
+  try{
+    const cuentas = todasLasCuentas();
+    const doc = new jspdf.jsPDF({orientation:'portrait', unit:'mm', format:'a4'});
+    const hoy = EC.hoy();
+    let y = dibujarEncabezadoPDF(doc, 'Plan de Cuentas Contable', '', hoy);
+
+    const tipoCls = {activo:'Activo',pasivo:'Pasivo',patrimonio:'Patrimonio',ingreso:'Ingreso',gasto:'Gasto'};
+    const natLabel = {deudora:'Deudora',acreedora:'Acreedora'};
+
+    const body = cuentas.map(c=>[
+      '  '.repeat(c.nivel-1) + c.codigo,
+      '  '.repeat(c.nivel-1) + c.nombre,
+      c.nivel===3 ? (tipoCls[c.tipo]||c.tipo) : '',
+      c.nivel===3 ? (natLabel[c.naturaleza]||c.naturaleza) : '',
+    ]);
+
+    doc.autoTable({
+      startY: y,
+      head:[['Código','Nombre de la cuenta','Tipo','Naturaleza']],
+      body,
+      theme:'grid',
+      styles:{fontSize:8.5, cellPadding:2.8},
+      headStyles:{fillColor:[26,58,92], textColor:255, fontStyle:'bold', fontSize:9},
+      didParseCell:(data)=>{
+        if(data.section==='body'){
+          // Nivel 1 — negrita y fondo gris
+          const raw = String(data.row.cells[0]?.raw||'').trim();
+          const nivel = cuentas[data.row.index]?.nivel||3;
+          if(nivel===1){
+            data.cell.styles.fontStyle='bold';
+            data.cell.styles.fillColor=[240,243,246];
+            data.cell.styles.fontSize=9;
+          } else if(nivel===2){
+            data.cell.styles.fontStyle='bold';
+            data.cell.styles.fillColor=[249,250,251];
+          }
+        }
+      },
+      margin:{left:15, right:15},
+    });
+
+    // Resumen al final
+    let yFinal = doc.lastAutoTable.finalY + 10;
+    if(yFinal > 270){ doc.addPage(); yFinal = 20; }
+    doc.setFontSize(9);doc.setFont('helvetica','normal');doc.setTextColor(120,120,120);
+    doc.text(`Total de cuentas en el plan: ${cuentas.length} (${cuentas.filter(c=>c.nivel===3).length} cuentas auxiliares)`, 15, yFinal);
+
+    dibujarPiePDF(doc);
+    doc.save(`plan_de_cuentas_${hoy}.pdf`);
+    EC.toast('Plan de cuentas exportado exitosamente');
   }catch(e){ EC.toast('Error generando PDF: '+e.message,'error'); }
   EC.hideLoading();
 }
