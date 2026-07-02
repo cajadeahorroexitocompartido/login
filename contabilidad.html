@@ -40,6 +40,21 @@
 .balance-err{color:var(--red);font-weight:bold}
 .field-date{background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:7px 10px;border-radius:6px;font-size:12px;outline:none}
 .field-date:focus{border-color:var(--navy)}
+/* Estilos de reportes y estados financieros */
+.rep-section{margin-bottom:16px}
+.rep-title{font-size:11px;font-weight:bold;text-transform:uppercase;letter-spacing:.04em;color:var(--text3);margin-bottom:8px;padding-bottom:5px;border-bottom:1px solid var(--border2)}
+.rep-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;font-size:13px;border-bottom:1px solid var(--border2);color:var(--text)}
+.rep-row:last-child{border-bottom:none}
+.rep-row.total{font-weight:bold;font-size:14px;color:var(--navy);padding-top:9px;border-top:1px solid var(--border);border-bottom:none;margin-top:4px}
+.rep-val{font-weight:bold;font-family:Arial,Helvetica,sans-serif}
+.balance-ok{color:var(--green);font-weight:bold}
+/* Info grid para morosidad y arqueo */
+.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:14px}
+.info-item{background:var(--surface2);border:1px solid var(--border2);border-radius:6px;padding:12px}
+.info-label{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px;font-weight:bold}
+.info-val{font-size:14px;font-weight:bold;color:var(--text)}
+/* Mayor */
+.mayor-saldo-pos{color:var(--green)}.mayor-saldo-neg{color:var(--red)}
 @media(max-width:640px){.partida-row{grid-template-columns:1fr 85px 85px 28px}}
 </style>
 </head>
