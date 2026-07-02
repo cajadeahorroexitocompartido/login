@@ -310,7 +310,7 @@ async function cargarTodo(){
 // "Estado" guardado manualmente — se calcula siempre en tiempo real.
 function estaEnMora(credito){
   if(credito.Estado === 'cancelado') return false;
-  const pagosCredito = todosPagos.filter(p=>(p.CreditoID||p.creditoId||'')===credito.ID);
+  const pagosCredito = todosPagos.filter(p=>String(p.CreditoID||p.creditoId||'').trim()===String(credito.ID||'').trim());
   const cuotasPagadas = pagosCredito.length;
   const numCuotas = parseInt(credito.NumCuotas||0);
   if(cuotasPagadas >= numCuotas) return false; // ya pagó todo
@@ -328,7 +328,7 @@ function estaEnMora(credito){
 }
 
 function diasEnMora(credito){
-  const pagosCredito = todosPagos.filter(p=>(p.CreditoID||p.creditoId||'')===credito.ID);
+  const pagosCredito = todosPagos.filter(p=>String(p.CreditoID||p.creditoId||'').trim()===String(credito.ID||'').trim());
   const cuotasPagadas = pagosCredito.length;
   const filas = generarAmortizacion(
     parseFloat(credito.MontoOriginal||0),
@@ -366,12 +366,18 @@ function calcularKPIs(){
 
 // ── RENDER CLIENTES CON CRÉDITO ───────────────────────────────
 function renderClientes(creditos, filtro=''){
-  // Agrupar por cliente
+  // Agrupar por cliente usando ClienteID o ClienteNombre como clave
   const mapa = {};
   creditos.filter(c=>c.Estado!=='cancelado').forEach(c=>{
-    const cid = c.ClienteID||c.clienteId||'';
-    if(!mapa[cid]) mapa[cid]={clienteId:cid,nombre:c.ClienteNombre||'—',creditos:[]};
-    mapa[cid].creditos.push(c);
+    // Intentar obtener el ID del cliente por múltiples variantes de campo
+    const cid = c.ClienteID||c.clienteId||c.clienteid||c.CLIENTEID||'';
+    // Intentar obtener el nombre por múltiples variantes
+    const nombre = c.ClienteNombre||c.clienteNombre||c.clientenombre||c.CLIENTENOMBRE||
+      // Si no hay nombre en el crédito, buscarlo en todosClientes
+      (()=>{ const cl=todosClientes.find(x=>x.ID===cid); return cl?(cl.Nombres+' '+cl.Apellidos).trim():'—'; })();
+    const key = cid || nombre; // usar nombre como fallback de clave si no hay ID
+    if(!mapa[key]) mapa[key]={clienteId:cid,nombre,creditos:[]};
+    mapa[key].creditos.push(c);
   });
   let lista = Object.values(mapa);
   if(filtro) lista = lista.filter(x=>x.nombre.toLowerCase().includes(filtro.toLowerCase()));
@@ -381,13 +387,13 @@ function renderClientes(creditos, filtro=''){
     return;
   }
   document.getElementById('lista-clientes').innerHTML = lista.map(item=>{
-    const saldo   = item.creditos.reduce((a,c)=>a+(+c.Saldo||0),0);
-    const monto   = item.creditos.reduce((a,c)=>a+(+c.MontoOriginal||0),0);
-    const pct     = monto>0 ? Math.round((1-(saldo/monto))*100) : 0;
+    const saldo    = item.creditos.reduce((a,c)=>a+(+c.Saldo||0),0);
+    const monto    = item.creditos.reduce((a,c)=>a+(+c.MontoOriginal||0),0);
+    const pct      = monto>0 ? Math.round((1-(saldo/monto))*100) : 0;
     const tienenMora = item.creditos.some(c=>estaEnMora(c));
-    const ini     = item.nombre.split(' ').map(n=>n[0]).slice(0,2).join('').toUpperCase();
-    const numCreds= item.creditos.length;
-    return `<div class="cliente-card" onclick="verDetalleCliente('${item.clienteId}')">
+    const ini      = (item.nombre||'?').split(' ').map(n=>n[0]||'').slice(0,2).join('').toUpperCase()||'?';
+    const numCreds = item.creditos.length;
+    return `<div class="cliente-card" onclick="verDetalleCliente('${item.clienteId}','${item.nombre.replace(/'/g,"\\'")}')">
       <div class="cli-avatar">${ini}</div>
       <div class="cli-info">
         <div class="cli-nombre">${item.nombre}</div>
@@ -414,7 +420,7 @@ function renderFinalizados(creditos, filtro=''){
     return;
   }
   document.getElementById('tbody-finalizados').innerHTML = finalizados.map(c=>{
-    const pagosCredito = todosPagos.filter(p=>(p.CreditoID||p.creditoId||'')===c.ID);
+    const pagosCredito = todosPagos.filter(p=>String(p.CreditoID||p.creditoId||'').trim()===String(c.ID||'').trim());
     const totalPagado  = pagosCredito.reduce((a,p)=>a+(+p.Capital||0)+(+p.Interes||0),0);
     return `<tr>
       <td class="mono" style="color:var(--navy)">${c.Codigo||'—'}</td>
@@ -433,18 +439,25 @@ function renderFinalizados(creditos, filtro=''){
 function filtrarFinalizados(q){ renderFinalizados(todosCreditos, q); }
 
 // ── VER DETALLE CLIENTE / CRÉDITO ─────────────────────────────
-function verDetalleCliente(clienteId){
+function verDetalleCliente(clienteId, nombreFallback){
+  // Buscar créditos activos de este cliente con comparación flexible
   const creds = todosCreditos.filter(c=>
-    (c.ClienteID||c.clienteId||'')===clienteId && c.Estado!=='cancelado'
+    c.Estado!=='cancelado' && (
+      String(c.ClienteID||'').trim()===String(clienteId).trim() ||
+      // Si clienteId está vacío, buscar por nombre
+      (!clienteId && (c.ClienteNombre||'')===(nombreFallback||''))
+    )
   );
-  if(!creds.length){ EC.toast('No se encontraron créditos para este cliente','error'); return; }
-  // Mostrar el primero (si tiene varios se puede expandir)
+  if(!creds.length){
+    EC.toast('No se encontraron créditos activos para este cliente','error');
+    return;
+  }
   verDetalle(creds[0]);
 }
 
 function verDetalle(cr){
   creditoDetalle = cr;
-  const pagosCredito = todosPagos.filter(p=>(p.CreditoID||p.creditoId||'')===cr.ID);
+  const pagosCredito = todosPagos.filter(p=>String(p.CreditoID||p.creditoId||'').trim()===String(cr.ID||'').trim());
   const capPagado    = pagosCredito.reduce((a,p)=>a+(+p.Capital||0),0);
   const intPagado    = pagosCredito.reduce((a,p)=>a+(+p.Interes||0),0);
   const monto        = parseFloat(cr.MontoOriginal||0);
@@ -692,7 +705,7 @@ async function imprimirAmortizacion(){
   try{
     const {jsPDF}  = window.jspdf;
     const doc      = new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
-    const pagosCredito = todosPagos.filter(p=>(p.CreditoID||p.creditoId||'')===cr.ID);
+    const pagosCredito = todosPagos.filter(p=>String(p.CreditoID||p.creditoId||'').trim()===String(cr.ID||'').trim());
     const cuotasPagadas= pagosCredito.length;
     const monto        = parseFloat(cr.MontoOriginal||0);
     const hoy          = new Date().toLocaleDateString('es-EC',{day:'2-digit',month:'long',year:'numeric'});
@@ -744,8 +757,8 @@ async function imprimirAmortizacion(){
     doc.setFontSize(11);doc.setFont('helvetica','bold');
     doc.text('ESTADO ACTUAL DEL CRÉDITO', 15, y); y+=8;
     const saldo    = parseFloat(cr.Saldo||0);
-    const capPag   = todosPagos.filter(p=>(p.CreditoID||p.creditoId||'')===cr.ID).reduce((a,p)=>a+(+p.Capital||0),0);
-    const intPag   = todosPagos.filter(p=>(p.CreditoID||p.creditoId||'')===cr.ID).reduce((a,p)=>a+(+p.Interes||0),0);
+    const capPag   = todosPagos.filter(p=>String(p.CreditoID||p.creditoId||'').trim()===String(cr.ID||'').trim()).reduce((a,p)=>a+(+p.Capital||0),0);
+    const intPag   = todosPagos.filter(p=>String(p.CreditoID||p.creditoId||'').trim()===String(cr.ID||'').trim()).reduce((a,p)=>a+(+p.Interes||0),0);
     const pct      = monto>0?Math.round((1-(saldo/monto))*100):0;
     doc.autoTable({
       startY:y,
@@ -847,7 +860,7 @@ function addPer(d,t,n){
 
 // ── NUEVO CRÉDITO ─────────────────────────────────────────────
 function cargarSelectClientes(){
-  const activos = todosClientes.filter(c=>c.Activo===true||c.Activo==='true'||c.Activo==='TRUE');
+  const activos = todosClientes.filter(c=>String(c.Activo||'true').toLowerCase()!=='false');
   const opts = '<option value="">— Seleccionar cliente —</option>'+
     activos.map(c=>`<option value="${c.ID}">${c.Nombres} ${c.Apellidos} — ${c.Cedula}</option>`).join('');
   document.getElementById('n-cliente').innerHTML = opts;
@@ -897,12 +910,17 @@ async function guardarCredito(){
   const tasa     =parseFloat(document.getElementById('n-tasa').value)||0;
   const plazo    =parseInt(document.getElementById('n-plazo').value)||0;
   if(!clienteId||!monto||!tasa||!plazo){ EC.toast('Todos los campos son obligatorios','error'); return; }
-  const cliente  = todosClientes.find(c=>c.ID===clienteId)||{};
+
+  // Búsqueda robusta: comparar como string para evitar problemas de tipo
+  const cliente = todosClientes.find(c=>String(c.ID||'').trim()===String(clienteId).trim())||{};
+  // Construir nombre con fallback
+  const nombreCliente = ((cliente.Nombres||'').trim()+' '+(cliente.Apellidos||'').trim()).trim() || 'Cliente '+clienteId;
+
   const num      = todosCreditos.length+1;
   const datos    = {
     Codigo        :'C-'+String(num).padStart(3,'0'),
     ClienteID     :clienteId,
-    ClienteNombre :(cliente.Nombres||'')+' '+(cliente.Apellidos||''),
+    ClienteNombre :nombreCliente,
     MontoOriginal :monto,
     Saldo         :monto,
     TasaMensual   :tasa,
