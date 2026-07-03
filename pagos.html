@@ -576,7 +576,12 @@ function abrirModalPago(){
 // Lista de clientes con crédito activo, buscable por nombre o cédula
 function clientesConCreditoActivo(){
   return todosClientes.filter(c =>
-    todosCreditos.some(cr => cr.ClienteID === c.ID && cr.Estado === 'activo')
+    todosCreditos.some(cr => {
+      const idMatch = String(cr.ClienteID||'').trim()===String(c.ID||'').trim();
+      const estado = String(cr.Estado||'activo').toLowerCase();
+      const activo = estado !== 'cancelado' && estado !== 'eliminado';
+      return idMatch && activo;
+    })
   );
 }
 
@@ -596,7 +601,11 @@ function renderListaClientesPago(filtro){
     return;
   }
   cont.innerHTML = filtrados.map(c=>{
-    const creditosCliente = todosCreditos.filter(cr=>cr.ClienteID===c.ID && cr.Estado==='activo');
+    const creditosCliente = todosCreditos.filter(cr=>{
+      const idMatch = String(cr.ClienteID||'').trim()===String(c.ID||'').trim();
+      const estado = String(cr.Estado||'activo').toLowerCase();
+      return idMatch && estado!=='cancelado' && estado!=='eliminado';
+    });
     const saldoTotal = creditosCliente.reduce((a,cr)=>a+parseFloat(cr.Saldo||0),0);
     return `<div class="cliente-pago-item" onclick="seleccionarClientePago('${c.ID}')">
       <div>
@@ -654,7 +663,11 @@ function alSeleccionarCliente(clienteId){
   if(!clienteId){ creditoSeleccionado = null; return; }
 
   // Buscar crédito activo del cliente
-  const credito = todosCreditos.find(cr => cr.ClienteID === clienteId && cr.Estado === 'activo');
+  const credito = todosCreditos.find(cr => {
+    const idMatch = String(cr.ClienteID||'').trim()===String(clienteId||'').trim();
+    const estado = String(cr.Estado||'activo').toLowerCase();
+    return idMatch && estado!=='cancelado' && estado!=='eliminado';
+  });
   if(!credito){ EC.toast('Este cliente no tiene crédito activo','error'); creditoSeleccionado=null; return; }
 
   creditoSeleccionado = credito;
@@ -702,7 +715,7 @@ function alSeleccionarCliente(clienteId){
   }
 
   // Calcular número de cuota actual
-  const pagosDelCredito = todosPagos.filter(p=>(p.CreditoID||'')===credito.ID);
+  const pagosDelCredito = todosPagos.filter(p=>String(p.CreditoID||'').trim()===String(credito.ID||'').trim());
   const numCuotaActual  = pagosDelCredito.length + 1;
 
   // Calcular fecha de esta cuota usando la tabla de amortización
@@ -1041,7 +1054,7 @@ function mostrarComprobante(p){
 function verComprobante(id){
   const p=todosPagos.find(x=>x.ID===id);
   if(!p) return;
-  const cr=todosCreditos.find(c=>c.ID===p.CreditoID)||{};
+  const cr=todosCreditos.find(c=>String(c.ID||'').trim()===String(p.CreditoID||'').trim())||{};
   mostrarComprobante({...p, SaldoRestante:cr.Saldo||0, RegistradoPor:p.RegistradoPor||'—'});
 }
 
@@ -1159,7 +1172,7 @@ async function ejecutarEliminar(){
 
     // ── PASO 2: Revertir saldo del crédito ──────────────────
     if(creditoId && capital > 0){
-      const credito = todosCreditos.find(c=>c.ID===creditoId);
+      const credito = todosCreditos.find(c=>String(c.ID||'').trim()===String(creditoId||'').trim());
       if(credito){
         const nuevoSaldo = parseFloat((parseFloat(credito.Saldo||0) + capital).toFixed(2));
         const r2 = await fetch(EC.api, {
