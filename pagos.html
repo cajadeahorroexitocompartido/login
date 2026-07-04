@@ -196,6 +196,7 @@
           <input type="text" id="p-cliente-buscar" placeholder="Buscar por nombre o cédula..." oninput="filtrarClientesPago(this.value)" style="width:100%;padding-left:12px">
         </div>
       </div>
+      <div id="p-debug-info" style="font-size:10px;color:var(--text3);margin-bottom:6px;padding:4px 8px;background:var(--surface2);border-radius:4px"></div>
       <div id="p-cliente-seleccionado" style="display:none;margin-bottom:14px">
         <div class="cuota-info-box">
           <div style="font-size:13px;font-weight:bold;color:var(--text)" id="p-cliente-nombre-sel">—</div>
@@ -588,6 +589,12 @@ function clientesConCreditoActivo(){
 function renderListaClientesPago(filtro){
   const lista = clientesConCreditoActivo();
   const f = (filtro||'').toLowerCase().trim();
+
+  // DEBUG temporal — muestra todos los clientes con sus IDs y los créditos
+  const debugInfo = `Clientes: ${todosClientes.length} | Créditos: ${todosCreditos.length} | Con crédito activo: ${lista.length}`;
+  const contDebug = document.getElementById('p-debug-info');
+  if(contDebug) contDebug.textContent = debugInfo;
+
   const filtrados = f
     ? lista.filter(c =>
         ((c.Nombres||'')+' '+(c.Apellidos||'')).toLowerCase().includes(f) ||
@@ -597,7 +604,13 @@ function renderListaClientesPago(filtro){
 
   const cont = document.getElementById('p-cliente-lista');
   if(!filtrados.length){
-    cont.innerHTML = '<div class="empty-cell">No se encontraron clientes con crédito activo</div>';
+    // Mostrar diagnóstico de IDs para entender por qué no hay coincidencias
+    const diagCreditos = todosCreditos.slice(0,3).map(cr=>`ID_cred=${cr.ClienteID}`).join(', ');
+    const diagClientes = todosClientes.slice(0,3).map(c=>`ID_cli=${c.ID}`).join(', ');
+    cont.innerHTML = `<div class="empty-cell">
+      No se encontraron clientes con crédito activo<br>
+      <small style="font-size:10px;color:var(--text3)">Debug: ${diagCreditos} | ${diagClientes}</small>
+    </div>`;
     return;
   }
   cont.innerHTML = filtrados.map(c=>{
