@@ -603,14 +603,15 @@ function renderListaClientesPago(filtro){
     : lista;
 
   const cont = document.getElementById('p-cliente-lista');
+
+  // DEBUG VISIBLE - muestra IDs exactos para diagnóstico
+  const debugCreds = todosCreditos.slice(0,3).map(cr=>`cred.ClienteID="${cr.ClienteID}"`).join(' | ');
+  const debugClis  = todosClientes.slice(0,3).map(c=>`cli.ID="${c.ID}"`).join(' | ');
+  const debugEl = document.getElementById('p-debug-info');
+  if(debugEl) debugEl.innerHTML = `<b>Clientes total:</b> ${todosClientes.length} | <b>Créditos total:</b> ${todosCreditos.length} | <b>Con crédito activo:</b> ${lista.length}<br><small>${debugCreds}</small><br><small>${debugClis}</small>`;
+
   if(!filtrados.length){
-    // Mostrar diagnóstico de IDs para entender por qué no hay coincidencias
-    const diagCreditos = todosCreditos.slice(0,3).map(cr=>`ID_cred=${cr.ClienteID}`).join(', ');
-    const diagClientes = todosClientes.slice(0,3).map(c=>`ID_cli=${c.ID}`).join(', ');
-    cont.innerHTML = `<div class="empty-cell">
-      No se encontraron clientes con crédito activo<br>
-      <small style="font-size:10px;color:var(--text3)">Debug: ${diagCreditos} | ${diagClientes}</small>
-    </div>`;
+    cont.innerHTML = `<div class="empty-cell">No se encontraron clientes con crédito activo</div>`;
     return;
   }
   cont.innerHTML = filtrados.map(c=>{
@@ -620,14 +621,22 @@ function renderListaClientesPago(filtro){
       return idMatch && estado!=='cancelado' && estado!=='eliminado';
     });
     const saldoTotal = creditosCliente.reduce((a,cr)=>a+parseFloat(cr.Saldo||0),0);
-    return `<div class="cliente-pago-item" onclick="seleccionarClientePago('${c.ID}')">
+    return `<div class="cliente-pago-item" data-clienteid="${String(c.ID||'').replace(/"/g,'&quot;')}">
       <div>
-        <div class="cliente-pago-nombre">${c.Nombres} ${c.Apellidos}</div>
+        <div class="cliente-pago-nombre">${c.Nombres||''} ${c.Apellidos||''}</div>
         <div class="cliente-pago-cedula">${c.Cedula||'—'}</div>
       </div>
       <div class="cliente-pago-saldo">${EC.fmt(saldoTotal)}<br><span style="font-size:10px;color:var(--text3);font-weight:normal">saldo</span></div>
     </div>`;
   }).join('');
+
+  // Agregar event listeners usando data-clienteid (evita problemas con IDs que tengan caracteres especiales)
+  cont.querySelectorAll('.cliente-pago-item').forEach(el=>{
+    el.addEventListener('click', function(){
+      const cid = this.getAttribute('data-clienteid');
+      seleccionarClientePago(cid);
+    });
+  });
 }
 
 function filtrarClientesPago(valor){
@@ -635,14 +644,26 @@ function filtrarClientesPago(valor){
 }
 
 function seleccionarClientePago(clienteId){
-  const c = todosClientes.find(x=>x.ID===clienteId);
-  if(!c) return;
+  // Busqueda robusta insensible a tipo de dato
+  const c = todosClientes.find(x=>String(x.ID||'').trim()===String(clienteId||'').trim());
+  if(!c){ EC.toast('Cliente no encontrado','error'); return; }
+
+  // Verificar que tiene crédito activo antes de continuar
+  const tieneCredito = todosCreditos.some(cr=>{
+    const idMatch = String(cr.ClienteID||'').trim()===String(clienteId||'').trim();
+    const estado  = String(cr.Estado||'activo').toLowerCase();
+    return idMatch && estado!=='cancelado' && estado!=='eliminado';
+  });
+  if(!tieneCredito){ EC.toast('Este cliente no tiene crédito activo','error'); return; }
+
   document.getElementById('p-cliente').value = clienteId;
-  document.getElementById('p-cliente-nombre-sel').textContent = `${c.Nombres} ${c.Apellidos}`;
+  document.getElementById('p-cliente-nombre-sel').textContent = ((c.Nombres||'')+' '+(c.Apellidos||'')).trim();
   document.getElementById('p-cliente-cedula-sel').textContent = c.Cedula||'—';
   document.getElementById('p-cliente-seleccionado').style.display = 'block';
   document.getElementById('p-cliente-buscar').style.display = 'none';
   document.getElementById('p-cliente-lista').style.display = 'none';
+  const dbg = document.getElementById('p-debug-info');
+  if(dbg) dbg.style.display = 'none';
   alSeleccionarCliente(clienteId);
 }
 
