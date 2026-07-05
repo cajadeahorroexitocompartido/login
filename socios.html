@@ -351,7 +351,7 @@ function renderMovimientos(){
     const esRetiro=m.Tipo==='retiro';
     const color=esAporte?'var(--green)':esRetiro?'var(--red)':'var(--orange)';
     const bg=esAporte?'rgba(46,204,113,.12)':esRetiro?'rgba(231,76,60,.12)':'rgba(243,156,18,.12)';
-    const label={aporte:'Aporte',retiro:'Retiro',dividendo:'Dividendo'}[m.Tipo]||m.Tipo;
+    const label={aporte:'Aporte',retiro:'Retiro',dividendo:'Pago de utilidades'}[m.Tipo]||m.Tipo;
     return `<div class="mov-item">
       <div class="mov-icon" style="background:${bg}">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="2">
@@ -458,15 +458,54 @@ async function guardarMovimiento(){
   const desc = document.getElementById('m-desc').value.trim();
   if(!monto){ EC.toast('Ingresa el monto','error'); return; }
   const s=todosSocios.find(x=>x.ID===sid)||{};
+  const nombreSocio = ((s.Nombres||'')+' '+(s.Apellidos||'')).trim();
   EC.showLoading('Registrando movimiento...');
   try{
-    const r=await fetch(EC.api,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({accion:'agregar',tab:'capital',datos:{SocioID:sid,SocioNombre:(s.Nombres||'')+' '+(s.Apellidos||''),Tipo:tipo,Monto:monto,Fecha:fecha,Descripcion:desc||tipo}})});
+    // ── 1. Guardar el movimiento en la pestaña Capital_Social ─────
+    const r=await fetch(EC.api,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({
+      accion:'agregar',tab:'capital',
+      datos:{SocioID:sid,SocioNombre:nombreSocio,Tipo:tipo,Monto:monto,Fecha:fecha,Descripcion:desc||tipo}
+    })});
     const j=await r.json();
     if(j.ok){
+      // ── 2. Generar asiento contable según el tipo de movimiento ──
+      let partidas = null;
+      const glosa = desc || tipo;
+
+      if(tipo==='aporte'){
+        // Aporte de socio: DEBE Caja / HABER Aportes de socios
+        partidas = [
+          {cuenta:'1.1.01 Caja',               debe:monto, haber:0},
+          {cuenta:'3.1.01 Aportes de socios',   debe:0,     haber:monto},
+        ];
+      } else if(tipo==='retiro'){
+        // Retiro de socio: DEBE Aportes de socios / HABER Caja
+        partidas = [
+          {cuenta:'3.1.01 Aportes de socios',   debe:monto, haber:0},
+          {cuenta:'1.1.01 Caja',                debe:0,     haber:monto},
+        ];
+      } else if(tipo==='dividendo'){
+        // Pago de utilidades: DEBE Utilidades del ejercicio / HABER Aportes de socios
+        // La utilidad del ejercicio disminuye (cargo al debe)
+        // El aporte del socio aumenta (abono al haber)
+        partidas = [
+          {cuenta:'3.2.01 Utilidades del ejercicio', debe:monto, haber:0},
+          {cuenta:'3.1.01 Aportes de socios',        debe:0,     haber:monto},
+        ];
+      }
+
+      if(partidas){
+        const codigoAsiento = 'AM-'+Date.now().toString().slice(-5);
+        const asientoNuevo = {codigo:codigoAsiento, fecha, tipo, desc:`${glosa} — ${nombreSocio}`, partidas, auto:false};
+        const manuales = JSON.parse(localStorage.getItem('ec_asientos_manuales')||'[]');
+        manuales.push(asientoNuevo);
+        localStorage.setItem('ec_asientos_manuales', JSON.stringify(manuales));
+      }
+
       cerrarModalMov();
-      await cargarMovimientos();   // actualiza todosMovimientos + stats + lista de movimientos
-      renderSocios(todosSocios);   // vuelve a dibujar las tarjetas de socios con el capital nuevo
-      EC.toast('Movimiento registrado exitosamente');
+      await cargarMovimientos();
+      renderSocios(todosSocios);
+      EC.toast('Movimiento registrado y asiento contable generado');
     }
     else EC.toast('Error al registrar','error');
   }catch(e){ EC.toast('Error: '+e.message,'error'); }
@@ -487,7 +526,7 @@ function verDetalle(sid){
   document.getElementById('tbody-detalle-movs').innerHTML=sorted.length
     ?sorted.map(m=>{
       const badge=m.Tipo==='aporte'?'b-green':m.Tipo==='retiro'?'b-red':'b-orange';
-      const label={aporte:'Aporte',retiro:'Retiro',dividendo:'Dividendo'}[m.Tipo]||m.Tipo;
+      const label={aporte:'Aporte',retiro:'Retiro',dividendo:'Pago de utilidades'}[m.Tipo]||m.Tipo;
       const color=m.Tipo==='aporte'?'var(--green)':m.Tipo==='retiro'?'var(--red)':'var(--orange)';
       return `<tr><td class="mono">${m.Fecha||'—'}</td><td><span class="badge ${badge}">${label}</span></td><td class="mono" style="color:${color};font-weight:600">${m.Tipo==='retiro'?'-':'+'} ${EC.fmt(m.Monto||0)}</td><td>${m.Descripcion||'—'}</td></tr>`;
     }).join('')
