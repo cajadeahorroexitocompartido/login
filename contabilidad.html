@@ -661,65 +661,76 @@ function verDetalleMayor(codigo){
 async function cargarAsientos(){
   EC.showLoading('Cargando libro diario...');
   try{
-    // Construir asientos desde pagos y movimientos de capital
-    const [rPagos, rCapital, rCreditos] = await Promise.all([
+    // Cargar todos los datos en paralelo
+    const [rPagos, rCapital, rCreditos, rAsientos] = await Promise.all([
       fetch(`${EC.api}?accion=leer&tab=pagos`),
       fetch(`${EC.api}?accion=leer&tab=capital`),
       fetch(`${EC.api}?accion=leer&tab=creditos`),
+      fetch(`${EC.api}?accion=leer&tab=asientos`),
     ]);
-    const jPagos   = await rPagos.json();
-    const jCapital = await rCapital.json();
-    const jCreditos= await rCreditos.json();
+    const jPagos    = await rPagos.json();
+    const jCapital  = await rCapital.json();
+    const jCreditos = await rCreditos.json();
+    const jAsientos = await rAsientos.json();
 
     const asientosGenerados = [];
     let num = 1;
 
-    // Asientos de capital (aportes, retiros, dividendos)
+    // ── Asientos automáticos de capital (aportes, retiros, utilidades) ──
     for(const m of (jCapital.data||[])){
       const monto = parseFloat(m.Monto||0);
       let partidas = [];
       if(m.Tipo==='aporte'){
-        partidas = [{cuenta:'1.1.01 Caja',debe:monto,haber:0},{cuenta:'3.1.01 Aportes de socios',debe:0,haber:monto}];
+        partidas = [
+          {cuenta:'1.1.01 Caja',                    debe:monto, haber:0},
+          {cuenta:'3.1.01 Aportes de socios',        debe:0,     haber:monto},
+        ];
       } else if(m.Tipo==='retiro'){
-        partidas = [{cuenta:'3.1.01 Aportes de socios',debe:monto,haber:0},{cuenta:'1.1.01 Caja',debe:0,haber:monto}];
+        partidas = [
+          {cuenta:'3.1.01 Aportes de socios',        debe:monto, haber:0},
+          {cuenta:'1.1.01 Caja',                     debe:0,     haber:monto},
+        ];
       } else if(m.Tipo==='dividendo'){
-        partidas = [{cuenta:'3.2.01 Utilidades del ejercicio',debe:monto,haber:0},{cuenta:'1.1.01 Caja',debe:0,haber:monto}];
+        // Pago de utilidades: DEBE Utilidades / HABER Aportes de socios
+        partidas = [
+          {cuenta:'3.2.01 Utilidades del ejercicio', debe:monto, haber:0},
+          {cuenta:'3.1.01 Aportes de socios',        debe:0,     haber:monto},
+        ];
       }
       if(partidas.length){
         asientosGenerados.push({
           codigo:`A-${String(num++).padStart(4,'0')}`,
-          fecha: m.Fecha||'—',
-          tipo : m.Tipo,
-          desc : `${(m.Tipo||'').charAt(0).toUpperCase()+(m.Tipo||'').slice(1)} — ${m.SocioNombre||'—'}`,
-          partidas,
-          auto : true,
+          fecha : m.Fecha||'—',
+          tipo  : m.Tipo,
+          desc  : `${m.Tipo==='dividendo'?'Pago de utilidades':(m.Tipo||'').charAt(0).toUpperCase()+(m.Tipo||'').slice(1)} — ${m.SocioNombre||'—'}`,
+          partidas, auto:true,
         });
       }
     }
 
-    // Asientos de cobros (filtrar eliminados)
-    const pagosActivos = jPagos.data||[];  // Apps Script ya filtra eliminados
-    for(const p of pagosActivos){
-      const cap = parseFloat(p.Capital||0);
-      const int = parseFloat(p.Interes||0);
-      const tot = cap + int;
+    // ── Asientos automáticos de cobros de cuotas ──
+    for(const p of (jPagos.data||[])){
+      const cap  = parseFloat(p.Capital||0);
+      const int  = parseFloat(p.Interes||0);
+      const mora = parseFloat(p.Mora||0);
+      const tot  = cap + int + mora;
       if(tot <= 0) continue;
       const partidas = [
-        {cuenta:'1.1.01 Caja',debe:tot,haber:0},
-        {cuenta:'1.2.01 Cartera vigente',debe:0,haber:cap},
-        {cuenta:'4.1.01 Intereses en créditos',debe:0,haber:int},
+        {cuenta:'1.1.01 Caja',                  debe:tot,  haber:0},
+        {cuenta:'1.2.01 Cartera vigente',        debe:0,    haber:cap},
+        {cuenta:'4.1.01 Intereses en créditos',  debe:0,    haber:int},
       ];
+      if(mora>0) partidas.push({cuenta:'4.1.02 Mora e intereses', debe:0, haber:mora});
       asientosGenerados.push({
         codigo:`A-${String(num++).padStart(4,'0')}`,
         fecha : p.Fecha||'—',
         tipo  : 'cobro',
         desc  : `Cobro cuota — ${p.ClienteNombre||'—'} (${p.CreditoCodigo||'—'})`,
-        partidas,
-        auto  : true,
+        partidas, auto:true,
       });
     }
 
-    // Asientos de créditos otorgados
+    // ── Asientos automáticos de créditos otorgados ──
     for(const cr of (jCreditos.data||[])){
       const monto = parseFloat(cr.MontoOriginal||0);
       if(monto <= 0) continue;
@@ -729,17 +740,25 @@ async function cargarAsientos(){
         tipo  : 'credito',
         desc  : `Crédito otorgado — ${cr.ClienteNombre||'—'} (${cr.Codigo||'—'})`,
         partidas:[
-          {cuenta:'1.2.01 Cartera vigente',debe:monto,haber:0},
-          {cuenta:'1.1.01 Caja',debe:0,haber:monto},
+          {cuenta:'1.2.01 Cartera vigente', debe:monto, haber:0},
+          {cuenta:'1.1.01 Caja',            debe:0,     haber:monto},
         ],
-        auto  : true,
+        auto:true,
       });
     }
 
-    // Asientos manuales guardados en localStorage
-    const manuales = JSON.parse(localStorage.getItem('ec_asientos_manuales')||'[]');
-    for(const m of manuales){
-      asientosGenerados.push({...m, auto:false});
+    // ── Asientos manuales guardados en el Sheet ──
+    for(const a of (jAsientos.data||[])){
+      let partidas = [];
+      try{ partidas = JSON.parse(a.Partidas||'[]'); }catch(e){}
+      asientosGenerados.push({
+        codigo : a.Codigo||'—',
+        fecha  : a.Fecha||'—',
+        tipo   : a.Tipo||'manual',
+        desc   : a.Descripcion||'—',
+        partidas,
+        auto   : false,
+      });
     }
 
     // Ordenar por fecha desc
@@ -944,7 +963,7 @@ function recalcBalance(){
   else { msg.textContent=`⚠ Diferencia: ${EC.fmt(Math.abs(debe-haber))}`; msg.className='balance-err'; }
 }
 
-function guardarAsiento(){
+async function guardarAsiento(){
   if(!EC.esAdmin){ EC.toast('Solo el administrador puede crear asientos manuales','error'); return; }
   const fecha = document.getElementById('a-fecha').value||EC.hoy();
   const tipo  = document.getElementById('a-tipo').value;
@@ -961,16 +980,33 @@ function guardarAsiento(){
   const haber = partidas.reduce((a,p)=>a+p.haber,0);
   if(Math.abs(debe-haber)>0.01){ EC.toast('El asiento no está balanceado (Debe ≠ Haber)','error'); return; }
   const codigo = `AM-${String(Date.now()).slice(-5)}`;
-  const nuevo = {codigo,fecha,tipo,desc,partidas,auto:false};
-  const manuales = JSON.parse(localStorage.getItem('ec_asientos_manuales')||'[]');
-  manuales.push(nuevo);
-  localStorage.setItem('ec_asientos_manuales', JSON.stringify(manuales));
-  closeModal('modal-asiento');
-  cargarAsientos().then(()=> filtrarLibroDiario());
-  EC.toast('Asiento '+codigo+' registrado correctamente');
-  document.getElementById('a-desc').value='';
-  document.getElementById('partidas-container').innerHTML='';
-  agregarPartida();agregarPartida();
+
+  EC.showLoading('Guardando asiento...');
+  try{
+    const r = await fetch(EC.api,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({
+      accion:'agregar',tab:'asientos',
+      datos:{
+        Codigo     : codigo,
+        Fecha      : fecha,
+        Tipo       : tipo,
+        Descripcion: desc,
+        Partidas   : JSON.stringify(partidas),
+      }
+    })});
+    const j = await r.json();
+    if(j.ok){
+      closeModal('modal-asiento');
+      await cargarAsientos();
+      filtrarLibroDiario();
+      EC.toast('Asiento '+codigo+' registrado correctamente');
+      document.getElementById('a-desc').value='';
+      document.getElementById('partidas-container').innerHTML='';
+      agregarPartida();agregarPartida();
+    } else {
+      EC.toast('Error al guardar asiento: '+(j.error||''),'error');
+    }
+  }catch(e){ EC.toast('Error: '+e.message,'error'); }
+  EC.hideLoading();
 }
 
 // ── BALANCE DE SUMAS ─────────────────────────────────────────

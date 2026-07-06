@@ -496,10 +496,16 @@ async function guardarMovimiento(){
 
       if(partidas){
         const codigoAsiento = 'AM-'+Date.now().toString().slice(-5);
-        const asientoNuevo = {codigo:codigoAsiento, fecha, tipo, desc:`${glosa} — ${nombreSocio}`, partidas, auto:false};
-        const manuales = JSON.parse(localStorage.getItem('ec_asientos_manuales')||'[]');
-        manuales.push(asientoNuevo);
-        localStorage.setItem('ec_asientos_manuales', JSON.stringify(manuales));
+        await fetch(EC.api,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({
+          accion:'agregar',tab:'asientos',
+          datos:{
+            Codigo     : codigoAsiento,
+            Fecha      : fecha,
+            Tipo       : tipo,
+            Descripcion: `${glosa} — ${nombreSocio}`,
+            Partidas   : JSON.stringify(partidas),
+          }
+        })});
       }
 
       cerrarModalMov();
