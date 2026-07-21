@@ -440,11 +440,9 @@ function filtrarFinalizados(q){ renderFinalizados(todosCreditos, q); }
 
 // ── VER DETALLE CLIENTE / CRÉDITO ─────────────────────────────
 function verDetalleCliente(clienteId, nombreFallback){
-  // Buscar créditos activos de este cliente con comparación flexible
   const creds = todosCreditos.filter(c=>
     c.Estado!=='cancelado' && (
-      String(c.ClienteID||'').trim()===String(clienteId).trim() ||
-      // Si clienteId está vacío, buscar por nombre
+      String(c.ClienteID||'').trim()===String(clienteId||'').trim() ||
       (!clienteId && (c.ClienteNombre||'')===(nombreFallback||''))
     )
   );
@@ -452,7 +450,51 @@ function verDetalleCliente(clienteId, nombreFallback){
     EC.toast('No se encontraron créditos activos para este cliente','error');
     return;
   }
+  // Si tiene más de un crédito activo, mostrar selector
+  if(creds.length > 1){
+    mostrarSelectorCreditos(creds);
+    return;
+  }
   verDetalle(creds[0]);
+}
+
+// ── SELECTOR DE CRÉDITO CUANDO HAY MÁS DE UNO ─────────────────
+function mostrarSelectorCreditos(creds){
+  // Crear modal dinámico de selección
+  let existing = document.getElementById('modal-selector-credito');
+  if(!existing){
+    existing = document.createElement('div');
+    existing.className = 'modal-overlay';
+    existing.id = 'modal-selector-credito';
+    existing.innerHTML = `
+      <div class="modal" style="max-width:480px">
+        <div class="modal-header">
+          <div class="modal-title">Seleccionar crédito</div>
+          <button class="modal-close" onclick="document.getElementById('modal-selector-credito').classList.remove('open')">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+        <div class="modal-body" id="selector-credito-lista"></div>
+      </div>`;
+    document.body.appendChild(existing);
+    existing.addEventListener('click', e=>{ if(e.target===existing) existing.classList.remove('open'); });
+  }
+  document.getElementById('selector-credito-lista').innerHTML =
+    `<p style="font-size:13px;color:var(--text2);margin-bottom:12px">Este cliente tiene ${creds.length} créditos activos. Selecciona cuál deseas ver:</p>` +
+    creds.map(c=>{
+      const saldo = parseFloat(c.Saldo||0);
+      const monto = parseFloat(c.MontoOriginal||0);
+      const pct   = monto>0 ? Math.round((1-(saldo/monto))*100) : 0;
+      return `<div class="cliente-card" style="cursor:pointer" onclick="document.getElementById('modal-selector-credito').classList.remove('open');verDetalle(${JSON.stringify(c).replace(/'/g,'&#39;')})">
+        <div style="flex:1">
+          <div style="font-size:13px;font-weight:bold">${c.Codigo||'—'}</div>
+          <div style="font-size:11px;color:var(--text3)">Capital: ${EC.fmt(monto)} · Saldo: ${EC.fmt(saldo)} · ${pct}% pagado</div>
+          <div style="font-size:11px;color:var(--text3)">Inicio: ${c.FechaInicio||'—'} · ${c.NumCuotas||'?'} cuotas ${c.Frecuencia||''}</div>
+        </div>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+      </div>`;
+    }).join('');
+  existing.classList.add('open');
 }
 
 function verDetalle(cr){
@@ -461,7 +503,10 @@ function verDetalle(cr){
   const capPagado    = pagosCredito.reduce((a,p)=>a+(+p.Capital||0),0);
   const intPagado    = pagosCredito.reduce((a,p)=>a+(+p.Interes||0),0);
   const monto        = parseFloat(cr.MontoOriginal||0);
+  // Saldo pendiente = valor real guardado en el Sheet (fuente de verdad)
   const saldo        = parseFloat(cr.Saldo||0);
+  // Capital por cobrar = el mismo saldo (son idénticos: lo que queda del capital original)
+  // No se recalcula desde monto-capPagado para evitar inconsistencias por redondeos
   const pct          = monto>0 ? Math.round((1-(saldo/monto))*100) : 0;
 
   // Generar tabla amortización
