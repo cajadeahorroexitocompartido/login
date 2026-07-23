@@ -460,7 +460,9 @@ function verDetalleCliente(clienteId, nombreFallback){
 
 // ── SELECTOR DE CRÉDITO CUANDO HAY MÁS DE UNO ─────────────────
 function mostrarSelectorCreditos(creds){
-  // Crear modal dinámico de selección
+  // Guardar créditos en variable global para referenciar desde onclick
+  window._creditosSelector = creds;
+
   let existing = document.getElementById('modal-selector-credito');
   if(!existing){
     existing = document.createElement('div');
@@ -479,22 +481,31 @@ function mostrarSelectorCreditos(creds){
     document.body.appendChild(existing);
     existing.addEventListener('click', e=>{ if(e.target===existing) existing.classList.remove('open'); });
   }
+
   document.getElementById('selector-credito-lista').innerHTML =
-    `<p style="font-size:13px;color:var(--text2);margin-bottom:12px">Este cliente tiene ${creds.length} créditos activos. Selecciona cuál deseas ver:</p>` +
-    creds.map(c=>{
+    `<p style="font-size:13px;color:var(--text2);margin-bottom:12px">Este cliente tiene <strong>${creds.length}</strong> créditos activos. Selecciona cuál ver:</p>` +
+    creds.map((c,idx)=>{
       const saldo = parseFloat(c.Saldo||0);
       const monto = parseFloat(c.MontoOriginal||0);
       const pct   = monto>0 ? Math.round((1-(saldo/monto))*100) : 0;
-      return `<div class="cliente-card" style="cursor:pointer" onclick="document.getElementById('modal-selector-credito').classList.remove('open');verDetalle(${JSON.stringify(c).replace(/'/g,'&#39;')})">
+      return `<div class="cliente-card" style="cursor:pointer;margin-bottom:8px" onclick="elegirCreditoSelector(${idx})">
         <div style="flex:1">
-          <div style="font-size:13px;font-weight:bold">${c.Codigo||'—'}</div>
-          <div style="font-size:11px;color:var(--text3)">Capital: ${EC.fmt(monto)} · Saldo: ${EC.fmt(saldo)} · ${pct}% pagado</div>
-          <div style="font-size:11px;color:var(--text3)">Inicio: ${c.FechaInicio||'—'} · ${c.NumCuotas||'?'} cuotas ${c.Frecuencia||''}</div>
+          <div style="font-size:14px;font-weight:bold;color:var(--navy)">${c.Codigo||'—'}</div>
+          <div style="font-size:12px;color:var(--text2);margin-top:3px">Capital: ${EC.fmt(monto)} &nbsp;·&nbsp; Saldo: ${EC.fmt(saldo)} &nbsp;·&nbsp; ${pct}% pagado</div>
+          <div style="font-size:11px;color:var(--text3);margin-top:2px">Inicio: ${c.FechaInicio||'—'} &nbsp;·&nbsp; ${c.NumCuotas||'?'} cuotas ${c.Frecuencia||''}</div>
+          <div class="prog-bg" style="margin-top:6px"><div class="prog-fill" style="width:${pct}%"></div></div>
         </div>
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
       </div>`;
     }).join('');
+
   existing.classList.add('open');
+}
+
+function elegirCreditoSelector(idx){
+  document.getElementById('modal-selector-credito').classList.remove('open');
+  const c = window._creditosSelector[idx];
+  if(c) verDetalle(c);
 }
 
 function verDetalle(cr){
@@ -548,19 +559,25 @@ function verDetalle(cr){
   // Datos actuales — si el crédito está finalizado, todo pendiente queda en cero
   const creditoFinalizado2 = cr.Estado === 'cancelado';
   const saldoMostrarDet = creditoFinalizado2 ? 0 : saldo;
-  const capPorCobrar = creditoFinalizado2 ? 0 : Math.max(0, monto - capPagado);
-  const intPorCobrar = creditoFinalizado2 ? 0 : Math.max(0, totalInteres - intPagado);
-  const pctMostrar    = creditoFinalizado2 ? 100 : pct;
-  const cuotasPagadasMostrar = creditoFinalizado2 ? filas.length : cuotasPagadas;
-  const cuotasPendMostrar    = creditoFinalizado2 ? 0 : cuotasPend;
+
+  // Capital por cobrar = saldo real del Sheet (fuente de verdad)
+  // Son exactamente lo mismo — el saldo IS el capital pendiente por cobrar
+  const capPorCobrar = creditoFinalizado2 ? 0 : saldo;
+
+  // Interés por cobrar = total intereses del crédito - intereses ya pagados
+  const intPorCobrar = creditoFinalizado2 ? 0 : Math.max(0, parseFloat((totalInteres - intPagado).toFixed(2)));
+
+  const pctMostrar            = creditoFinalizado2 ? 100 : pct;
+  const cuotasPagadasMostrar  = creditoFinalizado2 ? filas.length : cuotasPagadas;
+  const cuotasPendMostrar     = creditoFinalizado2 ? 0 : Math.max(0, filas.length - cuotasPagadas);
 
   document.getElementById('det-saldo').textContent          = EC.fmt(saldoMostrarDet);
   document.getElementById('det-cap-pagado').textContent     = EC.fmt(creditoFinalizado2 ? monto : capPagado);
-  document.getElementById('det-int-pagado').textContent     = EC.fmt(creditoFinalizado2 ? intPagado : intPagado);
+  document.getElementById('det-int-pagado').textContent     = EC.fmt(intPagado);
   document.getElementById('det-cap-cobrar').textContent     = EC.fmt(capPorCobrar);
   document.getElementById('det-int-cobrar').textContent     = EC.fmt(intPorCobrar);
   document.getElementById('det-cuotas-pagadas').textContent = cuotasPagadasMostrar+' / '+filas.length;
-  document.getElementById('det-cuotas-pend').textContent    = cuotasPendMostrar+' cuotas';
+  document.getElementById('det-cuotas-pend').textContent    = cuotasPendMostrar+' cuota'+(cuotasPendMostrar!==1?'s':'');
   document.getElementById('det-pct').textContent            = pctMostrar+'%';
 
   // ── CÁLCULO DE MORA: cuotas vencidas no pagadas ────────────
