@@ -419,7 +419,9 @@ function renderFinalizados(creditos, filtro=''){
     document.getElementById('tbody-finalizados').innerHTML = '<tr><td colspan="7" class="empty-cell">Aún no hay créditos finalizados</td></tr>';
     return;
   }
-  document.getElementById('tbody-finalizados').innerHTML = finalizados.map(c=>{
+  // Guardar en variable global para referenciar desde onclick sin JSON en HTML
+  window._creditosFinalizados = finalizados;
+  document.getElementById('tbody-finalizados').innerHTML = finalizados.map((c,idx)=>{
     const pagosCredito = todosPagos.filter(p=>String(p.CreditoID||p.creditoId||'').trim()===String(c.ID||'').trim());
     const totalPagado  = pagosCredito.reduce((a,p)=>a+(+p.Capital||0)+(+p.Interes||0),0);
     return `<tr>
@@ -429,11 +431,16 @@ function renderFinalizados(creditos, filtro=''){
       <td class="mono" style="color:var(--green);font-weight:600">${EC.fmt(totalPagado)}</td>
       <td class="mono">${c.FechaInicio||'—'}</td>
       <td class="mono">${c.NumCuotas||'—'}</td>
-      <td><button class="btn btn-blue btn-xs" onclick='verDetalle(${JSON.stringify(c).replace(/'/g,"&#39;")})'>
+      <td><button class="btn btn-blue btn-xs" onclick="verCreditoFinalizado(${idx})">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>Ver
       </button></td>
     </tr>`;
   }).join('');
+}
+
+function verCreditoFinalizado(idx){
+  const c = (window._creditosFinalizados||[])[idx];
+  if(c) verDetalle(c);
 }
 
 function filtrarFinalizados(q){ renderFinalizados(todosCreditos, q); }
