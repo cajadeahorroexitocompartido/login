@@ -541,7 +541,14 @@ function filtrarPorFecha(){
 // ══════════════════════════════════════════════════════════════
 //  MODAL PAGO — Lógica nueva
 // ══════════════════════════════════════════════════════════════
-function abrirModalPago(){
+async function abrirModalPago(){
+  // Recargar créditos frescos del servidor para tener saldos actualizados post-abono
+  try{
+    const r = await fetch(`${EC.api}?accion=leer&tab=creditos`);
+    const j = await r.json();
+    if(j.ok) todosCreditos = j.data||[];
+  }catch(e){ /* continuar con datos en memoria */ }
+
   // Reset estado
   creditoSeleccionado = null;
   tipoPagoActual      = null;
@@ -696,33 +703,91 @@ function alSeleccionarCliente(clienteId){
 
   if(!clienteId){ creditoSeleccionado = null; return; }
 
-  // Buscar crédito activo del cliente
-  const credito = todosCreditos.find(cr => {
+  // Buscar TODOS los créditos activos del cliente (puede tener más de uno)
+  const creditosActivos = todosCreditos.filter(cr => {
     const idMatch = String(cr.ClienteID||'').trim()===String(clienteId||'').trim();
     const estado = String(cr.Estado||'activo').toLowerCase();
     return idMatch && estado!=='cancelado' && estado!=='eliminado';
   });
-  if(!credito){ EC.toast('Este cliente no tiene crédito activo','error'); creditoSeleccionado=null; return; }
 
+  if(!creditosActivos.length){
+    EC.toast('Este cliente no tiene crédito activo','error');
+    creditoSeleccionado = null;
+    return;
+  }
+
+  // Si tiene más de un crédito, mostrar selector
+  if(creditosActivos.length > 1){
+    mostrarSelectorCreditoPago(creditosActivos, clienteId);
+    return;
+  }
+
+  // Solo un crédito — cargar directamente
+  cargarDetalleCreditoPago(creditosActivos[0]);
+}
+
+function mostrarSelectorCreditoPago(creditos, clienteId){
+  window._creditosPagoSelector = creditos;
+  // Crear o reutilizar modal selector
+  let modal = document.getElementById('modal-selector-credito-pago');
+  if(!modal){
+    modal = document.createElement('div');
+    modal.className = 'modal-overlay';
+    modal.id = 'modal-selector-credito-pago';
+    modal.innerHTML = `
+      <div class="modal" style="max-width:480px">
+        <div class="modal-header">
+          <div class="modal-title">¿Cuál crédito desea pagar?</div>
+          <button class="modal-close" onclick="document.getElementById('modal-selector-credito-pago').classList.remove('open')">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+        <div class="modal-body" id="selector-credito-pago-lista"></div>
+      </div>`;
+    document.body.appendChild(modal);
+    modal.addEventListener('click', e=>{ if(e.target===modal) modal.classList.remove('open'); });
+  }
+  document.getElementById('selector-credito-pago-lista').innerHTML =
+    `<p style="font-size:13px;color:var(--text2);margin-bottom:12px">Este cliente tiene <strong>${creditos.length}</strong> créditos activos. Selecciona cuál pagar:</p>` +
+    creditos.map((c,idx)=>{
+      const saldo = parseFloat(c.Saldo||0);
+      const monto = parseFloat(c.MontoOriginal||0);
+      const pct   = monto>0 ? Math.round((1-(saldo/monto))*100) : 0;
+      return `<div class="cliente-card" style="cursor:pointer;margin-bottom:8px" onclick="elegirCreditoPago(${idx})">
+        <div style="flex:1">
+          <div style="font-size:14px;font-weight:bold;color:var(--navy)">${c.Codigo||'—'}</div>
+          <div style="font-size:12px;color:var(--text2);margin-top:3px">Saldo pendiente: <strong>${EC.fmt(saldo)}</strong></div>
+          <div style="font-size:11px;color:var(--text3);margin-top:2px">${c.NumCuotas||'?'} cuotas ${c.Frecuencia||''} · ${pct}% pagado</div>
+          <div class="prog-bg" style="margin-top:5px"><div class="prog-fill" style="width:${pct}%"></div></div>
+        </div>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+      </div>`;
+    }).join('');
+  modal.classList.add('open');
+}
+
+function elegirCreditoPago(idx){
+  document.getElementById('modal-selector-credito-pago').classList.remove('open');
+  const c = (window._creditosPagoSelector||[])[idx];
+  if(c) cargarDetalleCreditoPago(c);
+}
+
+function cargarDetalleCreditoPago(credito){
   creditoSeleccionado = credito;
 
-  // Calcular cuota según tabla de amortización almacenada en el crédito
   const saldo      = parseFloat(credito.Saldo||0);
-  const plazo      = parseInt(credito.NumCuotas||1);          // ← correcto
-  const tasa       = parseFloat(credito.TasaMensual||0);      // ← correcto
-  const monto      = parseFloat(credito.MontoOriginal||saldo); // ← correcto
+  const plazo      = parseInt(credito.NumCuotas||1);
+  const tasa       = parseFloat(credito.TasaMensual||0);
+  const monto      = parseFloat(credito.MontoOriginal||saldo);
   const frecuencia = credito.Frecuencia||'mensual';
   const tabla      = credito.Tabla||'francesa';
 
-  // Factor de frecuencia (mensual=1, quincenal=2, semanal=4, diario=30)
   const _factores  = {mensual:1, quincenal:2, semanal:4, diario:30};
   const _factor    = _factores[frecuencia]||1;
-  const tasaPer    = tasa / _factor / 100;  // tasa por período
+  const tasaPer    = tasa / _factor / 100;
 
-  // Calcular cuota correctamente según tabla de amortización
   let cuotaTotal, cuotaCapital, cuotaInteres;
   if(tabla === 'francesa'){
-    // Cuota fija: misma en todos los períodos
     const cuotaFija = tasaPer === 0
       ? monto / plazo
       : monto * (tasaPer * Math.pow(1+tasaPer, plazo)) / (Math.pow(1+tasaPer, plazo) - 1);
@@ -731,18 +796,15 @@ function alSeleccionarCliente(clienteId){
     cuotaTotal   = parseFloat(cuotaFija.toFixed(2));
     if(cuotaCapital < 0) cuotaCapital = 0;
   } else if(tabla === 'alemana'){
-    // Capital fijo, interés sobre saldo
     cuotaCapital = parseFloat((monto / plazo).toFixed(2));
     cuotaInteres = parseFloat((saldo * tasaPer).toFixed(2));
     cuotaTotal   = parseFloat((cuotaCapital + cuotaInteres).toFixed(2));
   } else {
-    // Americana: solo interés, capital al vencimiento
     cuotaInteres = parseFloat((monto * tasaPer).toFixed(2));
     cuotaCapital = saldo <= cuotaInteres ? saldo : 0;
     cuotaTotal   = parseFloat((cuotaCapital + cuotaInteres).toFixed(2));
   }
 
-  // Si el saldo es menor que la cuota de capital → es la última cuota
   if(saldo > 0 && saldo < cuotaCapital){
     cuotaCapital = parseFloat(saldo.toFixed(2));
     cuotaTotal   = parseFloat((cuotaCapital + cuotaInteres).toFixed(2));
@@ -752,8 +814,7 @@ function alSeleccionarCliente(clienteId){
   const pagosDelCredito = todosPagos.filter(p=>String(p.CreditoID||'').trim()===String(credito.ID||'').trim());
   const numCuotaActual  = pagosDelCredito.length + 1;
 
-  // Calcular fecha de esta cuota usando la tabla de amortización
-  const factores2 = {mensual:1,quincenal:2,semanal:4,diario:30};
+  // Calcular fecha de esta cuota
   function addPer(d,t,n){
     const dt=new Date(d+'T12:00:00');
     if(t==='mensual') dt.setMonth(dt.getMonth()+n);
@@ -762,7 +823,7 @@ function alSeleccionarCliente(clienteId){
     else dt.setDate(dt.getDate()+n);
     return dt.toISOString().split('T')[0];
   }
-  const fechaInicio   = credito.FechaInicio||EC.hoy();
+  const fechaInicio      = credito.FechaInicio||EC.hoy();
   const fechaCuotaActual = addPer(fechaInicio, frecuencia, numCuotaActual);
 
   // Calcular mora si la fecha de la cuota ya pasó
@@ -985,12 +1046,18 @@ async function guardarPago(){
   if(diff > 0.01){ EC.toast(`El monto ingresado (${EC.fmt(sumaFormas)}) no coincide con el total (${EC.fmt(total)})`,'error'); return; }
 
   const clienteId = document.getElementById('p-cliente').value;
-  const cliente   = todosClientes.find(c=>c.ID===clienteId)||{};
+  // Búsqueda robusta con String() para evitar problemas de tipo
+  const cliente   = todosClientes.find(c=>String(c.ID||'').trim()===String(clienteId||'').trim())||{};
   const credito   = creditoSeleccionado;
   const fecha     = document.getElementById('p-fecha').value||EC.hoy();
   const numComp   = document.getElementById('p-comp').value.trim();
   const numPago   = 'P-'+Date.now().toString().slice(-6);
   const nuevoSaldo = Math.max(0, parseFloat(credito.Saldo||0) - capital);
+
+  // Nombre del cliente: del objeto cliente o del crédito como fallback
+  const nombreCliente = ((cliente.Nombres||'').trim()+' '+(cliente.Apellidos||'').trim()).trim()
+    || credito.ClienteNombre
+    || 'Cliente';
 
   // Descripción del método — guardar correctamente para estadísticas
   const metodoPrincipal = formas.length===1 ? formas[0].metodo : 'mixto';
@@ -1019,7 +1086,7 @@ async function guardarPago(){
     CreditoID      : credito.ID,
     CreditoCodigo  : credito.Codigo||'',
     ClienteID      : clienteId,
-    ClienteNombre  : (cliente.Nombres||'')+' '+(cliente.Apellidos||''),
+    ClienteNombre  : nombreCliente,
     Fecha          : fecha,
     Capital        : capFinal,
     Interes        : intFinal,
