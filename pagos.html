@@ -219,10 +219,11 @@
           <div class="cuota-info-row"><span class="cuota-info-label">Crédito</span><span class="cuota-info-val" id="ci-codigo">—</span></div>
           <div class="cuota-info-row"><span class="cuota-info-label">Fecha de esta cuota</span><span class="cuota-info-val green" id="ci-fecha-cuota">—</span></div>
           <div class="cuota-info-row"><span class="cuota-info-label">N° de cuota</span><span class="cuota-info-val" id="ci-num-cuota">—</span></div>
-          <div class="cuota-info-row"><span class="cuota-info-label">Saldo pendiente</span><span class="cuota-info-val orange" id="ci-saldo">$0.00</span></div>
-          <div class="cuota-info-row"><span class="cuota-info-label">Cuota a pagar</span><span class="cuota-info-val green" id="ci-cuota">$0.00</span></div>
-          <div class="cuota-info-row"><span class="cuota-info-label">Capital de cuota</span><span class="cuota-info-val" id="ci-cap">$0.00</span></div>
-          <div class="cuota-info-row"><span class="cuota-info-label">Interés de cuota</span><span class="cuota-info-val" id="ci-int">$0.00</span></div>
+          <div class="cuota-info-row"><span class="cuota-info-label">Saldo total del crédito</span><span class="cuota-info-val orange" id="ci-saldo">$0.00</span></div>
+          <div class="cuota-info-row" id="ci-abono-pend-row" style="display:none"><span class="cuota-info-label" style="color:var(--red);font-weight:bold">Abono pendiente cuota anterior</span><span class="cuota-info-val" style="color:var(--red);font-weight:bold" id="ci-abono-pend">$0.00</span></div>
+          <div class="cuota-info-row"><span class="cuota-info-label">Capital de esta cuota</span><span class="cuota-info-val" id="ci-cap">$0.00</span></div>
+          <div class="cuota-info-row"><span class="cuota-info-label">Interés de esta cuota</span><span class="cuota-info-val" id="ci-int">$0.00</span></div>
+          <div class="cuota-info-row"><span class="cuota-info-label" style="font-weight:bold">Total cuota a pagar</span><span class="cuota-info-val green" style="font-weight:bold" id="ci-cuota">$0.00</span></div>
           <div class="cuota-info-row" id="ci-mora-row" style="display:none"><span class="cuota-info-label" style="color:var(--red)">Interés de mora</span><span class="cuota-info-val" style="color:var(--red)" id="ci-mora">$0.00</span></div>
           <div class="cuota-info-row" id="ci-dias-mora-row" style="display:none"><span class="cuota-info-label" style="color:var(--red)">Días en mora</span><span class="cuota-info-val" style="color:var(--red)" id="ci-dias-mora">0 días</span></div>
         </div>
@@ -777,6 +778,47 @@ function elegirCreditoPago(idx){
   if(c) cargarDetalleCreditoPago(c);
 }
 
+// ── GENERAR TABLA DE AMORTIZACIÓN ─────────────────────────────
+function generarAmortizacion(monto, tasaMens, plazo, frec, tabla, fechaInicio){
+  const fact = {mensual:1,quincenal:2,semanal:4,diario:30}[frec]||1;
+  const tasa = tasaMens / fact / 100;
+  const filas = [];
+  function addPer(d,t,n){
+    const dt=new Date(d+'T12:00:00');
+    if(t==='mensual') dt.setMonth(dt.getMonth()+n);
+    else if(t==='quincenal') dt.setDate(dt.getDate()+n*15);
+    else if(t==='semanal') dt.setDate(dt.getDate()+n*7);
+    else dt.setDate(dt.getDate()+n);
+    return dt.toISOString().split('T')[0];
+  }
+  if(tabla==='francesa'){
+    const cuota = tasa===0 ? monto/plazo : monto*(tasa*Math.pow(1+tasa,plazo))/(Math.pow(1+tasa,plazo)-1);
+    let s = monto;
+    for(let i=1;i<=plazo;i++){
+      const int=parseFloat((s*tasa).toFixed(2));
+      const cap=parseFloat(Math.min(cuota-int,s).toFixed(2));
+      s=parseFloat(Math.max(0,s-cap).toFixed(2));
+      filas.push({n:i,fecha:addPer(fechaInicio,frec,i),cuota:parseFloat((cap+int).toFixed(2)),cap,int,saldo:s});
+    }
+  } else if(tabla==='alemana'){
+    const capC=parseFloat((monto/plazo).toFixed(2));
+    let s=monto;
+    for(let i=1;i<=plazo;i++){
+      const int=parseFloat((s*tasa).toFixed(2));
+      const cuota=parseFloat((capC+int).toFixed(2));
+      s=parseFloat(Math.max(0,s-capC).toFixed(2));
+      filas.push({n:i,fecha:addPer(fechaInicio,frec,i),cuota,cap:capC,int,saldo:s});
+    }
+  } else {
+    for(let i=1;i<=plazo;i++){
+      const int=parseFloat((monto*tasa).toFixed(2));
+      const cap=i===plazo?monto:0;
+      filas.push({n:i,fecha:addPer(fechaInicio,frec,i),cuota:parseFloat((int+cap).toFixed(2)),cap,int,saldo:i===plazo?0:monto});
+    }
+  }
+  return filas;
+}
+
 function cargarDetalleCreditoPago(credito){
   creditoSeleccionado = credito;
 
@@ -815,9 +857,47 @@ function cargarDetalleCreditoPago(credito){
     cuotaTotal   = parseFloat((cuotaCapital + cuotaInteres).toFixed(2));
   }
 
-  // Calcular número de cuota actual
+  // Calcular capital total pagado hasta ahora
   const pagosDelCredito = todosPagos.filter(p=>String(p.CreditoID||'').trim()===String(credito.ID||'').trim());
-  const numCuotaActual  = pagosDelCredito.length + 1;
+  const capTotalPagado  = pagosDelCredito.reduce((a,p)=>a+(parseFloat(p.Capital||0)),0);
+
+  // Determinar en qué cuota estamos basándonos en el capital acumulado de la tabla
+  // No contamos por número de pagos sino por cuánto capital se ha amortizado realmente
+  let capAcumulado = 0;
+  let numCuotaActual = 1;
+  let saldoPendienteCuotaActual = 0; // cuánto falta para completar la cuota actual
+
+  const filas = generarAmortizacion(
+    monto,
+    parseFloat(credito.TasaMensual||0),
+    parseInt(credito.NumCuotas||1),
+    frecuencia,
+    tabla,
+    credito.FechaInicio||EC.hoy()
+  );
+
+  for(let i = 0; i < filas.length; i++){
+    const capCuota = filas[i].cap;
+    if(capTotalPagado >= capAcumulado + capCuota){
+      // Esta cuota está completamente pagada
+      capAcumulado += capCuota;
+      numCuotaActual = i + 2; // siguiente cuota
+    } else {
+      // Estamos en esta cuota — calcular cuánto falta
+      const capPagadoEnEstaCuota = capTotalPagado - capAcumulado;
+      saldoPendienteCuotaActual  = parseFloat((capCuota - capPagadoEnEstaCuota).toFixed(2));
+      numCuotaActual = i + 1;
+      break;
+    }
+  }
+
+  // Si hay saldo pendiente de cuota anterior, ajustar el capital de esta cuota
+  // para que se cobre primero lo que falta de la cuota vencida
+  if(saldoPendienteCuotaActual > 0 && saldoPendienteCuotaActual < cuotaCapital){
+    // La cuota actual ya tiene una parte pagada → cobrar solo lo que falta
+    cuotaCapital = parseFloat(saldoPendienteCuotaActual.toFixed(2));
+    cuotaTotal   = parseFloat((cuotaCapital + cuotaInteres).toFixed(2));
+  }
 
   // Calcular fecha de esta cuota
   function addPer(d,t,n){
@@ -863,6 +943,15 @@ function cargarDetalleCreditoPago(credito){
   document.getElementById('ci-cuota').textContent      = EC.fmt(cuotaTotal + mora);
   document.getElementById('ci-cap').textContent        = EC.fmt(cuotaCapital);
   document.getElementById('ci-int').textContent        = EC.fmt(cuotaInteres);
+
+  // Mostrar abono pendiente de cuota anterior si existe
+  const abonoPendRow = document.getElementById('ci-abono-pend-row');
+  if(saldoPendienteCuotaActual > 0){
+    abonoPendRow.style.display = '';
+    document.getElementById('ci-abono-pend').textContent = EC.fmt(saldoPendienteCuotaActual)+' pendiente de cuota anterior';
+  } else {
+    abonoPendRow.style.display = 'none';
+  }
 
   // Mostrar mora si aplica
   if(mora > 0){
