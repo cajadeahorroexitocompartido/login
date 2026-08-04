@@ -542,11 +542,16 @@ function filtrarPorFecha(){
 //  MODAL PAGO — Lógica nueva
 // ══════════════════════════════════════════════════════════════
 async function abrirModalPago(){
-  // Recargar créditos frescos del servidor para tener saldos actualizados post-abono
+  // Recargar créditos Y clientes frescos del servidor
   try{
-    const r = await fetch(`${EC.api}?accion=leer&tab=creditos`);
-    const j = await r.json();
-    if(j.ok) todosCreditos = j.data||[];
+    const [rC, rCl] = await Promise.all([
+      fetch(`${EC.api}?accion=leer&tab=creditos`),
+      fetch(`${EC.api}?accion=leer&tab=clientes`),
+    ]);
+    const jC  = await rC.json();
+    const jCl = await rCl.json();
+    if(jC.ok)  todosCreditos  = jC.data||[];
+    if(jCl.ok) todosClientes  = jCl.data||[];
   }catch(e){ /* continuar con datos en memoria */ }
 
   // Reset estado
