@@ -858,10 +858,7 @@ function cargarDetalleCreditoPago(credito){
   }
 
   // ── CALCULAR EN QUÉ CUOTA ESTAMOS Y CUÁNTO FALTA ─────────────
-  const pagosDelCredito  = todosPagos.filter(p=>String(p.CreditoID||'').trim()===String(credito.ID||'').trim());
-  const capTotalPagado   = parseFloat(pagosDelCredito.reduce((a,p)=>a+(parseFloat(p.Capital||0)),0).toFixed(2));
-  const intTotalPagado   = parseFloat(pagosDelCredito.reduce((a,p)=>a+(parseFloat(p.Interes||0)),0).toFixed(2));
-  const totalPagado      = parseFloat((capTotalPagado + intTotalPagado).toFixed(2));
+  const pagosDelCredito = todosPagos.filter(p=>String(p.CreditoID||'').trim()===String(credito.ID||'').trim());
 
   const filas = generarAmortizacion(
     monto,
@@ -871,44 +868,67 @@ function cargarDetalleCreditoPago(credito){
     credito.FechaInicio||EC.hoy()
   );
 
-  // Acumular el total de cada cuota para saber exactamente en cuál estamos
-  let totalAcumulado = 0;
+  // Acumular pagos aplicando: primero cubre interés, sobrante va a capital
+  let capAcumulado  = 0;   // capital amortizado hasta ahora
+  let intAcumulado  = 0;   // interés pagado hasta ahora
   let numCuotaActual = 1;
   let hayAbonoParcial = false;
-  let saldoPendienteEnCuota = 0; // exactamente cuánto falta para completar la cuota actual
+  let intPendiente  = 0;   // interés que falta de la cuota actual
+  let capPendiente  = 0;   // capital que falta de la cuota actual
+
+  // Simular aplicación de cada pago cuota por cuota
+  let totalDisponible = parseFloat(pagosDelCredito.reduce((a,p)=>a+(parseFloat(p.Capital||0))+(parseFloat(p.Interes||0)),0).toFixed(2));
 
   for(let i = 0; i < filas.length; i++){
-    const totalCuota = parseFloat(filas[i].cuota.toFixed(2));
-    const totalAcumConEsta = parseFloat((totalAcumulado + totalCuota).toFixed(2));
-
-    if(totalPagado >= totalAcumConEsta - 0.01){
-      // Cuota completamente pagada
-      totalAcumulado = totalAcumConEsta;
-      numCuotaActual = i + 2;
-    } else {
-      // Estamos en esta cuota
+    const f = filas[i];
+    if(totalDisponible <= 0.01){
+      // No hay más pagos — estamos en esta cuota sin abono
       numCuotaActual = i + 1;
-      const pagadoEnEstaCuota = parseFloat((totalPagado - totalAcumulado).toFixed(2));
-      if(pagadoEnEstaCuota > 0.01){
-        // Hay abono parcial — falta exactamente cuotaTotal - lo que ya se pagó en esta cuota
-        saldoPendienteEnCuota = parseFloat((totalCuota - pagadoEnEstaCuota).toFixed(2));
-        hayAbonoParcial = true;
-      }
+      intPendiente   = f.int;
+      capPendiente   = f.cap;
+      break;
+    }
+    // Primero aplicar al interés
+    if(totalDisponible >= f.int){
+      totalDisponible = parseFloat((totalDisponible - f.int).toFixed(2));
+      intAcumulado    = parseFloat((intAcumulado + f.int).toFixed(2));
+    } else {
+      // El disponible no cubre el interés completo — cuota con abono parcial
+      numCuotaActual  = i + 1;
+      intPendiente    = parseFloat((f.int - totalDisponible).toFixed(2));
+      capPendiente    = f.cap; // capital sin tocar
+      totalDisponible = 0;
+      hayAbonoParcial = true;
+      break;
+    }
+    // Luego aplicar al capital
+    if(totalDisponible >= f.cap){
+      totalDisponible = parseFloat((totalDisponible - f.cap).toFixed(2));
+      capAcumulado    = parseFloat((capAcumulado + f.cap).toFixed(2));
+      numCuotaActual  = i + 2; // cuota siguiente
+    } else {
+      // El disponible cubre el interés pero no todo el capital — abono parcial
+      numCuotaActual  = i + 1;
+      const capCubierto = totalDisponible;
+      capPendiente    = parseFloat((f.cap - capCubierto).toFixed(2));
+      intPendiente    = 0; // interés ya cubierto
+      capAcumulado    = parseFloat((capAcumulado + capCubierto).toFixed(2));
+      totalDisponible = 0;
+      hayAbonoParcial = true;
       break;
     }
   }
 
-  // Si hay abono parcial, cobrar SOLO el saldo que falta (sin recalcular intereses)
-  // El saldo pendiente es simplemente: cuota original - lo ya pagado en esa cuota
-  if(hayAbonoParcial && saldoPendienteEnCuota > 0.01){
-    // Distribuir el saldo pendiente en capital e interés proporcionalmente a la cuota original
-    const pctPendiente    = saldoPendienteEnCuota / cuotaTotal;
-    cuotaCapital = parseFloat((cuotaCapital * pctPendiente).toFixed(2));
-    cuotaInteres = parseFloat((saldoPendienteEnCuota - cuotaCapital).toFixed(2));
-    cuotaTotal   = saldoPendienteEnCuota;
+  // Ajustar cuota a cobrar según el saldo pendiente real
+  if(hayAbonoParcial){
+    cuotaCapital = capPendiente;
+    cuotaInteres = intPendiente;
+    cuotaTotal   = parseFloat((cuotaCapital + cuotaInteres).toFixed(2));
   }
 
-  // Ajuste última cuota: si el saldo del crédito es menor que el capital calculado
+  const saldoPendienteTotal = parseFloat((cuotaCapital + cuotaInteres).toFixed(2));
+
+  // Ajuste última cuota
   if(saldo > 0 && saldo < cuotaCapital){
     cuotaCapital = parseFloat(saldo.toFixed(2));
     cuotaTotal   = parseFloat((cuotaCapital + cuotaInteres).toFixed(2));
@@ -961,9 +981,11 @@ function cargarDetalleCreditoPago(credito){
 
   // Mostrar abono pendiente solo cuando hay abono parcial real
   const abonoPendRow = document.getElementById('ci-abono-pend-row');
-  if(hayAbonoParcial && saldoPendienteEnCuota > 0.01){
+  if(hayAbonoParcial && saldoPendienteTotal > 0.01){
     abonoPendRow.style.display = '';
-    document.getElementById('ci-abono-pend').textContent = EC.fmt(saldoPendienteEnCuota)+' pendiente de cuota anterior';
+    document.getElementById('ci-abono-pend').textContent =
+      EC.fmt(saldoPendienteTotal)+
+      (intPendiente > 0.01 ? ' (int: '+EC.fmt(intPendiente)+' + cap: '+EC.fmt(capPendiente)+')' : ' (solo capital)');
   } else {
     abonoPendRow.style.display = 'none';
   }
