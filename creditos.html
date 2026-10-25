@@ -261,13 +261,13 @@
   </div>
 </div>
 
-<!-- jsPDF -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
-
+<!-- jsPDF se carga bajo demanda desde auth.js (EC.cargarLib) -->
 <script>
 EC.initSidebar();
 EC.aplicarPermisos();
+EC.conLib(['imprimirCreditoOriginal','imprimirAmortizacion'],'pdf');
+EC.precargarLib('pdf');
+EC.alActualizar(()=>cargarTodo());
 
 const API = EC.api;
 let todosCreditos = [];

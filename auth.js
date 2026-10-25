@@ -37,8 +37,178 @@
     throw new Error('SESION_INVALIDA');
   }
 
+  // ============================================================
+  //  CAPA DE CACHÉ DE DATOS (stale-while-revalidate)
+  //  - Las lecturas (GET al Apps Script) se guardan en memoria y en
+  //    sessionStorage, así al cambiar de página los datos aparecen al instante.
+  //  - Si el dato tiene menos de FRESH_MS se usa tal cual (sin red).
+  //  - Si tiene menos de MAX_MS se muestra al instante y se actualiza en
+  //    segundo plano; si cambió, se dispara el evento 'ec:datos'.
+  //  - Cualquier escritura (POST agregar/actualizar) limpia la caché.
+  //  - Las peticiones idénticas simultáneas se unifican en una sola.
+  // ============================================================
+  const FRESH_MS = 15 * 1000;
+  const MAX_MS   = 10 * 60 * 1000;
+  const PREFIJO  = 'ec_c:';
+  const mem      = new Map();
+  const enVuelo  = new Map();
+  let generacion = 0;
+  let timerEvento = null;
+  const fetchOriginal = window.fetch.bind(window);
+
+  function cacheGet(k){
+    if(mem.has(k)) return mem.get(k);
+    try{
+      const raw = sessionStorage.getItem(PREFIJO + k);
+      if(raw){ const e = JSON.parse(raw); mem.set(k, e); return e; }
+    }catch(_){}
+    return null;
+  }
+  function cacheSet(k, texto){
+    const e = {t: Date.now(), d: texto};
+    mem.set(k, e);
+    try{ sessionStorage.setItem(PREFIJO + k, JSON.stringify(e)); }
+    catch(_){ /* sin espacio: queda solo en memoria */ }
+  }
+  function cacheLimpiar(){
+    generacion++;
+    mem.clear();
+    try{
+      Object.keys(sessionStorage).forEach(k=>{ if(k.indexOf(PREFIJO)===0) sessionStorage.removeItem(k); });
+    }catch(_){}
+  }
+  function esLectura(url, init){
+    const metodo = ((init && init.method) || 'GET').toUpperCase();
+    if(metodo !== 'GET') return false;
+    if(typeof url !== 'string' || url.indexOf(API) !== 0) return false;
+    if(url.indexOf('accion=') < 0 || url.indexOf('accion=login') >= 0) return false;
+    if(url.indexOf('tab=usuarios') >= 0) return false; // nunca se guarda en caché (contiene contraseñas)
+    return true;
+  }
+  function respuesta(texto){
+    return new Response(texto, {status:200, headers:{'Content-Type':'application/json'}});
+  }
+  function pedirRed(url){
+    if(enVuelo.has(url)) return enVuelo.get(url);
+    const gen = generacion;
+    const p = fetchOriginal(url).then(r=>r.text()).then(txt=>{
+      let ok = false;
+      try{ ok = JSON.parse(txt).ok === true; }catch(_){}
+      if(ok && gen === generacion) cacheSet(url, txt);
+      return txt;
+    }).finally(()=>{ enVuelo.delete(url); });
+    enVuelo.set(url, p);
+    return p;
+  }
+  function avisarCambio(){
+    clearTimeout(timerEvento);
+    timerEvento = setTimeout(()=>window.dispatchEvent(new Event('ec:datos')), 300);
+  }
+
+  window.fetch = function(url, init){
+    // Escrituras al Apps Script: limpiar caché al terminar
+    if(typeof url === 'string' && url.indexOf(API) === 0 && init && String(init.method||'').toUpperCase() === 'POST'){
+      const esLogin = typeof init.body === 'string' && init.body.indexOf('"accion":"login"') >= 0;
+      if(!esLogin){
+        return fetchOriginal(url, init).then(
+          r=>{ cacheLimpiar(); return r; },
+          e=>{ cacheLimpiar(); throw e; }
+        );
+      }
+    }
+    if(!esLectura(url, init)) return fetchOriginal(url, init);
+
+    // cache:'reload' = forzar lectura fresca del servidor (y refrescar la caché)
+    if(init && init.cache === 'reload') return pedirRed(url).then(respuesta);
+
+    const e = cacheGet(url);
+    const edad = e ? Date.now() - e.t : Infinity;
+    if(e && edad < FRESH_MS) return Promise.resolve(respuesta(e.d));
+    if(e && edad < MAX_MS){
+      pedirRed(url).then(txt=>{ if(txt !== e.d) avisarCambio(); }).catch(()=>{});
+      return Promise.resolve(respuesta(e.d));
+    }
+    return pedirRed(url).then(respuesta);
+  };
+
+  // ============================================================
+  //  CARGA DIFERIDA DE LIBRERÍAS (PDF / imágenes)
+  // ============================================================
+  const LIBS = {
+    jspdf   : 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js',
+    autotable: 'https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js',
+    html2canvas: 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js',
+  };
+  const GRUPOS = { pdf:['jspdf','autotable'], canvas:['html2canvas'] };
+  const libsPromesas = {};
+  const libsListas   = new Set();
+  function cargarScript(nombre){
+    if(libsPromesas[nombre]) return libsPromesas[nombre];
+    libsPromesas[nombre] = new Promise((res, rej)=>{
+      const s = document.createElement('script');
+      s.src = LIBS[nombre]; s.async = true;
+      s.onload = ()=>{ libsListas.add(nombre); res(); };
+      s.onerror = ()=>{ delete libsPromesas[nombre]; rej(new Error('No se pudo cargar '+nombre)); };
+      document.head.appendChild(s);
+    });
+    return libsPromesas[nombre];
+  }
+  async function cargarGrupo(grupo){
+    for(const n of (GRUPOS[grupo]||[])) await cargarScript(n); // en orden: jsPDF antes que autoTable
+  }
+
+  // Conexión anticipada al CDN
+  try{
+    const pc = document.createElement('link');
+    pc.rel = 'preconnect'; pc.href = 'https://cdnjs.cloudflare.com'; pc.crossOrigin = '';
+    document.head.appendChild(pc);
+  }catch(_){}
+
   // Exponer globalmente para que cada página los use
   window.EC = {
+    // ── Datos / caché ────────────────────────────────────────
+    silencioso : false,
+    // Lee una pestaña completa de la base de datos (usa la caché)
+    leer: async function(tab){
+      const r = await fetch(`${API}?accion=leer&tab=${tab}`);
+      const j = await r.json();
+      return j.ok ? (j.data||[]) : [];
+    },
+    leerVarias: function(tabs){ return Promise.all(tabs.map(t=>EC.leer(t))); },
+    limpiarCache: cacheLimpiar,
+    // Ejecuta fn cuando llegan datos más nuevos en segundo plano (si no hay un modal abierto)
+    alActualizar: function(fn){
+      window.addEventListener('ec:datos', ()=>{
+        if(document.querySelector('.modal-overlay.open')) return;
+        EC.silencioso = true;
+        Promise.resolve().then(fn).catch(()=>{}).finally(()=>{ EC.silencioso = false; });
+      });
+    },
+    // Librerías pesadas bajo demanda: 'pdf' (jsPDF + autoTable) y 'canvas' (html2canvas)
+    cargarLib: async function(...grupos){ for(const g of grupos) await cargarGrupo(g); },
+    precargarLib: function(...grupos){
+      const ir = ()=>EC.cargarLib(...grupos).catch(()=>{});
+      if('requestIdleCallback' in window) requestIdleCallback(ir, {timeout:4000});
+      else setTimeout(ir, 2000);
+    },
+    // Envuelve funciones globales para que carguen las librerías antes de ejecutarse
+    conLib: function(nombres, ...grupos){
+      nombres.forEach(n=>{
+        const f = window[n];
+        if(typeof f !== 'function') return;
+        window[n] = async function(...args){
+          const hayLibs = grupos.every(g=>(GRUPOS[g]||[]).every(x=>libsListas.has(x)));
+          if(!hayLibs){
+            EC.showLoading('Preparando documento...');
+            try{ await EC.cargarLib(...grupos); }
+            catch(e){ EC.hideLoading(); EC.toast('No se pudo cargar el generador de documentos. Revisa tu conexión.','error'); return; }
+            EC.hideLoading();
+          }
+          return f.apply(this, args);
+        };
+      });
+    },
+
     usuario : usuario,
     rol     : ROL,
     api     : API,
@@ -126,6 +296,7 @@
 
     // Loading
     showLoading: function(msg='Cargando...'){
+      if(EC.silencioso) return; // refresco en segundo plano: sin pantalla de carga
       const el = document.getElementById('loading-overlay');
       const tx = document.getElementById('loading-text');
       if(el) el.classList.add('show');

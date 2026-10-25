@@ -93,7 +93,7 @@
             </select>
           </div>
           <div class="field" style="display:flex;align-items:flex-end">
-            <button class="btn btn-green" style="width:100%" onclick="generarReporte()">
+            <button class="btn btn-green" style="width:100%" onclick="EC.limpiarCache();generarReporte()">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/></svg>
               Generar reporte
             </button>
@@ -183,13 +183,13 @@
   </div>
 </div>
 
-<!-- jsPDF -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
-
+<!-- jsPDF se carga bajo demanda desde auth.js (EC.cargarLib) -->
 <script>
 EC.initSidebar();
 EC.aplicarPermisos();
+EC.conLib(['exportarPDF'],'pdf');
+EC.precargarLib('pdf');
+EC.alActualizar(()=>generarReporte());
 
 // ── GENERAR AMORTIZACIÓN Y CALCULAR MORA DINÁMICAMENTE ────────
 function generarAmortizacion(monto, tasaMens, plazo, frec, tabla, fechaInicio){
@@ -391,7 +391,7 @@ async function generarReporte(){
         </tr>`).join('')
       : '<tr><td colspan="7" class="empty-cell">No hay cobros en el período seleccionado</td></tr>';
 
-    EC.toast('Reporte generado correctamente');
+    if(!EC.silencioso) EC.toast('Reporte generado correctamente');
   }catch(e){
     EC.toast('Error generando reporte: '+e.message,'error');
   }

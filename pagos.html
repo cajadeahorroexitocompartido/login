@@ -398,12 +398,14 @@
   </div>
 </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-
+<!-- html2canvas y jsPDF se cargan bajo demanda desde auth.js (EC.cargarLib) -->
 <script>
 EC.initSidebar();
 EC.aplicarPermisos();
+EC.conLib(['descargarImagen','compartirWhatsApp'],'canvas');
+EC.conLib(['descargarPDF'],'canvas','pdf');
+EC.precargarLib('canvas','pdf');
+EC.alActualizar(()=>Promise.all([cargarClientes(), cargarCreditos(), cargarPagos()]));
 
 let todosPagos    = [];
 let todosClientes = [];
@@ -545,14 +547,18 @@ function filtrarPorFecha(){
 async function abrirModalPago(){
   // Recargar créditos Y clientes frescos del servidor
   try{
-    const [rC, rCl] = await Promise.all([
-      fetch(`${EC.api}?accion=leer&tab=creditos`),
-      fetch(`${EC.api}?accion=leer&tab=clientes`),
+    // Datos críticos para cobrar: siempre frescos del servidor (se salta la caché)
+    const [rC, rCl, rP] = await Promise.all([
+      fetch(`${EC.api}?accion=leer&tab=creditos`, {cache:'reload'}),
+      fetch(`${EC.api}?accion=leer&tab=clientes`, {cache:'reload'}),
+      fetch(`${EC.api}?accion=leer&tab=pagos`,    {cache:'reload'}),
     ]);
     const jC  = await rC.json();
     const jCl = await rCl.json();
+    const jP  = await rP.json();
     if(jC.ok)  todosCreditos  = jC.data||[];
     if(jCl.ok) todosClientes  = jCl.data||[];
+    if(jP.ok)  todosPagos     = jP.data||[];
   }catch(e){ /* continuar con datos en memoria */ }
 
   // Reset estado

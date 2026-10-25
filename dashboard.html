@@ -140,6 +140,7 @@
 // Inicializar sidebar y permisos
 EC.initSidebar();
 EC.aplicarPermisos();
+EC.alActualizar(()=>cargarDashboard());
 document.getElementById('fecha-hoy').textContent = new Date().toLocaleDateString('es-EC',{day:'2-digit',month:'short',year:'numeric'});
 
 // ── GENERAR TABLA DE AMORTIZACIÓN (para calcular mora dinámica) ──

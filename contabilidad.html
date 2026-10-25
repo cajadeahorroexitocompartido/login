@@ -428,12 +428,14 @@
   </div>
 </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+<!-- jsPDF se carga bajo demanda desde auth.js (EC.cargarLib) -->
 <script>
 // ── AUTH ─────────────────────────────────────────────────────
 EC.initSidebar();
 EC.aplicarPermisos();
+EC.conLib(['exportarLibroPDF','exportarBalancePDF','exportarMayorPDF','exportarEstadoResultadosPDF','exportarBalanceGeneralPDF','exportarFlujoEfectivoPDF','exportarMorosidadPDF','exportarArqueoCajaPDF','exportarPlanCuentasPDF'],'pdf');
+EC.precargarLib('pdf');
+EC.alActualizar(async ()=>{ await cargarAsientos(); filtrarLibroDiario(); filtrarBalance(); });
 
 // ── PLAN DE CUENTAS BASE ─────────────────────────────────────
 const PLAN_BASE = [
