@@ -106,6 +106,14 @@
       </div>
     </div>
 
+    <div class="tabs-bar">
+      <button class="tab-btn active" data-tab="socios" onclick="cambiarTab('socios')">Socios y movimientos</button>
+      <button class="tab-btn" data-tab="utilidad" onclick="cambiarTab('utilidad')">Utilidad ganada</button>
+      <button class="tab-btn" data-tab="pago" onclick="cambiarTab('pago')">Pago de utilidades</button>
+      <button class="tab-btn" data-tab="nuevo" onclick="cambiarTab('nuevo')">Monto para socio nuevo</button>
+    </div>
+
+    <div class="tab-content active" id="tab-socios">
     <div class="g2">
       <!-- LISTA DE SOCIOS -->
       <div>
@@ -127,6 +135,94 @@
           <div class="card-body" id="lista-movimientos"><div style="text-align:center;padding:30px;color:var(--text3)">Cargando...</div></div>
         </div>
       </div>
+    </div>
+    </div>
+
+    <!-- ═════════ TAB UTILIDAD GANADA ═════════ -->
+    <div class="tab-content" id="tab-utilidad">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Utilidad ganada por mes</div>
+          <button class="btn btn-green btn-sm solo-admin" onclick="abrirModalUtilidad()">Registrar utilidad de un mes</button>
+        </div>
+        <div class="card-body">
+          <div class="form-grid" style="margin-bottom:14px">
+            <div class="field"><label>Desde (mes)</label><input type="month" id="u-desde" onchange="renderUtilidades()"></div>
+            <div class="field"><label>Hasta (mes)</label><input type="month" id="u-hasta" onchange="renderUtilidades()"></div>
+          </div>
+          <div class="tbl-wrap"><table>
+            <thead><tr><th>Mes</th><th style="text-align:right">Utilidad generada</th><th class="solo-admin"></th></tr></thead>
+            <tbody id="tbody-utilidades"></tbody>
+            <tfoot><tr><th>Total del período</th><th style="text-align:right" id="u-total">$0.00</th><th class="solo-admin"></th></tr></tfoot>
+          </table></div>
+          <div style="font-size:11px;color:var(--text3);margin-top:10px">Solo el administrador puede registrar o modificar la utilidad de cada mes.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═════════ TAB PAGO DE UTILIDADES ═════════ -->
+    <div class="tab-content" id="tab-pago">
+      <div class="card">
+        <div class="card-header"><div class="card-title">Pago de utilidades a socios</div></div>
+        <div class="card-body">
+          <div class="form-grid" style="margin-bottom:14px">
+            <div class="field"><label>Desde (mes)</label><input type="month" id="p-desde" onchange="renderPagoUtilidades()"></div>
+            <div class="field"><label>Hasta (mes)</label><input type="month" id="p-hasta" onchange="renderPagoUtilidades()"></div>
+          </div>
+          <div class="stats-row" style="grid-template-columns:repeat(3,1fr)">
+            <div class="stat-box"><div><div class="stat-val" id="p-total-util">$0.00</div><div class="stat-label">Utilidad del período</div></div></div>
+            <div class="stat-box"><div><div class="stat-val" id="p-meses">0</div><div class="stat-label">Meses con utilidad</div></div></div>
+            <div class="stat-box"><div><div class="stat-val" id="p-total-pagar">$0.00</div><div class="stat-label">Total a repartir</div></div></div>
+          </div>
+          <div class="tbl-wrap"><table>
+            <thead><tr><th>Socio</th><th style="text-align:right">Capital actual</th><th style="text-align:right">Participación</th><th style="text-align:right">Utilidad a pagar</th></tr></thead>
+            <tbody id="tbody-pago"></tbody>
+          </table></div>
+          <div style="font-size:11px;color:var(--text3);margin-top:10px">La utilidad de cada mes (tabla «Utilidad ganada») se reparte según el capital que tenía cada socio al cierre de ese mes; así quien aporta más, o aportes adicionales, gana proporcionalmente más desde la fecha de su aporte.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═════════ TAB MONTO PARA SOCIO NUEVO ═════════ -->
+    <div class="tab-content" id="tab-nuevo">
+      <div class="card">
+        <div class="card-header"><div class="card-title">Monto para ingresar como socio nuevo</div></div>
+        <div class="card-body">
+          <div class="form-grid" style="margin-bottom:14px">
+            <div class="field"><label>Interés mensual a cobrar (%)</label><input type="number" id="n-interes" value="2" step="0.01" min="0" oninput="renderSocioNuevo()"></div>
+            <div class="field"><label>Fecha de ingreso</label><input type="date" id="n-fecha" oninput="renderSocioNuevo()"></div>
+          </div>
+          <div class="stats-row" style="grid-template-columns:repeat(3,1fr)">
+            <div class="stat-box"><div><div class="stat-val" id="n-aportes">$0.00</div><div class="stat-label">Aportes acumulados por socio</div></div></div>
+            <div class="stat-box"><div><div class="stat-val" id="n-intereses" style="color:var(--amber)">$0.00</div><div class="stat-label">Interés acumulado</div></div></div>
+            <div class="stat-box"><div><div class="stat-val" id="n-total" style="color:var(--green)">$0.00</div><div class="stat-label">Total a ingresar</div></div></div>
+          </div>
+          <div class="tbl-wrap"><table>
+            <thead><tr><th>Mes</th><th style="text-align:right">Aporte</th><th style="text-align:right">Meses trabajados</th><th style="text-align:right">Interés</th></tr></thead>
+            <tbody id="tbody-nuevo"></tbody>
+          </table></div>
+          <div style="font-size:11px;color:var(--text3);margin:10px 0">El aporte de cada mes se toma de lo que realmente han aportado los socios fundadores (mayo 2025) en la base de datos. Interés = aporte × % mensual × meses transcurridos desde ese mes hasta la fecha de ingreso.</div>
+          <button class="btn btn-green btn-sm solo-admin" onclick="registrarSocioNuevoDesdeCalculo()">Registrar socio nuevo con estos aportes</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL UTILIDAD DEL MES -->
+<div class="modal-overlay" id="modal-utilidad">
+  <div class="modal" style="max-width:420px">
+    <div class="modal-header"><div class="modal-title">Utilidad del mes</div><button class="modal-close" onclick="cerrarModalUtilidad()">×</button></div>
+    <div class="modal-body">
+      <input type="hidden" id="ut-id">
+      <div class="form-grid">
+        <div class="field"><label>Mes *</label><input type="month" id="ut-mes"></div>
+        <div class="field"><label>Utilidad generada ($) *</label><input type="number" id="ut-monto" step="0.01" placeholder="0.00"></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="cerrarModalUtilidad()">Cancelar</button>
+      <button class="btn btn-green" onclick="guardarUtilidad()">Guardar</button>
     </div>
   </div>
 </div>
@@ -172,6 +268,7 @@
           <label>Tipo de movimiento</label>
           <select id="m-tipo">
             <option value="aporte">Aporte de capital</option>
+            <option value="aporte_adicional">Aporte adicional (voluntario)</option>
             <option value="retiro">Retiro de capital</option>
             <option value="dividendo">Pago de utilidades (suma al capital del socio)</option>
           </select>
@@ -266,6 +363,8 @@ async function cargarTodo(){
     calcularStats();
     renderSocios(todosSocios);
     renderMovimientos();
+    const act=document.querySelector('.tab-content.active');
+    if(act&&act.id!=='tab-socios') cambiarTab(act.id.slice(4));
   }catch(e){ EC.toast('Error cargando datos: '+e.message,'error'); }
 }
 
@@ -331,6 +430,7 @@ function renderSocios(lista){
         <button class="btn btn-green btn-xs" onclick="abrirMovimiento('${s.ID}')">
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Añadir aporte
         </button>
+        <button class="btn btn-outline btn-xs" onclick="abrirMovimiento('${s.ID}','aporte_adicional')">Aporte adicional</button>
         <button class="btn btn-outline btn-xs solo-admin" onclick="abrirEditarSocio('${s.ID}')">
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>Editar
         </button>
@@ -345,14 +445,14 @@ function renderSocios(lista){
 
 // ── RENDER MOVIMIENTOS ────────────────────────────────────────
 function renderMovimientos(){
-  const ultimos=[...todosMovimientos].sort((a,b)=>(b.Fecha||'').localeCompare(a.Fecha||'')).slice(0,10);
+  const ultimos=todosMovimientos.filter(m=>['aporte','retiro','dividendo'].includes(m.Tipo)).sort((a,b)=>(b.Fecha||'').localeCompare(a.Fecha||'')).slice(0,10);
   if(!ultimos.length){ document.getElementById('lista-movimientos').innerHTML='<div style="text-align:center;padding:30px;color:var(--text3)">Sin movimientos</div>'; return; }
   document.getElementById('lista-movimientos').innerHTML=ultimos.map(m=>{
     const esAporte=m.Tipo==='aporte';
     const esRetiro=m.Tipo==='retiro';
     const color=esAporte?'var(--green)':esRetiro?'var(--red)':'var(--orange)';
     const bg=esAporte?'rgba(46,204,113,.12)':esRetiro?'rgba(231,76,60,.12)':'rgba(243,156,18,.12)';
-    const label={aporte:'Aporte',retiro:'Retiro',dividendo:'Pago de utilidades'}[m.Tipo]||m.Tipo;
+    const label=(m.Tipo==='aporte'&&String(m.Descripcion||'').startsWith('[Adicional]'))?'Aporte adicional':({aporte:'Aporte',retiro:'Retiro',dividendo:'Pago de utilidades'}[m.Tipo]||m.Tipo);
     return `<div class="mov-item">
       <div class="mov-icon" style="background:${bg}">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="2">
@@ -433,13 +533,13 @@ async function guardarSocio(){
 }
 
 // ── MODAL MOVIMIENTO ──────────────────────────────────────────
-function abrirMovimiento(sid){
+function abrirMovimiento(sid,tipoInicial){
   const s=todosSocios.find(x=>x.ID===sid)||{};
   document.getElementById('m-socio-id').value    = sid;
   document.getElementById('m-socio-nombre').value= (s.Nombres||'')+' '+(s.Apellidos||'');
   document.getElementById('m-monto').value='';
   document.getElementById('m-desc').value='';
-  document.getElementById('m-tipo').value='aporte';
+  document.getElementById('m-tipo').value=tipoInicial||'aporte';
   document.getElementById('m-fecha').value=EC.hoy();
   document.getElementById('modal-movimiento').classList.add('open');
 }
@@ -453,10 +553,13 @@ function abrirMovDesdeDetalle(){
 
 async function guardarMovimiento(){
   const sid  = document.getElementById('m-socio-id').value;
-  const tipo = document.getElementById('m-tipo').value;
+  let tipo = document.getElementById('m-tipo').value;
+  const esAdicional = tipo==='aporte_adicional';
+  if(esAdicional) tipo='aporte';
   const monto= parseFloat(document.getElementById('m-monto').value)||0;
   const fecha= document.getElementById('m-fecha').value||EC.hoy();
-  const desc = document.getElementById('m-desc').value.trim();
+  let desc = document.getElementById('m-desc').value.trim();
+  if(esAdicional) desc='[Adicional] '+(desc||'Aporte adicional');
   if(!monto){ EC.toast('Ingresa el monto','error'); return; }
   const s=todosSocios.find(x=>x.ID===sid)||{};
   const nombreSocio = ((s.Nombres||'')+' '+(s.Apellidos||'')).trim();
@@ -533,7 +636,7 @@ function verDetalle(sid){
   document.getElementById('tbody-detalle-movs').innerHTML=sorted.length
     ?sorted.map(m=>{
       const badge=m.Tipo==='aporte'?'b-green':m.Tipo==='retiro'?'b-red':'b-orange';
-      const label={aporte:'Aporte',retiro:'Retiro',dividendo:'Pago de utilidades'}[m.Tipo]||m.Tipo;
+      const label=(m.Tipo==='aporte'&&String(m.Descripcion||'').startsWith('[Adicional]'))?'Aporte adicional':({aporte:'Aporte',retiro:'Retiro',dividendo:'Pago de utilidades'}[m.Tipo]||m.Tipo);
       const color=m.Tipo==='aporte'?'var(--green)':m.Tipo==='retiro'?'var(--red)':'var(--orange)';
       return `<tr><td class="mono">${m.Fecha||'—'}</td><td><span class="badge ${badge}">${label}</span></td><td class="mono" style="color:${color};font-weight:600">${m.Tipo==='retiro'?'-':'+'} ${EC.fmt(m.Monto||0)}</td><td>${m.Descripcion||'—'}</td></tr>`;
     }).join('')
@@ -564,8 +667,160 @@ async function ejecutarEliminar(){
   EC.hideLoading();
 }
 
+
+// ═══ PESTAÑAS ═════════════════════════════════════════════════
+function cambiarTab(t){
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.toggle('active',b.dataset.tab===t));
+  document.querySelectorAll('.tab-content').forEach(c=>c.classList.toggle('active',c.id==='tab-'+t));
+  if(t==='utilidad') renderUtilidades();
+  if(t==='pago') renderPagoUtilidades();
+  if(t==='nuevo') renderSocioNuevo();
+}
+const mesActual=()=>EC.hoy().slice(0,7);
+const MESES=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+const nombreMes=ym=>MESES[parseInt(ym.slice(5,7),10)-1]+' '+ym.slice(0,4);
+const mesesEntre=(a,b)=>(parseInt(b.slice(0,4))-parseInt(a.slice(0,4)))*12+parseInt(b.slice(5,7))-parseInt(a.slice(5,7));
+function listaMeses(d,h){const r=[];let y=parseInt(d.slice(0,4)),m=parseInt(d.slice(5,7));const fin=h.slice(0,7);while(true){const ym=y+'-'+String(m).padStart(2,'0');if(ym>fin)break;r.push(ym);if(++m>12){m=1;y++;}if(r.length>600)break;}return r;}
+const fechaMov=m=>String(m.Fecha||'').slice(0,10);
+const esMovCapital=m=>['aporte','retiro','dividendo'].includes(m.Tipo);
+
+// ═══ UTILIDAD GANADA (se guarda en la pestaña "capital" con Tipo 'utilidad_mes') ══
+function utilidadesRegistradas(){
+  const por={};
+  todosMovimientos.filter(m=>m.Tipo==='utilidad_mes').forEach(m=>{
+    const ym=fechaMov(m).slice(0,7); if(!ym) return;
+    por[ym]={id:m.ID,ym,monto:parseFloat(m.Monto||0)}; // si hubiera repetidos, queda el último
+  });
+  return por;
+}
+function renderUtilidades(){
+  const d=document.getElementById('u-desde'), h=document.getElementById('u-hasta');
+  if(!d.value) d.value='2025-05';
+  if(!h.value) h.value=mesActual();
+  const reg=utilidadesRegistradas();
+  const filas=Object.values(reg).filter(u=>u.ym>=d.value&&u.ym<=h.value).sort((a,b)=>a.ym.localeCompare(b.ym));
+  let total=0;
+  document.getElementById('tbody-utilidades').innerHTML=filas.length?filas.map(u=>{
+    total+=u.monto;
+    return `<tr><td>${nombreMes(u.ym)}</td><td class="mono" style="text-align:right;color:var(--green);font-weight:600">${EC.fmt(u.monto)}</td><td class="solo-admin" style="text-align:right"><button class="btn btn-outline btn-xs" onclick="abrirModalUtilidad('${u.ym}')">Editar</button></td></tr>`;
+  }).join(''):'<tr><td colspan="3" class="empty-cell">Sin utilidades registradas en este período</td></tr>';
+  document.getElementById('u-total').textContent=EC.fmt(total);
+  EC.aplicarPermisos();
+}
+function abrirModalUtilidad(ym){
+  if(!EC.esAdmin){EC.toast('Solo el administrador puede modificar las utilidades','error');return;}
+  const u=ym?utilidadesRegistradas()[ym]:null;
+  document.getElementById('ut-id').value=u?u.id:'';
+  document.getElementById('ut-mes').value=ym||mesActual();
+  document.getElementById('ut-mes').disabled=!!u;
+  document.getElementById('ut-monto').value=u?u.monto:'';
+  document.getElementById('modal-utilidad').classList.add('open');
+}
+function cerrarModalUtilidad(){document.getElementById('modal-utilidad').classList.remove('open');}
+async function guardarUtilidad(){
+  if(!EC.esAdmin){EC.toast('Solo el administrador puede modificar las utilidades','error');return;}
+  const ym=document.getElementById('ut-mes').value;
+  const monto=parseFloat(document.getElementById('ut-monto').value);
+  if(!ym||isNaN(monto)){EC.toast('Indica el mes y el monto','error');return;}
+  const existente=utilidadesRegistradas()[ym];
+  EC.showLoading('Guardando utilidad...');
+  try{
+    const datos={SocioID:'',SocioNombre:'Utilidad del mes',Tipo:'utilidad_mes',Monto:monto,Fecha:ym+'-01',Descripcion:'Utilidad '+nombreMes(ym)};
+    const body=existente?{accion:'actualizar',tab:'capital',id:existente.id,datos}:{accion:'agregar',tab:'capital',datos};
+    const r=await fetch(EC.api,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify(body)});
+    const j=await r.json();
+    if(!j.ok) throw new Error(j.error||'No se pudo guardar');
+    cerrarModalUtilidad();
+    await cargarTodo(); renderUtilidades(); renderPagoUtilidades();
+    EC.toast('Utilidad guardada');
+  }catch(e){EC.toast('Error: '+e.message,'error');}
+  EC.hideLoading();
+}
+
+// ═══ PAGO DE UTILIDADES ═══════════════════════════════════════
+function capitalSocioAl(sid,fechaCorte){
+  return todosMovimientos.reduce((a,m)=>{
+    if(m.SocioID!==sid||fechaMov(m)>fechaCorte) return a;
+    const v=parseFloat(m.Monto||0);
+    return m.Tipo==='aporte'||m.Tipo==='dividendo'?a+v:m.Tipo==='retiro'?a-v:a;
+  },0);
+}
+function renderPagoUtilidades(){
+  const d=document.getElementById('p-desde'), h=document.getElementById('p-hasta');
+  if(!d.value) d.value='2025-05';
+  if(!h.value) h.value=mesActual();
+  const reg=utilidadesRegistradas();
+  const meses=listaMeses(d.value,h.value).filter(ym=>reg[ym]);
+  const pagar={}; todosSocios.forEach(s=>pagar[s.ID]=0);
+  let totalUtil=0;
+  meses.forEach(ym=>{
+    const U=reg[ym].monto, corte=ym+'-31';
+    const caps={}; let tot=0;
+    todosSocios.forEach(s=>{const c=Math.max(0,capitalSocioAl(s.ID,corte));caps[s.ID]=c;tot+=c;});
+    totalUtil+=U;
+    if(tot>0) todosSocios.forEach(s=>pagar[s.ID]+=U*caps[s.ID]/tot);
+  });
+  const totalPagar=Object.values(pagar).reduce((a,b)=>a+b,0);
+  const hoy=EC.hoy();
+  const capTot=todosSocios.reduce((a,s)=>a+Math.max(0,capitalSocioAl(s.ID,hoy)),0);
+  document.getElementById('p-total-util').textContent=EC.fmt(totalUtil);
+  document.getElementById('p-meses').textContent=meses.length;
+  document.getElementById('p-total-pagar').textContent=EC.fmt(totalPagar);
+  const filas=[...todosSocios].sort((a,b)=>(a.Apellidos||'').localeCompare(b.Apellidos||''));
+  document.getElementById('tbody-pago').innerHTML=filas.length?filas.map(s=>{
+    const cap=capitalSocioAl(s.ID,hoy);
+    const part=totalUtil>0?pagar[s.ID]/totalUtil*100:(capTot>0?cap/capTot*100:0);
+    return `<tr><td>${s.Nombres} ${s.Apellidos}</td><td class="mono" style="text-align:right">${EC.fmt(cap)}</td><td class="mono" style="text-align:right">${part.toFixed(2)}%</td><td class="mono" style="text-align:right;font-weight:700;color:var(--green)">${EC.fmt(pagar[s.ID])}</td></tr>`;
+  }).join(''):'<tr><td colspan="4" class="empty-cell">Sin socios</td></tr>';
+}
+
+// ═══ MONTO PARA SOCIO NUEVO ═══════════════════════════════════
+// Aporte mensual de referencia = el más frecuente entre los socios fundadores (según sus aportes reales)
+function aportesReferencia(){
+  const aportes=todosMovimientos.filter(m=>m.Tipo==='aporte'&&!String(m.Descripcion||'').startsWith('[Adicional]')&&todosSocios.some(s=>s.ID===m.SocioID));
+  if(!aportes.length) return {};
+  const primerMes=aportes.map(m=>fechaMov(m).slice(0,7)).sort()[0];
+  const fundadores=[...new Set(aportes.filter(m=>fechaMov(m).slice(0,7)===primerMes).map(m=>m.SocioID))];
+  const porMes={};
+  aportes.filter(m=>fundadores.includes(m.SocioID)).forEach(m=>{
+    const ym=fechaMov(m).slice(0,7);
+    (porMes[ym]=porMes[ym]||{});
+    porMes[ym][m.SocioID]=(porMes[ym][m.SocioID]||0)+parseFloat(m.Monto||0);
+  });
+  const res={};
+  Object.keys(porMes).forEach(ym=>{
+    const cuenta={};
+    Object.values(porMes[ym]).forEach(v=>{const k=v.toFixed(2);cuenta[k]=(cuenta[k]||0)+1;});
+    res[ym]=parseFloat(Object.entries(cuenta).sort((a,b)=>b[1]-a[1]||parseFloat(b[0])-parseFloat(a[0]))[0][0]);
+  });
+  return res;
+}
+let _nuevoAportesTotal=0;
+function renderSocioNuevo(){
+  const f=document.getElementById('n-fecha'); if(!f.value) f.value=EC.hoy();
+  const tasa=(parseFloat(document.getElementById('n-interes').value)||0)/100;
+  const ref=aportesReferencia();
+  const meses=Object.keys(ref).sort(), corte=f.value.slice(0,7);
+  let sumA=0,sumI=0;
+  const filas=meses.filter(ym=>ym<=corte).map(ym=>{
+    const n=mesesEntre(ym,corte), a=ref[ym], i=a*tasa*n;
+    sumA+=a;sumI+=i;
+    return `<tr><td>${nombreMes(ym)}</td><td class="mono" style="text-align:right">${EC.fmt(a)}</td><td class="mono" style="text-align:right">${n}</td><td class="mono" style="text-align:right">${EC.fmt(i)}</td></tr>`;
+  });
+  _nuevoAportesTotal=sumA;
+  document.getElementById('tbody-nuevo').innerHTML=filas.length?filas.join(''):'<tr><td colspan="4" class="empty-cell">No hay aportes de socios fundadores para calcular</td></tr>';
+  document.getElementById('n-aportes').textContent=EC.fmt(sumA);
+  document.getElementById('n-intereses').textContent=EC.fmt(sumI);
+  document.getElementById('n-total').textContent=EC.fmt(sumA+sumI);
+}
+function registrarSocioNuevoDesdeCalculo(){
+  abrirModalSocio();
+  document.getElementById('s-fecha').value=document.getElementById('n-fecha').value||EC.hoy();
+  document.getElementById('s-aporte-inicial').value=_nuevoAportesTotal.toFixed(2);
+}
+
 document.addEventListener('keydown',e=>{
-  if(e.key==='Escape'){ cerrarModalSocio(); cerrarModalMov(); cerrarDetalle(); cerrarConfirm(); EC.closeSidebar(); }
+  if(e.key==='Escape'){ cerrarModalSocio(); cerrarModalMov(); cerrarDetalle(); cerrarConfirm(); cerrarModalUtilidad(); EC.closeSidebar(); }
 });
 document.querySelectorAll('.modal-overlay').forEach(m=>{
   m.addEventListener('click',e=>{ if(e.target===m){ cerrarModalSocio(); cerrarModalMov(); cerrarDetalle(); cerrarConfirm(); } });
