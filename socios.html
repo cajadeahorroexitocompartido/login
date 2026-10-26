@@ -143,7 +143,6 @@
       <div class="card">
         <div class="card-header">
           <div class="card-title">Utilidad ganada por mes</div>
-          <button class="btn btn-green btn-sm solo-admin" onclick="abrirModalUtilidad()">Registrar utilidad de un mes</button>
         </div>
         <div class="card-body">
           <div class="form-grid" style="margin-bottom:14px">
@@ -151,11 +150,11 @@
             <div class="field"><label>Hasta (mes)</label><input type="month" id="u-hasta" onchange="renderUtilidades()"></div>
           </div>
           <div class="tbl-wrap"><table>
-            <thead><tr><th>Mes</th><th style="text-align:right">Utilidad generada</th><th class="solo-admin"></th></tr></thead>
+            <thead><tr><th>Mes</th><th style="text-align:right">Utilidad generada</th><th>Origen</th><th class="solo-admin"></th></tr></thead>
             <tbody id="tbody-utilidades"></tbody>
-            <tfoot><tr><th>Total del período</th><th style="text-align:right" id="u-total">$0.00</th><th class="solo-admin"></th></tr></tfoot>
+            <tfoot><tr><th>Total del período</th><th style="text-align:right" id="u-total">$0.00</th><th></th><th class="solo-admin"></th></tr></tfoot>
           </table></div>
-          <div style="font-size:11px;color:var(--text3);margin-top:10px">Solo el administrador puede registrar o modificar la utilidad de cada mes.</div>
+          <div style="font-size:11px;color:var(--text3);margin-top:10px">La utilidad de cada mes se calcula sola con los datos del sistema: intereses y mora cobrados (Pagos) menos los gastos registrados en Contabilidad. Solo el administrador puede editar el valor de un mes; el contador solo lo ve.</div>
         </div>
       </div>
     </div>
@@ -178,7 +177,7 @@
             <thead><tr><th>Socio</th><th style="text-align:right">Capital actual</th><th style="text-align:right">Participación</th><th style="text-align:right">Utilidad a pagar</th></tr></thead>
             <tbody id="tbody-pago"></tbody>
           </table></div>
-          <div style="font-size:11px;color:var(--text3);margin-top:10px">La utilidad de cada mes (tabla «Utilidad ganada») se reparte según el capital que tenía cada socio al cierre de ese mes; así quien aporta más, o aportes adicionales, gana proporcionalmente más desde la fecha de su aporte.</div>
+          <div style="font-size:11px;color:var(--text3);margin-top:10px">La utilidad de cada mes (tabla «Utilidad ganada», que sale automáticamente del sistema) se reparte según el capital que tenía cada socio al cierre de ese mes; así quien aporta más, o aportes adicionales, gana proporcionalmente más desde la fecha de su aporte.</div>
         </div>
       </div>
     </div>
@@ -216,12 +215,14 @@
     <div class="modal-body">
       <input type="hidden" id="ut-id">
       <div class="form-grid">
-        <div class="field"><label>Mes *</label><input type="month" id="ut-mes"></div>
-        <div class="field"><label>Utilidad generada ($) *</label><input type="number" id="ut-monto" step="0.01" placeholder="0.00"></div>
+        <div class="field"><label>Mes</label><input type="month" id="ut-mes" disabled></div>
+        <div class="field"><label>Calculado por el sistema ($)</label><input type="text" id="ut-auto" readonly></div>
+        <div class="field col-span-2"><label>Utilidad del mes ($) *</label><input type="number" id="ut-monto" step="0.01" placeholder="0.00"></div>
       </div>
     </div>
     <div class="modal-footer">
       <button class="btn btn-outline" onclick="cerrarModalUtilidad()">Cancelar</button>
+      <button class="btn btn-outline" id="ut-restaurar" onclick="restaurarUtilidad()">Volver al valor automático</button>
       <button class="btn btn-green" onclick="guardarUtilidad()">Guardar</button>
     </div>
   </div>
@@ -336,6 +337,8 @@ EC.alActualizar(()=>cargarTodo());
 
 let todosSocios = [];
 let todosMovimientos = [];
+let datosPagos = [];
+let datosAsientos = [];
 let socioSeleccionado = null;
 let socioAEliminar = null;
 
@@ -351,12 +354,18 @@ let socioAEliminar = null;
 // ── CARGAR TODO Y RENDERIZAR UNA SOLA VEZ AL FINAL ────────────
 async function cargarTodo(){
   try{
-    const [rS, rM] = await Promise.all([
+    const [rS, rM, rP, rA] = await Promise.all([
       fetch(`${EC.api}?accion=leer&tab=socios`),
       fetch(`${EC.api}?accion=leer&tab=capital`),
+      fetch(`${EC.api}?accion=leer&tab=pagos`),
+      fetch(`${EC.api}?accion=leer&tab=asientos`),
     ]);
     const jS = await rS.json();
     const jM = await rM.json();
+    const jP = await rP.json();
+    const jA = await rA.json();
+    if(jP.ok) datosPagos = jP.data||[];
+    if(jA.ok) datosAsientos = jA.data||[];
     if(jS.ok) todosSocios     = (jS.data||[]).filter(s=>s.Activo==='true'||s.Activo===true);
     if(jM.ok) todosMovimientos = jM.data||[];
     // Renderizar solo después de tener AMBOS conjuntos de datos completos
@@ -684,36 +693,66 @@ function listaMeses(d,h){const r=[];let y=parseInt(d.slice(0,4)),m=parseInt(d.sl
 const fechaMov=m=>String(m.Fecha||'').slice(0,10);
 const esMovCapital=m=>['aporte','retiro','dividendo'].includes(m.Tipo);
 
-// ═══ UTILIDAD GANADA (se guarda en la pestaña "capital" con Tipo 'utilidad_mes') ══
-function utilidadesRegistradas(){
+// ═══ UTILIDAD GANADA ════════════════════════════════════════
+// Valor automático = intereses + mora cobrados (Pagos) + ingresos manuales (grupo 4) − gastos (grupo 5, Contabilidad).
+// El administrador puede sobrescribir un mes: se guarda en 'capital' con Tipo 'utilidad_mes'.
+function utilidadAutomatica(){
   const por={};
-  todosMovimientos.filter(m=>m.Tipo==='utilidad_mes').forEach(m=>{
-    const ym=fechaMov(m).slice(0,7); if(!ym) return;
-    por[ym]={id:m.ID,ym,monto:parseFloat(m.Monto||0)}; // si hubiera repetidos, queda el último
+  const mes=f=>String(f||'').slice(0,7);
+  const suma=(ym,v)=>{ if(ym&&/^\d{4}-\d{2}$/.test(ym)) por[ym]=(por[ym]||0)+v; };
+  datosPagos.forEach(p=>{
+    if(String(p.Estado||'activo').toLowerCase().trim()==='eliminado') return;
+    suma(mes(p.Fecha),(+p.Interes||0)+(+p.Mora||0));
+  });
+  datosAsientos.forEach(a=>{
+    let partidas=[]; try{partidas=JSON.parse(a.Partidas||'[]');}catch(e){}
+    partidas.forEach(pt=>{
+      const cod=String(pt.cuenta||'').split(' ')[0];
+      if(cod.startsWith('4')) suma(mes(a.Fecha),(+pt.haber||0)-(+pt.debe||0));
+      else if(cod.startsWith('5')) suma(mes(a.Fecha),-((+pt.debe||0)-(+pt.haber||0)));
+    });
   });
   return por;
+}
+function utilidadMensual(){
+  const auto=utilidadAutomatica();
+  const manual={};
+  todosMovimientos.filter(m=>m.Tipo==='utilidad_mes').forEach(m=>{
+    const ym=fechaMov(m).slice(0,7); if(ym) manual[ym]={id:m.ID,monto:parseFloat(m.Monto||0)};
+  });
+  const claves=[...Object.keys(auto),...Object.keys(manual)].sort();
+  const res={};
+  if(!claves.length) return res;
+  listaMeses(claves[0],mesActual()).forEach(ym=>{
+    const au=Math.round((auto[ym]||0)*100)/100, mn=manual[ym];
+    res[ym]={ym,auto:au,editado:!!mn,id:mn?mn.id:null,valor:mn?mn.monto:au};
+  });
+  return res;
 }
 function renderUtilidades(){
   const d=document.getElementById('u-desde'), h=document.getElementById('u-hasta');
   if(!d.value) d.value='2025-05';
   if(!h.value) h.value=mesActual();
-  const reg=utilidadesRegistradas();
-  const filas=Object.values(reg).filter(u=>u.ym>=d.value&&u.ym<=h.value).sort((a,b)=>a.ym.localeCompare(b.ym));
+  const filas=Object.values(utilidadMensual()).filter(u=>u.ym>=d.value&&u.ym<=h.value).sort((a,b)=>a.ym.localeCompare(b.ym));
   let total=0;
   document.getElementById('tbody-utilidades').innerHTML=filas.length?filas.map(u=>{
-    total+=u.monto;
-    return `<tr><td>${nombreMes(u.ym)}</td><td class="mono" style="text-align:right;color:var(--green);font-weight:600">${EC.fmt(u.monto)}</td><td class="solo-admin" style="text-align:right"><button class="btn btn-outline btn-xs" onclick="abrirModalUtilidad('${u.ym}')">Editar</button></td></tr>`;
-  }).join(''):'<tr><td colspan="3" class="empty-cell">Sin utilidades registradas en este período</td></tr>';
+    total+=u.valor;
+    const col=u.valor<0?'var(--red)':'var(--green)';
+    const origen=u.editado?'<span class="badge b-orange">Editado</span>':'<span class="badge b-blue">Automático</span>';
+    const enCurso=u.ym===mesActual()?' <span style="font-size:11px;color:var(--text3)">(en curso)</span>':'';
+    return `<tr><td>${nombreMes(u.ym)}${enCurso}</td><td class="mono" style="text-align:right;color:${col};font-weight:600">${EC.fmt(u.valor)}</td><td>${origen}</td><td class="solo-admin" style="text-align:right"><button class="btn btn-outline btn-xs" onclick="abrirModalUtilidad('${u.ym}')">Editar</button></td></tr>`;
+  }).join(''):'<tr><td colspan="4" class="empty-cell">Sin utilidades en este período</td></tr>';
   document.getElementById('u-total').textContent=EC.fmt(total);
   EC.aplicarPermisos();
 }
 function abrirModalUtilidad(ym){
   if(!EC.esAdmin){EC.toast('Solo el administrador puede modificar las utilidades','error');return;}
-  const u=ym?utilidadesRegistradas()[ym]:null;
-  document.getElementById('ut-id').value=u?u.id:'';
-  document.getElementById('ut-mes').value=ym||mesActual();
-  document.getElementById('ut-mes').disabled=!!u;
-  document.getElementById('ut-monto').value=u?u.monto:'';
+  const u=utilidadMensual()[ym]; if(!u) return;
+  document.getElementById('ut-id').value=u.id||'';
+  document.getElementById('ut-mes').value=ym;
+  document.getElementById('ut-auto').value=EC.fmt(u.auto);
+  document.getElementById('ut-monto').value=u.valor;
+  document.getElementById('ut-restaurar').style.display=u.editado?'':'none';
   document.getElementById('modal-utilidad').classList.add('open');
 }
 function cerrarModalUtilidad(){document.getElementById('modal-utilidad').classList.remove('open');}
@@ -721,18 +760,32 @@ async function guardarUtilidad(){
   if(!EC.esAdmin){EC.toast('Solo el administrador puede modificar las utilidades','error');return;}
   const ym=document.getElementById('ut-mes').value;
   const monto=parseFloat(document.getElementById('ut-monto').value);
-  if(!ym||isNaN(monto)){EC.toast('Indica el mes y el monto','error');return;}
-  const existente=utilidadesRegistradas()[ym];
+  if(!ym||isNaN(monto)){EC.toast('Indica el monto','error');return;}
+  const id=document.getElementById('ut-id').value;
   EC.showLoading('Guardando utilidad...');
   try{
-    const datos={SocioID:'',SocioNombre:'Utilidad del mes',Tipo:'utilidad_mes',Monto:monto,Fecha:ym+'-01',Descripcion:'Utilidad '+nombreMes(ym)};
-    const body=existente?{accion:'actualizar',tab:'capital',id:existente.id,datos}:{accion:'agregar',tab:'capital',datos};
+    const datos={SocioID:'',SocioNombre:'Utilidad del mes',Tipo:'utilidad_mes',Monto:monto,Fecha:ym+'-01',Descripcion:'Utilidad editada '+nombreMes(ym)};
+    const body=id?{accion:'actualizar',tab:'capital',id,datos}:{accion:'agregar',tab:'capital',datos};
     const r=await fetch(EC.api,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify(body)});
     const j=await r.json();
     if(!j.ok) throw new Error(j.error||'No se pudo guardar');
     cerrarModalUtilidad();
-    await cargarTodo(); renderUtilidades(); renderPagoUtilidades();
-    EC.toast('Utilidad guardada');
+    await cargarTodo();
+    EC.toast('Utilidad actualizada');
+  }catch(e){EC.toast('Error: '+e.message,'error');}
+  EC.hideLoading();
+}
+async function restaurarUtilidad(){
+  if(!EC.esAdmin) return;
+  const id=document.getElementById('ut-id').value; if(!id) return;
+  EC.showLoading('Restaurando valor automático...');
+  try{
+    const r=await fetch(EC.api,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({accion:'eliminar',tab:'capital',id})});
+    const j=await r.json();
+    if(!j.ok) throw new Error(j.error||'No se pudo restaurar');
+    cerrarModalUtilidad();
+    await cargarTodo();
+    EC.toast('Se usa de nuevo el valor automático');
   }catch(e){EC.toast('Error: '+e.message,'error');}
   EC.hideLoading();
 }
@@ -749,12 +802,12 @@ function renderPagoUtilidades(){
   const d=document.getElementById('p-desde'), h=document.getElementById('p-hasta');
   if(!d.value) d.value='2025-05';
   if(!h.value) h.value=mesActual();
-  const reg=utilidadesRegistradas();
+  const reg=utilidadMensual();
   const meses=listaMeses(d.value,h.value).filter(ym=>reg[ym]);
   const pagar={}; todosSocios.forEach(s=>pagar[s.ID]=0);
   let totalUtil=0;
   meses.forEach(ym=>{
-    const U=reg[ym].monto, corte=ym+'-31';
+    const U=reg[ym].valor, corte=ym+'-31';
     const caps={}; let tot=0;
     todosSocios.forEach(s=>{const c=Math.max(0,capitalSocioAl(s.ID,corte));caps[s.ID]=c;tot+=c;});
     totalUtil+=U;
